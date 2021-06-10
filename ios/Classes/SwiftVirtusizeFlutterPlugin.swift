@@ -3,7 +3,7 @@ import UIKit
 
 public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
   public static func register(with registrar: FlutterPluginRegistrar) {
-    let channel = FlutterMethodChannel(name: "virtusize_flutter_plugin", binaryMessenger: registrar.messenger())
+    let channel = FlutterMethodChannel(name: "com.virtusize/virtusize_flutter_plugin", binaryMessenger: registrar.messenger())
     let instance = SwiftVirtusizeFlutterPlugin()
     registrar.addMethodCallDelegate(instance, channel: channel)
   }

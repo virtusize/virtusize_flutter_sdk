@@ -1,6 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:virtusize_flutter_plugin/virtusize_flutter_plugin.dart';
+import 'package:virtusize_flutter_plugin/virtusize_plugin.dart';
 
 void main() {
   const MethodChannel channel = MethodChannel('virtusize_flutter_plugin');
@@ -18,6 +18,6 @@ void main() {
   });
 
   test('getPlatformVersion', () async {
-    expect(await VirtusizeFlutterPlugin.platformVersion, '42');
+    expect(await VirtusizePlugin.platformVersion, '42');
   });
 }

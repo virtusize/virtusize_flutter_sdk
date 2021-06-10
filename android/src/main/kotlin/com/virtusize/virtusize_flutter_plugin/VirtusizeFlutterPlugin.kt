@@ -18,7 +18,7 @@ class VirtusizeFlutterPlugin: FlutterPlugin, MethodCallHandler {
   private lateinit var channel : MethodChannel
 
   override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
-    channel = MethodChannel(flutterPluginBinding.binaryMessenger, "virtusize_flutter_plugin")
+    channel = MethodChannel(flutterPluginBinding.binaryMessenger, "com.virtusize/virtusize_flutter_plugin")
     channel.setMethodCallHandler(this)
   }
 

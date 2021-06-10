@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 
 import 'package:flutter/services.dart';
-import 'package:virtusize_flutter_plugin/virtusize_flutter_plugin.dart';
+import 'package:virtusize_flutter_plugin/virtusize_plugin.dart';
 
 void main() {
   runApp(MyApp());
@@ -27,7 +27,7 @@ class _MyAppState extends State<MyApp> {
     String platformVersion;
     // Platform messages may fail, so we use a try/catch PlatformException.
     try {
-      platformVersion = await VirtusizeFlutterPlugin.platformVersion;
+      platformVersion = await VirtusizePlugin.platformVersion;
     } on PlatformException {
       platformVersion = 'Failed to get platform version.';
     }
@@ -50,7 +50,7 @@ class _MyAppState extends State<MyApp> {
           title: const Text('Plugin example app'),
         ),
         body: Center(
-          child: Text('Running on: $_platformVersion\n'),
+          child: UiKitView(viewType: "VirtusizeWebView"),
         ),
       ),
     );
