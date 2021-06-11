@@ -2,7 +2,10 @@ group 'com.virtusize.virtusize_flutter_plugin'
 version '1.0-SNAPSHOT'
 
 buildscript {
-    ext.kotlin_version = '1.3.50'
+    ext {
+        kotlin_version = '1.5.0'
+        virtusize_integration_versioin = '2.1.4'
+    }
     repositories {
         google()
         jcenter()
@@ -18,6 +21,7 @@ rootProject.allprojects {
     repositories {
         google()
         jcenter()
+        maven { url 'https://jitpack.io' }
     }
 }
 
@@ -31,10 +35,11 @@ android {
         main.java.srcDirs += 'src/main/kotlin'
     }
     defaultConfig {
-        minSdkVersion 16
+        minSdkVersion 21
     }
 }
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "com.github.virtusize:integration_android:$virtusize_integration_versioin"
 }
