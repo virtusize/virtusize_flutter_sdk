@@ -17,7 +17,7 @@ void main() {
     channel.setMockMethodCallHandler(null);
   });
 
-  test('getPlatformVersion', () async {
-    expect(await VirtusizePlugin.platformVersion, '42');
+  test('setVirtusizeProps', () async {
+    expect(await VirtusizePlugin.setVirtusizeProps, '42');
   });
 }

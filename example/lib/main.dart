@@ -14,7 +14,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  String _platformVersion = 'Unknown';
+  String _hasSetVirtusizeProps = 'Unknown';
 
   @override
   void initState() {
@@ -24,12 +24,20 @@ class _MyAppState extends State<MyApp> {
 
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async {
-    String platformVersion;
+    String hasSetVirtusizeProps;
     // Platform messages may fail, so we use a try/catch PlatformException.
     try {
-      platformVersion = await VirtusizePlugin.platformVersion;
+      hasSetVirtusizeProps = await VirtusizePlugin.setVirtusizeProps(
+          '15cc36e1d7dad62b8e11722ce1a245cb6c5e6692',
+          '123',
+          Env.staging,
+          Language.en,
+          true,
+          [Language.en, Language.jp],
+          [InfoCategory.generalFit, InfoCategory.brandSizing]
+      );
     } on PlatformException {
-      platformVersion = 'Failed to get platform version.';
+      hasSetVirtusizeProps = 'failed to set Virtusize props';
     }
 
     // If the widget was removed from the tree while the asynchronous platform
@@ -38,7 +46,7 @@ class _MyAppState extends State<MyApp> {
     if (!mounted) return;
 
     setState(() {
-      _platformVersion = platformVersion;
+      _hasSetVirtusizeProps = hasSetVirtusizeProps;
     });
   }
 
@@ -50,7 +58,7 @@ class _MyAppState extends State<MyApp> {
           title: const Text('Plugin example app'),
         ),
         body: Center(
-          child: UiKitView(viewType: "VirtusizeWebView"),
+          child: Text('Has set Virtusize props: $_hasSetVirtusizeProps\n'),
         ),
       ),
     );
