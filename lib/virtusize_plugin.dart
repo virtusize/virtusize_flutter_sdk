@@ -28,6 +28,26 @@ class VirtusizePlugin {
     );
     return virtusize;
   }
+
+  static Future<void> setVirtusizeProduct(
+      String externalId,
+      String imageUrl
+      ) async {
+    await _channel.invokeMethod(
+        'setVirtusizeProduct',
+        {
+          'externalId': externalId,
+          'imageUrl': imageUrl
+        }
+    );
+  }
+
+  static Future<void> setVirtusizeView(int viewId) async {
+    await _channel.invokeMethod(
+        'setVirtusizeView',
+        {'viewId': viewId}
+    );
+  }
 }
 
 enum Env {
