@@ -3,6 +3,7 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:virtusize_flutter_plugin/virtusize_plugin.dart';
+import 'package:virtusize_flutter_plugin/virtusize_button.dart';
 
 void main() {
   runApp(MyApp());
@@ -15,6 +16,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   String _hasSetVirtusizeProps = 'Unknown';
+  VirtusizeButton _button = null;
 
   @override
   void initState() {
@@ -34,10 +36,22 @@ class _MyAppState extends State<MyApp> {
           Language.en,
           true,
           [Language.en, Language.jp],
-          [InfoCategory.generalFit, InfoCategory.brandSizing]
-      );
+          [InfoCategory.generalFit, InfoCategory.brandSizing]);
     } on PlatformException {
-      hasSetVirtusizeProps = 'failed to set Virtusize props';
+      hasSetVirtusizeProps = 'failed to set VirtusizepProps';
+    }
+
+    try {
+      await VirtusizePlugin.setVirtusizeProduct(
+          '694', 'http://www.image.com/goods/12345.jpg');
+    } on PlatformException {
+      print('failed to set VirtusizeProduct');
+    }
+
+    try {
+      await VirtusizePlugin.setVirtusizeView(_button.getViewId());
+    } on PlatformException {
+      print('failed to set VirtusizeView');
     }
 
     // If the widget was removed from the tree while the asynchronous platform
@@ -52,14 +66,16 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    _button = VirtusizeButton();
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
           title: const Text('Plugin example app'),
         ),
-        body: Center(
-          child: Text('Has set Virtusize props: $_hasSetVirtusizeProps\n'),
-        ),
+        body: Column(children: [
+          Text('Has set Virtusize props: $_hasSetVirtusizeProps\n'),
+          Flexible(child: _button)
+        ]),
       ),
     );
   }
