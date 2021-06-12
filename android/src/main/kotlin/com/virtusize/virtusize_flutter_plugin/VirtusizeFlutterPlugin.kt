@@ -7,6 +7,7 @@ import com.virtusize.libsource.VirtusizeBuilder
 import com.virtusize.libsource.data.local.VirtusizeEnvironment
 import com.virtusize.libsource.data.local.VirtusizeInfoCategory
 import com.virtusize.libsource.data.local.VirtusizeLanguage
+import com.virtusize.libsource.data.local.VirtusizeProduct
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodCall
@@ -28,11 +29,17 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler {
 
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         context = flutterPluginBinding.applicationContext;
+
         channel = MethodChannel(
             flutterPluginBinding.binaryMessenger,
             "com.virtusize/virtusize_flutter_plugin"
         )
         channel.setMethodCallHandler(this)
+
+        flutterPluginBinding.platformViewRegistry.registerViewFactory(
+            "com.virtusize/virtusize_button",
+            FLVirtusizeButtonFactory()
+        )
     }
 
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
@@ -63,7 +70,19 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler {
                         VirtusizeInfoCategory.valueOf(it)
                     }?.toMutableList() ?: VirtusizeInfoCategory.values().toMutableList())
                     .build()
-                result.success(virtuszie.toString())
+                result.success(call.arguments.toString())
+            }
+            "setVirtusizeProduct" -> {
+                virtuszie?.setupVirtusizeProduct(VirtusizeProduct(
+                    externalId = call.argument<String>("externalId") ?: "",
+                    imageUrl = call.argument<String>("imageUrl")
+                ))
+                result.success(true)
+            }
+            "setVirtusizeView" -> {
+                val viewId = call.argument<Int>("viewId") ?: 0
+                virtuszie?.setupVirtusizeView(FLVirtusizeButton.virtusizeButtons.get(viewId))
+                result.success(true)
             }
             else -> {
                 result.notImplemented()
