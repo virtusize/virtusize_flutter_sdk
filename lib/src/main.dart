@@ -30,12 +30,12 @@ class VirtusizePlugin {
     return virtusize;
   }
 
-  static Future<void> setVirtusizeProduct(
+  static Future<void> setProduct(
       String externalId,
       String imageUrl
       ) async {
     await _channel.invokeMethod(
-        'setVirtusizeProduct',
+        'setProduct',
         {
           'externalId': externalId,
           'imageUrl': imageUrl

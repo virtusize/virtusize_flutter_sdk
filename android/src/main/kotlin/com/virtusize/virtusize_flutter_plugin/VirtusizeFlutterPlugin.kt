@@ -69,7 +69,7 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler {
                     .build()
                 result.success(call.arguments.toString())
             }
-            "setVirtusizeProduct" -> {
+            "setProduct" -> {
                 val externalId = call.argument<String>("externalId")
                     ?: throw IllegalArgumentException("Please set the product's external ID")
                 virtuszie?.setupVirtusizeProduct(

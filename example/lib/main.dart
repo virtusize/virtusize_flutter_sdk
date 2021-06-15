@@ -46,8 +46,12 @@ class _MyAppState extends State<MyApp> {
     }
 
     try {
-      await VirtusizePlugin.setVirtusizeProduct(
-          '694', 'http://www.image.com/goods/12345.jpg');
+      await VirtusizePlugin.setProduct(
+          // Set the product's external ID
+          '694',
+          // Set the product image URL
+          'http://www.image.com/goods/12345.jpg'
+      );
     } on PlatformException {
       print('Failed to set VirtusizeProduct');
     }
