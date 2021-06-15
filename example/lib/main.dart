@@ -3,7 +3,6 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:virtusize_flutter_plugin/virtusize_plugin.dart';
-import 'package:virtusize_flutter_plugin/virtusize_button.dart';
 
 void main() {
   runApp(MyApp());
@@ -24,34 +23,39 @@ class _MyAppState extends State<MyApp> {
     initPlatformState();
   }
 
-  // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async {
     String hasSetVirtusizeProps;
-    // Platform messages may fail, so we use a try/catch PlatformException.
     try {
       hasSetVirtusizeProps = await VirtusizePlugin.setVirtusizeProps(
+          // Only the API key is required
           '15cc36e1d7dad62b8e11722ce1a245cb6c5e6692',
+          // For using the Order API, a user ID is required
           '123',
+          // By default, the Virtusize environment will be set to GLOBAL
           Env.staging,
+          // By default, the initial language will be set based on the Virtusize environment
           Language.en,
+          // By default, ShowSGI is false
           true,
+          // By default, Virtusize allows all the possible languages
           [Language.en, Language.jp],
+          // By default, Virtusize displays all the possible info categories in the Product Details tab
           [InfoCategory.generalFit, InfoCategory.brandSizing]);
     } on PlatformException {
-      hasSetVirtusizeProps = 'failed to set VirtusizepProps';
+      hasSetVirtusizeProps = 'Failed to set VirtusizepProps';
     }
 
     try {
       await VirtusizePlugin.setVirtusizeProduct(
           '694', 'http://www.image.com/goods/12345.jpg');
     } on PlatformException {
-      print('failed to set VirtusizeProduct');
+      print('Failed to set VirtusizeProduct');
     }
 
     try {
       await VirtusizePlugin.setVirtusizeView(_button.getViewId());
     } on PlatformException {
-      print('failed to set VirtusizeView');
+      print('Failed to set VirtusizeView');
     }
 
     // If the widget was removed from the tree while the asynchronous platform
@@ -70,12 +74,13 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Plugin example app'),
+          title: const Text('Virtusize Plugin example app'),
         ),
-        body: Column(children: [
+        body: Center(
+            child: Column(children: <Widget>[
           Text('Has set Virtusize props: $_hasSetVirtusizeProps\n'),
-          Flexible(child: _button)
-        ]),
+          _button
+        ])),
       ),
     );
   }
