@@ -15,7 +15,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   String _hasSetVirtusizeProps = 'Unknown';
-  VirtusizeButton _button = null;
+  VirtusizeButton _virtusizeButton;
 
   @override
   void initState() {
@@ -53,7 +53,7 @@ class _MyAppState extends State<MyApp> {
     }
 
     try {
-      await VirtusizePlugin.setVirtusizeView(_button.getViewId());
+      await VirtusizePlugin.setVirtusizeView(_virtusizeButton.getId());
     } on PlatformException {
       print('Failed to set VirtusizeView');
     }
@@ -70,7 +70,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    _button = VirtusizeButton(
+    _virtusizeButton = VirtusizeButton(
       virtusizeStyle: VirtusizeStyle.Black,
       text: "Custom Text",
     );
@@ -80,10 +80,14 @@ class _MyAppState extends State<MyApp> {
           title: const Text('Virtusize Plugin example app'),
         ),
         body: Center(
-            child: Column(children: <Widget>[
-          Text('Has set Virtusize props: $_hasSetVirtusizeProps\n'),
-          _button
-        ])),
+            child: Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text('Has set Virtusize props: $_hasSetVirtusizeProps\n'),
+                      _virtusizeButton
+                    ]))),
       ),
     );
   }

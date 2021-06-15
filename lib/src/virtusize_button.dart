@@ -20,13 +20,13 @@ class VirtusizeButton extends StatefulWidget {
   @override
   _VirtusizeButtonState createState() => state;
 
-  int getViewId() {
-    return state._viewId;
+  int getId() {
+    return state._id;
   }
 }
 
 class _VirtusizeButtonState extends State<VirtusizeButton> {
-  int _viewId;
+  int _id;
 
   @override
   Widget build(BuildContext context) {
@@ -44,8 +44,8 @@ class _VirtusizeButtonState extends State<VirtusizeButton> {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return SizedBox(
-            width: 120,
-            height: 50,
+            width: 135,
+            height: 36,
             child: PlatformViewLink(
               viewType: viewType,
               surfaceFactory:
@@ -58,7 +58,7 @@ class _VirtusizeButtonState extends State<VirtusizeButton> {
                 );
               },
               onCreatePlatformView: (PlatformViewCreationParams params) {
-                _viewId = params.id;
+                _id = params.id;
                 return PlatformViewsService.initSurfaceAndroidView(
                   id: params.id,
                   viewType: viewType,
