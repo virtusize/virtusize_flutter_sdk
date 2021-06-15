@@ -7,6 +7,14 @@ import 'package:flutter/widgets.dart';
 import 'package:virtusize_flutter_plugin/src/models.dart';
 
 class VirtusizeButton extends StatefulWidget {
+  const VirtusizeButton(
+      {Key key,
+      this.virtusizeStyle = VirtusizeStyle.None,
+      this.text})
+      : super(key: key);
+
+  final VirtusizeStyle virtusizeStyle;
+  final String text;
   static _VirtusizeButtonState state = _VirtusizeButtonState();
 
   @override
@@ -25,7 +33,13 @@ class _VirtusizeButtonState extends State<VirtusizeButton> {
     // This is used in the platform side to register the view.
     final String viewType = 'com.virtusize/virtusize_button';
     // Pass parameters to the platform side.
-    final Map<String, dynamic> creationParams = <String, dynamic>{};
+    final Map<String, dynamic> creationParams = <String, dynamic>{
+      "style": widget.virtusizeStyle.value
+    };
+
+    if (widget.text != null) {
+      creationParams["text"] = widget.text;
+    }
 
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:

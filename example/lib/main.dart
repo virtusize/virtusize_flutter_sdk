@@ -70,7 +70,10 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    _button = VirtusizeButton();
+    _button = VirtusizeButton(
+      virtusizeStyle: VirtusizeStyle.Black,
+      text: "Custom Text",
+    );
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
