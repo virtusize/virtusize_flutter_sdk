@@ -4,24 +4,18 @@ import android.content.Context
 import androidx.annotation.NonNull
 import com.virtusize.libsource.Virtusize
 import com.virtusize.libsource.VirtusizeBuilder
-import com.virtusize.libsource.data.local.VirtusizeEnvironment
-import com.virtusize.libsource.data.local.VirtusizeInfoCategory
-import com.virtusize.libsource.data.local.VirtusizeLanguage
-import com.virtusize.libsource.data.local.VirtusizeProduct
+import com.virtusize.libsource.data.local.*
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
+import java.lang.IllegalArgumentException
 
 
-/** VirtusizeFlutterPlugin */
 class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler {
-    /// The MethodChannel that will the communication between Flutter and native Android
-    ///
-    /// This local reference serves to register the plugin with the Flutter Engine and unregister it
-    /// when the Flutter Engine is detached from the Activity
+    /// The MethodChannel that will create the communication between Flutter and native Android
     private lateinit var channel: MethodChannel
 
     private lateinit var context: Context
@@ -36,6 +30,7 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler {
         )
         channel.setMethodCallHandler(this)
 
+        // Register the VirtusizeButton
         flutterPluginBinding.platformViewRegistry.registerViewFactory(
             "com.virtusize/virtusize_button",
             FLVirtusizeButtonFactory()
@@ -45,44 +40,53 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler {
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
         when (call.method) {
             "setVirtusizeProps" -> {
+                val apiKey = call.argument<String>("apiKey")
+                if (apiKey == null) {
+                    result.error("Missing Arguments", "apiKey is null", null)
+                }
                 virtuszie = VirtusizeBuilder().init(context)
-                    .setApiKey(call.argument<String>("apiKey") ?: "")
-                    // For using the Order API, a user ID is required
-                    .setUserId(call.argument<String>("externalUserId") ?: "")
-                    // By default, the Virtusize environment will be set to GLOBAL
-                    .setEnv(VirtusizeEnvironment.valueOf(call.argument<String>("env") ?: "GLOBAL"))
-                    // By default, the initial language will be set based on the Virtusize environment
+                    .setApiKey(call.argument<String>("apiKey"))
+                    .setUserId(call.argument<String>("externalUserId"))
+                    .setEnv(call.argument<String>("env")?.let {
+                        VirtusizeEnvironment.valueOf(it)
+                    })
                     .setLanguage(
-                        VirtusizeLanguage.valueOf(
-                            call.argument<String>("language") ?: "EN"
-                        )
+                        call.argument<String>("language")?.let {
+                            VirtusizeLanguage.valueOf(it)
+                        }
                     )
-                    // By default, ShowSGI is false
                     .setShowSGI(call.argument<Boolean>("showSGI") ?: false)
-                    // By default, Virtusize allows all the possible languages
                     .setAllowedLanguages(
                         call.argument<List<String>>("allowedLanguages")?.map {
                             VirtusizeLanguage.valueOf(it)
-                        }?.toMutableList() ?: VirtusizeLanguage.values().toMutableList()
+                        }?.toMutableList()
                     )
-                    // By default, Virtusize displays all the possible info categories in the Product Details tab
-                    .setDetailsPanelCards(call.argument<List<String>>("detailsPanelCards")?.map {
-                        VirtusizeInfoCategory.valueOf(it)
-                    }?.toMutableList() ?: VirtusizeInfoCategory.values().toMutableList())
+                    .setDetailsPanelCards(
+                        call.argument<List<String>>("detailsPanelCards")?.map {
+                            VirtusizeInfoCategory.valueOf(it)
+                        }?.toMutableList()
+                    )
                     .build()
                 result.success(call.arguments.toString())
             }
             "setVirtusizeProduct" -> {
-                virtuszie?.setupVirtusizeProduct(VirtusizeProduct(
-                    externalId = call.argument<String>("externalId") ?: "",
-                    imageUrl = call.argument<String>("imageUrl")
-                ))
+                val externalId = call.argument<String>("externalId")
+                    ?: throw IllegalArgumentException("Please set the product's external ID")
+                virtuszie?.setupVirtusizeProduct(
+                    VirtusizeProduct(
+                        externalId = externalId,
+                        imageUrl = call.argument<String>("imageUrl")
+                    )
+                )
                 result.success(true)
             }
             "setVirtusizeView" -> {
-                val viewId = call.argument<Int>("viewId") ?: 0
-                virtuszie?.setupVirtusizeView(FLVirtusizeButton.virtusizeButtons.get(viewId))
-                result.success(true)
+                call.argument<Int>("viewId")?.let {
+                    virtuszie?.setupVirtusizeView(FLVirtusizeButton.virtusizeButtons.get(it))
+                    result.success(true)
+                } ?: run {
+                    result.error("Missing Arguments", "viewId is null", null)
+                }
             }
             else -> {
                 result.notImplemented()
