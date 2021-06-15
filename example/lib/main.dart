@@ -57,7 +57,7 @@ class _MyAppState extends State<MyApp> {
     }
 
     try {
-      await VirtusizePlugin.setVirtusizeView(_virtusizeButton.getId());
+      await VirtusizePlugin.setVirtusizeView(_virtusizeButton);
     } on PlatformException {
       print('Failed to set VirtusizeView');
     }
@@ -81,7 +81,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Virtusize Plugin example app'),
+          title: const Text('Virtusize Plugin Example App'),
         ),
         body: Center(
             child: Padding(
@@ -89,7 +89,7 @@ class _MyAppState extends State<MyApp> {
                 child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      Text('Has set Virtusize props: $_hasSetVirtusizeProps\n'),
+                      Text('Has set the Virtusize props: $_hasSetVirtusizeProps\n'),
                       _virtusizeButton
                     ]))),
       ),

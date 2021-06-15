@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:virtusize_flutter_plugin/src/models.dart';
+import 'package:virtusize_flutter_plugin/src/virtusize_button.dart';
 
 class VirtusizePlugin {
   static const MethodChannel _channel =
@@ -43,10 +44,10 @@ class VirtusizePlugin {
     );
   }
 
-  static Future<void> setVirtusizeView(int viewId) async {
+  static Future<void> setVirtusizeView(dynamic virtusizeView) async {
     await _channel.invokeMethod(
         'setVirtusizeView',
-        {'viewId': viewId}
+        {'viewId': virtusizeView is VirtusizeButton ? virtusizeView.getId() : null}
     );
   }
 }
