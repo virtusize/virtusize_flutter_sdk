@@ -4,8 +4,32 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:virtusize_flutter_plugin/virtusize_plugin.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  initializeVirtusize();
   runApp(MyApp());
+}
+
+Future<void> initializeVirtusize() async {
+  try {
+    await VirtusizePlugin.setVirtusizeProps(
+        // Only the API key is required
+        '15cc36e1d7dad62b8e11722ce1a245cb6c5e6692',
+        // For using the Order API, a user ID is required
+        '123',
+        // By default, the Virtusize environment will be set to GLOBAL
+        Env.staging,
+        // By default, the initial language will be set based on the Virtusize environment
+        Language.en,
+        // By default, ShowSGI is false
+        true,
+        // By default, Virtusize allows all the possible languages
+        [Language.en, Language.jp],
+        // By default, Virtusize displays all the possible info categories in the Product Details tab
+        [InfoCategory.generalFit, InfoCategory.brandSizing]);
+  } on PlatformException {
+    print('Failed to set the Virtusize props');
+  }
 }
 
 class MyApp extends StatefulWidget {
@@ -14,7 +38,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  String _hasSetVirtusizeProps = 'Unknown';
   VirtusizeButton _virtusizeButton;
 
   @override
@@ -24,27 +47,6 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> initPlatformState() async {
-    String hasSetVirtusizeProps;
-    try {
-      hasSetVirtusizeProps = await VirtusizePlugin.setVirtusizeProps(
-          // Only the API key is required
-          '15cc36e1d7dad62b8e11722ce1a245cb6c5e6692',
-          // For using the Order API, a user ID is required
-          '123',
-          // By default, the Virtusize environment will be set to GLOBAL
-          Env.staging,
-          // By default, the initial language will be set based on the Virtusize environment
-          Language.en,
-          // By default, ShowSGI is false
-          true,
-          // By default, Virtusize allows all the possible languages
-          [Language.en, Language.jp],
-          // By default, Virtusize displays all the possible info categories in the Product Details tab
-          [InfoCategory.generalFit, InfoCategory.brandSizing]);
-    } on PlatformException {
-      hasSetVirtusizeProps = 'Failed to set VirtusizepProps';
-    }
-
     try {
       await VirtusizePlugin.setProduct(
           // Set the product's external ID
@@ -68,7 +70,7 @@ class _MyAppState extends State<MyApp> {
     if (!mounted) return;
 
     setState(() {
-      _hasSetVirtusizeProps = hasSetVirtusizeProps;
+
     });
   }
 
@@ -89,7 +91,6 @@ class _MyAppState extends State<MyApp> {
                 child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      Text('Has set the Virtusize props: $_hasSetVirtusizeProps\n'),
                       _virtusizeButton
                     ]))),
       ),
