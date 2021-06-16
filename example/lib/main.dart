@@ -39,6 +39,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   VirtusizeButton _virtusizeButton;
+  VirtusizeInPageStandard _virtusizeInPageStandard;
 
   @override
   void initState() {
@@ -60,6 +61,7 @@ class _MyAppState extends State<MyApp> {
 
     try {
       await VirtusizePlugin.setVirtusizeView(_virtusizeButton);
+      await VirtusizePlugin.setVirtusizeView(_virtusizeInPageStandard);
     } on PlatformException {
       print('Failed to set VirtusizeView');
     }
@@ -80,6 +82,7 @@ class _MyAppState extends State<MyApp> {
       virtusizeStyle: VirtusizeStyle.Black,
       text: "Custom Text",
     );
+    _virtusizeInPageStandard = VirtusizeInPageStandard();
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
@@ -91,7 +94,8 @@ class _MyAppState extends State<MyApp> {
                 child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      _virtusizeButton
+                      _virtusizeButton,
+                      _virtusizeInPageStandard
                     ]))),
       ),
     );

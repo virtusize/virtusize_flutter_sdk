@@ -35,6 +35,11 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler {
             "com.virtusize/virtusize_button",
             FLVirtusizeButtonFactory()
         )
+
+        flutterPluginBinding.platformViewRegistry.registerViewFactory(
+            "com.virtusize/virtusize_inpage_standard",
+            FLVirtusizeInPageStandardFactory()
+        )
     }
 
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
@@ -81,8 +86,13 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler {
                 result.success(true)
             }
             "setVirtusizeView" -> {
+                val type = call.argument<String>("viewType")
                 call.argument<Int>("viewId")?.let {
-                    virtuszie?.setupVirtusizeView(FLVirtusizeButton.virtusizeButtons.get(it))
+                    if(type == "VirtusizeButton") {
+                        virtuszie?.setupVirtusizeView(FLVirtusizeButton.virtusizeButtons.get(it))
+                    } else if (type == "VirtusizeInPageStandard") {
+                        virtuszie?.setupVirtusizeView(FLVirtusizeInPageStandard.virtusizeInPageStandards.get(it))
+                    }
                     result.success(true)
                 } ?: run {
                     result.error("Missing Arguments", "viewId is null", null)

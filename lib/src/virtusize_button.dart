@@ -6,7 +6,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:virtusize_flutter_plugin/src/models.dart';
 
-class VirtusizeButton extends StatefulWidget {
+import 'virtusize_view.dart';
+
+class VirtusizeButton extends StatefulWidget implements VirtusizeView {
   const VirtusizeButton(
       {Key key,
       this.virtusizeStyle = VirtusizeStyle.None,
