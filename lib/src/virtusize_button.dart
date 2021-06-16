@@ -9,7 +9,7 @@ import 'package:virtusize_flutter_plugin/src/models.dart';
 import 'virtusize_view.dart';
 
 class VirtusizeButton extends StatefulWidget implements VirtusizeView {
-  const VirtusizeButton(
+  VirtusizeButton(
       {Key key,
       this.virtusizeStyle = VirtusizeStyle.None,
       this.text})
@@ -17,19 +17,17 @@ class VirtusizeButton extends StatefulWidget implements VirtusizeView {
 
   final VirtusizeStyle virtusizeStyle;
   final String text;
-  static _VirtusizeButtonState state = _VirtusizeButtonState();
+  int _id;
 
   @override
-  _VirtusizeButtonState createState() => state;
+  _VirtusizeButtonState createState() => _VirtusizeButtonState();
 
   int getId() {
-    return state._id;
+    return _id;
   }
 }
 
 class _VirtusizeButtonState extends State<VirtusizeButton> {
-  int _id;
-
   @override
   Widget build(BuildContext context) {
     // This is used in the platform side to register the view.
@@ -60,7 +58,7 @@ class _VirtusizeButtonState extends State<VirtusizeButton> {
                 );
               },
               onCreatePlatformView: (PlatformViewCreationParams params) {
-                _id = params.id;
+                widget._id = params.id;
                 return PlatformViewsService.initSurfaceAndroidView(
                   id: params.id,
                   viewType: viewType,

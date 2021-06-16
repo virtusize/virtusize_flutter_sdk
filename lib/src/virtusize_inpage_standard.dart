@@ -8,19 +8,17 @@ import 'package:flutter/widgets.dart';
 import 'virtusize_view.dart';
 
 class VirtusizeInPageStandard extends StatefulWidget implements VirtusizeView {
-  static _VirtusizeInPageStandardState state = _VirtusizeInPageStandardState();
+  int _id;
 
   @override
-  _VirtusizeInPageStandardState createState() => state;
+  _VirtusizeInPageStandardState createState() => _VirtusizeInPageStandardState();
 
   int getId() {
-    return state._id;
+    return _id;
   }
 }
 
 class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
-  int _id;
-
   @override
   Widget build(BuildContext context) {
     // This is used in the platform side to register the view.
@@ -43,7 +41,7 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
             );
           },
           onCreatePlatformView: (PlatformViewCreationParams params) {
-            _id = params.id;
+            widget._id = params.id;
             return PlatformViewsService.initSurfaceAndroidView(
               id: params.id,
               viewType: viewType,
