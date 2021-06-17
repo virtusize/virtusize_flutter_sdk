@@ -1,13 +1,12 @@
 import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:virtusize_flutter_plugin/src/models.dart';
-import 'package:virtusize_flutter_plugin/src/virtusize_view.dart';
 
 class VirtusizePlugin {
   static const MethodChannel _channel =
   const MethodChannel('com.virtusize/virtusize_flutter_plugin');
 
-  static Future<String> setVirtusizeProps(
+  static Future<void> setVirtusizeProps(
       String apiKey,
       [String externalUserId,
       Env env,
@@ -16,40 +15,51 @@ class VirtusizePlugin {
       List<Language> allowedLanguages,
       List<InfoCategory> detailsPanelCards]
       ) async {
-    final String virtusize = await _channel.invokeMethod(
-        'setVirtusizeProps',
-        {
-          'apiKey': apiKey,
-          'externalUserId': externalUserId,
-          'env': env.value,
-          'language': language.value,
-          'showSGI': showSGI,
-          'allowedLanguages': allowedLanguages.map((language) { return language.value;}).toList(),
-          'detailsPanelCards': detailsPanelCards.map((infoCategory) { return infoCategory.value;}).toList()
-        }
-    );
-    return virtusize;
+    try {
+      await _channel.invokeMethod(
+          'setVirtusizeProps',
+          {
+            'apiKey': apiKey,
+            'externalUserId': externalUserId,
+            'env': env.value,
+            'language': language.value,
+            'showSGI': showSGI,
+            'allowedLanguages': allowedLanguages.map((language) { return language.value;}).toList(),
+            'detailsPanelCards': detailsPanelCards.map((infoCategory) { return infoCategory.value;}).toList()
+          }
+      );
+    } catch (error) {
+      print('Failed to set the Virtusize props: $error');
+    }
   }
 
   static Future<void> setProduct(
       String externalId,
       String imageUrl
       ) async {
-    await _channel.invokeMethod(
-        'setProduct',
-        {
-          'externalId': externalId,
-          'imageUrl': imageUrl
-        }
-    );
+    try {
+      await _channel.invokeMethod(
+          'setProduct',
+          {
+            'externalId': externalId,
+            'imageUrl': imageUrl
+          }
+      );
+    } catch (error) {
+      print('Failed to set VirtusizeProduct: $error');
+    }
   }
 
-  static Future<void> setVirtusizeView(VirtusizeView virtusizeView) async {
-    await _channel.invokeMethod(
-        'setVirtusizeView',
-        { 'viewType': virtusizeView.toString(),
-          'viewId': virtusizeView.getId()
-        }
-    );
+  static Future<void> setVirtusizeView(String viewType, int id) async {
+    try {
+      await _channel.invokeMethod(
+          'setVirtusizeView',
+          { 'viewType': viewType.toString(),
+            'viewId': id
+          }
+      );
+    } catch (error) {
+      print('Failed to set VirtusizeView: $error');
+    }
   }
 }

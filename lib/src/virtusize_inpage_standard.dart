@@ -5,17 +5,11 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
-import 'virtusize_view.dart';
+import '../virtusize_plugin.dart';
 
-class VirtusizeInPageStandard extends StatefulWidget implements VirtusizeView {
-  int _id;
-
+class VirtusizeInPageStandard extends StatefulWidget {
   @override
   _VirtusizeInPageStandardState createState() => _VirtusizeInPageStandardState();
-
-  int getId() {
-    return _id;
-  }
 }
 
 class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
@@ -41,7 +35,6 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
             );
           },
           onCreatePlatformView: (PlatformViewCreationParams params) {
-            widget._id = params.id;
             return PlatformViewsService.initSurfaceAndroidView(
               id: params.id,
               viewType: viewType,
@@ -50,6 +43,9 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
               creationParamsCodec: StandardMessageCodec(),
             )
               ..addOnPlatformViewCreatedListener(params.onPlatformViewCreated)
+              ..addOnPlatformViewCreatedListener((int id) {
+                VirtusizePlugin.setVirtusizeView(widget.toString(), id);
+              })
               ..create();
           },
         ));

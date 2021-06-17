@@ -4,12 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:virtusize_flutter_plugin/src/main.dart';
 import 'package:virtusize_flutter_plugin/src/models.dart';
 
-import 'virtusize_view.dart';
-
-class VirtusizeButton extends StatefulWidget implements VirtusizeView {
-  VirtusizeButton(
+class VirtusizeButton extends StatefulWidget {
+  const VirtusizeButton(
       {Key key,
       this.virtusizeStyle = VirtusizeStyle.None,
       this.text})
@@ -17,14 +16,9 @@ class VirtusizeButton extends StatefulWidget implements VirtusizeView {
 
   final VirtusizeStyle virtusizeStyle;
   final String text;
-  int _id;
 
   @override
   _VirtusizeButtonState createState() => _VirtusizeButtonState();
-
-  int getId() {
-    return _id;
-  }
 }
 
 class _VirtusizeButtonState extends State<VirtusizeButton> {
@@ -58,7 +52,6 @@ class _VirtusizeButtonState extends State<VirtusizeButton> {
                 );
               },
               onCreatePlatformView: (PlatformViewCreationParams params) {
-                widget._id = params.id;
                 return PlatformViewsService.initSurfaceAndroidView(
                   id: params.id,
                   viewType: viewType,
@@ -69,6 +62,9 @@ class _VirtusizeButtonState extends State<VirtusizeButton> {
                   ..addOnPlatformViewCreatedListener(
                       params.onPlatformViewCreated
                   )
+                  ..addOnPlatformViewCreatedListener((int id) {
+                    VirtusizePlugin.setVirtusizeView(widget.toString(), id);
+                  })
                   ..create();
               },
             ));
