@@ -38,7 +38,7 @@ class _VirtusizeButtonState extends State<VirtusizeButton> {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return SizedBox(
-            width: 135,
+            width: 130,
             height: 36,
             child: PlatformViewLink(
               viewType: viewType,

@@ -6,7 +6,7 @@ import 'package:virtusize_flutter_plugin/virtusize_plugin.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   VirtusizePlugin.setVirtusizeProps(
-    // Only the API key is required
+      // Only the API key is required
       '15cc36e1d7dad62b8e11722ce1a245cb6c5e6692',
       // For using the Order API, a user ID is required
       '123',
@@ -37,11 +37,10 @@ class _MyAppState extends State<MyApp> {
     // Make sure setProduct is run after the MyApp widget is built
     WidgetsBinding.instance.addPostFrameCallback((_) {
       VirtusizePlugin.setProduct(
-        // Set the product's external ID
+          // Set the product's external ID
           '694',
           // Set the product image URL
-          'http://www.image.com/goods/12345.jpg'
-      );
+          'http://www.image.com/goods/12345.jpg');
     });
   }
 
@@ -49,21 +48,20 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Virtusize Plugin Example App'),
-        ),
-        body: Center(
-            child: Padding(
-                padding: EdgeInsets.only(top: 16.0),
-                child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      VirtusizeButton(
-                          virtusizeStyle: VirtusizeStyle.Black
-                      ),
-                    VirtusizeInPageStandard()
-                    ]))),
-      ),
+          appBar: AppBar(
+            title: const Text('Virtusize Plugin Example App'),
+          ),
+          body: Center(
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                VirtusizeButton(virtusizeStyle: VirtusizeStyle.Black),
+                VirtusizeInPageStandard(
+                    virtusizeStyle: VirtusizeStyle.Black,
+                    horizontalMargin: 16.0,
+                    messageTextSize: 10.0,
+                    buttonTextSize: 10.0)
+              ]))),
     );
   }
 }

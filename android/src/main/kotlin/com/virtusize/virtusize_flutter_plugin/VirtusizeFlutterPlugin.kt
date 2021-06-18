@@ -38,7 +38,7 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler {
 
         flutterPluginBinding.platformViewRegistry.registerViewFactory(
             "com.virtusize/virtusize_inpage_standard",
-            FLVirtusizeInPageStandardFactory()
+            FLVirtusizeInPageStandardFactory(flutterPluginBinding.binaryMessenger)
         )
     }
 
