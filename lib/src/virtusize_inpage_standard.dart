@@ -54,41 +54,43 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
 
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
-        return PlatformViewLink(
-            viewType: viewType,
-            surfaceFactory:
-                (BuildContext context, PlatformViewController controller) {
-              return AndroidViewSurface(
-                controller: controller,
-                gestureRecognizers: const <
-                    Factory<OneSequenceGestureRecognizer>>{},
-                hitTestBehavior: PlatformViewHitTestBehavior.opaque,
-              );
-            },
-            onCreatePlatformView: (PlatformViewCreationParams params) {
-              return PlatformViewsService.initSurfaceAndroidView(
-                id: params.id,
+        return Flexible(
+            child: PlatformViewLink(
                 viewType: viewType,
-                layoutDirection: TextDirection.ltr,
-                creationParams: creationParams,
-                creationParamsCodec: StandardMessageCodec(),
-              )
-                ..addOnPlatformViewCreatedListener(params.onPlatformViewCreated)
-                ..addOnPlatformViewCreatedListener((int id) {
-                  VirtusizePlugin.setVirtusizeView(widget.toString(), id);
-                  MethodChannel _channel = MethodChannel(
-                      'com.virtusize/virtusize_inpage_standard_$id');
-                  _channel.setMethodCallHandler((call) {
-                    if (call.method == 'onSizeChanged') {
-                      print('onSizeChanged ${call.arguments}');
-                    } else if (call.method == 'onFinishLoading') {
-                      print('onFinishLoading');
-                    }
-                    return null;
-                  });
-                })
-                ..create();
-            });
+                surfaceFactory:
+                    (BuildContext context, PlatformViewController controller) {
+                  return AndroidViewSurface(
+                    controller: controller,
+                    gestureRecognizers: const <
+                        Factory<OneSequenceGestureRecognizer>>{},
+                    hitTestBehavior: PlatformViewHitTestBehavior.opaque,
+                  );
+                },
+                onCreatePlatformView: (PlatformViewCreationParams params) {
+                  return PlatformViewsService.initSurfaceAndroidView(
+                    id: params.id,
+                    viewType: viewType,
+                    layoutDirection: TextDirection.ltr,
+                    creationParams: creationParams,
+                    creationParamsCodec: StandardMessageCodec(),
+                  )
+                    ..addOnPlatformViewCreatedListener(
+                        params.onPlatformViewCreated)
+                    ..addOnPlatformViewCreatedListener((int id) {
+                      VirtusizePlugin.setVirtusizeView(widget.toString(), id);
+                      MethodChannel _channel = MethodChannel(
+                          'com.virtusize/virtusize_inpage_standard_$id');
+                      _channel.setMethodCallHandler((call) {
+                        if (call.method == 'onSizeChanged') {
+                          print('onSizeChanged ${call.arguments}');
+                        } else if (call.method == 'onFinishLoading') {
+                          print('onFinishLoading');
+                        }
+                        return null;
+                      });
+                    })
+                    ..create();
+                }));
       case TargetPlatform.iOS:
         throw UnsupportedError("Unsupported platform view");
       default:
