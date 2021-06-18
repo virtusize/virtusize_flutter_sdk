@@ -1,17 +1,14 @@
 package com.virtusize.virtusize_flutter_plugin
 
 import android.content.Context
-import android.content.res.Resources
 import android.graphics.Color
-import android.graphics.Rect
-import android.util.Log
 import android.util.SparseArray
-import android.view.Gravity
 import android.view.View
-import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import com.virtusize.libsource.data.local.VirtusizeViewStyle
 import com.virtusize.libsource.ui.VirtusizeInPageStandard
 import com.virtusize.libsource.util.dpInPx
+import com.virtusize.libsource.util.onSizeChanged
+import com.virtusize.libsource.util.pxInDp
 import com.virtusize.libsource.util.spToPx
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodChannel
