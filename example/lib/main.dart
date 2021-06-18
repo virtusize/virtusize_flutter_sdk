@@ -52,16 +52,18 @@ class _MyAppState extends State<MyApp> {
             title: const Text('Virtusize Plugin Example App'),
           ),
           body: Center(
-              child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                VirtusizeButton(virtusizeStyle: VirtusizeStyle.Black),
-                VirtusizeInPageStandard(
-                    virtusizeStyle: VirtusizeStyle.Black,
-                    horizontalMargin: 16.0,
-                    messageTextSize: 10.0,
-                    buttonTextSize: 10.0)
-              ]))),
+              child: Padding(
+                  padding: EdgeInsets.only(top: 16),
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        VirtusizeButton(virtusizeStyle: VirtusizeStyle.Black),
+                        VirtusizeInPageStandard(
+                            virtusizeStyle: VirtusizeStyle.Black,
+                            horizontalMargin: 16.0,
+                            messageTextSize: 10.0,
+                            buttonTextSize: 10.0)
+                      ])))),
     );
   }
 }
