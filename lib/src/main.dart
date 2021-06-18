@@ -28,7 +28,7 @@ class VirtusizePlugin {
             'detailsPanelCards': detailsPanelCards.map((infoCategory) { return infoCategory.value;}).toList()
           }
       );
-    } catch (error) {
+    } on PlatformException catch (error) {
       print('Failed to set the Virtusize props: $error');
     }
   }
@@ -45,7 +45,7 @@ class VirtusizePlugin {
             'imageUrl': imageUrl
           }
       );
-    } catch (error) {
+    } on PlatformException catch (error) {
       print('Failed to set VirtusizeProduct: $error');
     }
   }
@@ -58,7 +58,7 @@ class VirtusizePlugin {
             'viewId': id
           }
       );
-    } catch (error) {
+    } on PlatformException catch (error) {
       print('Failed to set VirtusizeView: $error');
     }
   }
