@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/services.dart';
-import 'package:virtusize_flutter_plugin/src/models.dart';
+import 'models.dart';
 
 class VirtusizePlugin {
   static const MethodChannel _channel =
@@ -35,7 +35,7 @@ class VirtusizePlugin {
 
   static Future<void> setProduct(
       String externalId,
-      String imageUrl
+      [String imageUrl]
       ) async {
     try {
       await _channel.invokeMethod(

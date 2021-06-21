@@ -59,10 +59,15 @@ class _MyAppState extends State<MyApp> {
                       children: [
                         VirtusizeButton(virtusizeStyle: VirtusizeStyle.Black),
                         VirtusizeInPageStandard(
-                            virtusizeStyle: VirtusizeStyle.Black,
-                            horizontalMargin: 16.0,
-                            messageTextSize: 10.0,
-                            buttonTextSize: 10.0)
+                            virtusizeStyle: VirtusizeStyle.Black),
+                        VirtusizeInPageStandard(
+                            virtusizeStyle: VirtusizeStyle.Teal,
+                            horizontalMargin: 32.0
+                        ),
+                        VirtusizeInPageStandard(
+                            buttonBackgroundColor: Colors.blue,
+                            horizontalMargin: 64.0
+                        )
                       ])))),
     );
   }

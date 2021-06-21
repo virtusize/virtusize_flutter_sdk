@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:virtusize_flutter_plugin/src/main.dart';
-import 'package:virtusize_flutter_plugin/src/models.dart';
+
+import '../virtusize_plugin.dart';
 
 class VirtusizeButton extends StatefulWidget {
   const VirtusizeButton(
