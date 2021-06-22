@@ -34,14 +34,12 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
 
-    // Make sure setProduct is run after the MyApp widget is built
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      VirtusizePlugin.setProduct(
-          // Set the product's external ID
-          '694',
-          // Set the product image URL
-          'http://www.image.com/goods/12345.jpg');
-    });
+    VirtusizePlugin.setProduct(
+      // Set the product's external ID
+      externalId: '694',
+      // Set the product image URL
+      imageUrl: 'http://www.image.com/goods/12345.jpg'
+    );
   }
 
   @override
@@ -57,16 +55,10 @@ class _MyAppState extends State<MyApp> {
                   child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        VirtusizeButton(virtusizeStyle: VirtusizeStyle.Black),
-                        VirtusizeInPageStandard(
-                            virtusizeStyle: VirtusizeStyle.Black),
-                        VirtusizeInPageStandard(
-                            virtusizeStyle: VirtusizeStyle.Teal,
-                            horizontalMargin: 32.0
-                        ),
-                        VirtusizeInPageStandard(
-                            buttonBackgroundColor: Colors.blue,
-                            horizontalMargin: 64.0
+                        VirtusizeButton(
+                          child: Padding(
+                              padding: EdgeInsets.all(8),
+                              child: Text('Check Size')),
                         )
                       ])))),
     );

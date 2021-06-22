@@ -1,10 +1,15 @@
 import 'dart:async';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'models.dart';
+import 'models/virtusize_enums.dart';
+import 'models/virtusize_product.dart';
 
 class VirtusizePlugin {
   static const MethodChannel _channel =
   const MethodChannel('com.virtusize/virtusize_flutter_plugin');
+
+  static ClientProduct product;
+  static bool productDataCheck = false;
 
   static Future<void> setVirtusizeProps(
       String apiKey,
@@ -33,20 +38,30 @@ class VirtusizePlugin {
     }
   }
 
-  static Future<void> setProduct(
-      String externalId,
-      [String imageUrl]
-      ) async {
+  static void setProduct({@required String externalId, String imageUrl}) {
+    product = ClientProduct(externalId: externalId, imageUrl: imageUrl);
+  }
+
+  static Future<bool> getProductDataCheck() async {
     try {
-      await _channel.invokeMethod(
-          'setProduct',
+      return await _channel.invokeMethod(
+          'getProductDataCheck',
           {
-            'externalId': externalId,
-            'imageUrl': imageUrl
+            'externalId': product.externalId,
+            'imageUrl': product.imageUrl
           }
       );
     } on PlatformException catch (error) {
       print('Failed to set VirtusizeProduct: $error');
+    }
+    return false;
+  }
+
+  static Future<void> openVirtusizeWebView() async {
+    try {
+      await _channel.invokeMethod('openVirtusizeWebView');
+    } on PlatformException catch (error) {
+      print('Failed to open the VirtusizeWebView: $error');
     }
   }
 
