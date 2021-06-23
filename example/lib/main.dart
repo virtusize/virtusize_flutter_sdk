@@ -35,11 +35,10 @@ class _MyAppState extends State<MyApp> {
     super.initState();
 
     VirtusizePlugin.setProduct(
-      // Set the product's external ID
-      externalId: '694',
-      // Set the product image URL
-      imageUrl: 'http://www.image.com/goods/12345.jpg'
-    );
+        // Set the product's external ID
+        externalId: '694',
+        // Set the product image URL
+        imageUrl: 'http://www.image.com/goods/12345.jpg');
   }
 
   @override
@@ -52,15 +51,27 @@ class _MyAppState extends State<MyApp> {
           body: Center(
               child: Padding(
                   padding: EdgeInsets.only(top: 16),
-                  child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        VirtusizeButton(
-                          child: Padding(
-                              padding: EdgeInsets.all(8),
-                              child: Text('Check Size')),
-                        )
-                      ])))),
+                  child: Column(mainAxisSize: MainAxisSize.min, children: [
+                    VirtusizeButton.vsStyle(),
+                    VirtusizeButton.vsStyle(
+                        style: VirtusizeStyle.Teal, child: Text("Custom Text")),
+                    VirtusizeButton(
+                      child: ElevatedButton.icon(
+                          label: Text('サイズチェック'),
+                          icon: Icon(Icons.account_circle_rounded),
+                          style: ElevatedButton.styleFrom(
+                              primary: Color(0xFF191919),
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 10),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(32.0)))),
+                          onPressed: VirtusizePlugin.openVirtusizeWebView),
+                    ),
+                    VirtusizeButton(
+                      child: Text("Custom Text"),
+                    )
+                  ])))),
     );
   }
 }
