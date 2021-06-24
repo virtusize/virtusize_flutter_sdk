@@ -96,7 +96,7 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 )
                 CoroutineScope(Dispatchers.Main).launch {
                     productDataCheck = repository.productDataCheck(virtusizeProduct!!)
-                    result.success(productDataCheck?.data?.validProduct)
+                    result.success(productDataCheck?.jsonString)
                 }
             }
             "openVirtusizeWebView" -> {

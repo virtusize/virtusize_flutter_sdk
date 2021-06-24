@@ -85,7 +85,7 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
                         ..addOnPlatformViewCreatedListener(
                             params.onPlatformViewCreated)
                         ..addOnPlatformViewCreatedListener((int id) {
-                          VirtusizePlugin.setVirtusizeView(
+                          VirtusizePlugin.instance.setVirtusizeView(
                               widget.toString(), id);
                           MethodChannel _channel = MethodChannel(
                               'com.virtusize/virtusize_inpage_standard_$id');

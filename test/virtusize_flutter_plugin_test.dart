@@ -18,6 +18,6 @@ void main() {
   });
 
   test('setVirtusizeProps', () async {
-    expect(await VirtusizePlugin.setVirtusizeProps, '42');
+    expect(await VirtusizePlugin.instance.setVirtusizeProps, '42');
   });
 }

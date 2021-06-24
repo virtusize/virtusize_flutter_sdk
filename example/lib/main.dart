@@ -5,7 +5,7 @@ import 'package:virtusize_flutter_plugin/virtusize_plugin.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  VirtusizePlugin.setVirtusizeProps(
+  VirtusizePlugin.instance.setVirtusizeProps(
       // Only the API key is required
       '15cc36e1d7dad62b8e11722ce1a245cb6c5e6692',
       // For using the Order API, a user ID is required
@@ -34,8 +34,8 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
 
-    VirtusizePlugin.setProduct(
-        // Set the product's external ID
+    VirtusizePlugin.instance.setProduct(
+      // Set the product's external ID
         externalId: '694',
         // Set the product image URL
         imageUrl: 'http://www.image.com/goods/12345.jpg');
@@ -66,7 +66,8 @@ class _MyAppState extends State<MyApp> {
                               shape: RoundedRectangleBorder(
                                   borderRadius:
                                       BorderRadius.all(Radius.circular(32.0)))),
-                          onPressed: VirtusizePlugin.openVirtusizeWebView),
+                          onPressed:
+                              VirtusizePlugin.instance.openVirtusizeWebView),
                     ),
                     VirtusizeButton(
                       child: Text("Custom Text"),

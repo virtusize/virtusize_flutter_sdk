@@ -1,10 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:virtusize_flutter_plugin/src/main.dart';
+import 'package:virtusize_flutter_plugin/src/models/product_data_check.dart';
 import 'package:virtusize_flutter_plugin/src/ui/images.dart';
 
 import '../../virtusize_plugin.dart';
-import 'colors.dart';
+import '../ui/colors.dart';
 
 class VirtusizeButton extends StatefulWidget {
   final Widget child;
@@ -19,42 +22,29 @@ class VirtusizeButton extends StatefulWidget {
 }
 
 class _VirtusizeButtonState extends State<VirtusizeButton> {
+  StreamSubscription<ProductDataCheck> pdcSubscription;
   bool _isValidProduct = false;
-
-  Future<void> _startLoading() async {
-    bool isValidProduct = await VirtusizePlugin.getProductDataCheck();
-    setState(() {
-      _isValidProduct = isValidProduct;
-    });
-  }
-
-  Future<void> _openVirtusizeWebview() async {
-    await VirtusizePlugin.openVirtusizeWebView();
-  }
-
-  ElevatedButton _createVSButton(Color color, Widget child) {
-    return ElevatedButton.icon(
-      label: child != null ? child : Text('サイズチェック'),
-      icon: VSImages.vsIcon,
-      style: ElevatedButton.styleFrom(
-          primary: color,
-          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(32.0)))),
-      onPressed: _openVirtusizeWebview,
-    );
-  }
 
   @override
   void initState() {
     super.initState();
 
-    _startLoading();
+    pdcSubscription = VirtusizePlugin.instance.pdcStream.listen((value) {
+      setState(() {
+        _isValidProduct = value.isValidProduct;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    pdcSubscription.cancel();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_isValidProduct) {
+    if(_isValidProduct) {
       switch (widget.style) {
         case VirtusizeStyle.None:
           return widget.child;
@@ -68,8 +58,24 @@ class _VirtusizeButtonState extends State<VirtusizeButton> {
           return _createVSButton(color, widget.child);
           break;
       }
-    } else {
-      return SizedBox();
     }
+    return Container();
+  }
+
+  Future<void> _openVirtusizeWebview() async {
+    await VirtusizePlugin.instance.openVirtusizeWebView();
+  }
+
+  ElevatedButton _createVSButton(Color color, Widget child) {
+    return ElevatedButton.icon(
+      label: child != null ? child : Text('サイズチェック'),
+      icon: VSImages.vsIcon,
+      style: ElevatedButton.styleFrom(
+          primary: color,
+          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(32.0)))),
+      onPressed: _openVirtusizeWebview,
+    );
   }
 }
