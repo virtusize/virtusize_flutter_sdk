@@ -58,13 +58,14 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
         when (call.method) {
             "setVirtusizeProps" -> {
-                val apiKey = call.argument<String>("apiKey")
-                if (apiKey == null) {
-                    result.error("Missing Arguments", "apiKey is null", null)
-                }
                 var virtusizeBuilder = VirtusizeBuilder().init(context)
 
-                virtusizeBuilder = virtusizeBuilder.setApiKey(apiKey)
+                call.argument<String>("apiKey")?.let { apiKey ->
+                    virtusizeBuilder = virtusizeBuilder.setApiKey(apiKey)
+                } ?: run {
+                    result.error("Missing Arguments", "apiKey is null", null)
+                    return
+                }
 
                 call.argument<String>("externalUserId")?.let { userId ->
                     virtusizeBuilder = virtusizeBuilder.setUserId(userId)
