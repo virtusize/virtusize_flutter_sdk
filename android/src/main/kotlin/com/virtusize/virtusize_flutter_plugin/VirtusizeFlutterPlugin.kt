@@ -62,29 +62,40 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 if (apiKey == null) {
                     result.error("Missing Arguments", "apiKey is null", null)
                 }
-                virtuszie = VirtusizeBuilder().init(context)
-                    .setApiKey(call.argument<String>("apiKey"))
-                    .setUserId(call.argument<String>("externalUserId"))
-                    .setEnv(call.argument<String>("env")?.let {
-                        VirtusizeEnvironment.valueOf(it)
-                    })
-                    .setLanguage(
-                        call.argument<String>("language")?.let {
-                            VirtusizeLanguage.valueOf(it)
-                        }
-                    )
-                    .setShowSGI(call.argument<Boolean>("showSGI") ?: false)
-                    .setAllowedLanguages(
-                        call.argument<List<String>>("allowedLanguages")?.map {
-                            VirtusizeLanguage.valueOf(it)
-                        }?.toMutableList()
-                    )
-                    .setDetailsPanelCards(
-                        call.argument<List<String>>("detailsPanelCards")?.map {
-                            VirtusizeInfoCategory.valueOf(it)
-                        }?.toMutableList()
-                    )
-                    .build()
+                var virtusizeBuilder = VirtusizeBuilder().init(context)
+
+                virtusizeBuilder = virtusizeBuilder.setApiKey(apiKey)
+
+                call.argument<String>("externalUserId")?.let { userId ->
+                    virtusizeBuilder = virtusizeBuilder.setUserId(userId)
+                }
+
+                call.argument<String>("env")?.let { env ->
+                    virtusizeBuilder = virtusizeBuilder.setEnv(VirtusizeEnvironment.valueOf(env))
+                }
+
+                call.argument<String>("language")?.let { lang ->
+                    virtusizeBuilder = virtusizeBuilder.setLanguage(VirtusizeLanguage.valueOf(lang))
+                }
+
+                call.argument<Boolean>("showSGI")?.let { showSGI ->
+                    virtusizeBuilder = virtusizeBuilder.setShowSGI(showSGI)
+                }
+
+                call.argument<List<String>>("allowedLanguages")?.let { langList ->
+                    val allowedLanguages =
+                        langList.map { VirtusizeLanguage.valueOf(it) }.toMutableList()
+                    virtusizeBuilder = virtusizeBuilder.setAllowedLanguages(allowedLanguages)
+                }
+
+                call.argument<List<String>>("detailsPanelCards")?.let { detailsPanelCardList ->
+                    val detailsPanelCards =
+                        detailsPanelCardList.map { VirtusizeInfoCategory.valueOf(it) }.toMutableList()
+                    virtusizeBuilder = virtusizeBuilder.setDetailsPanelCards(detailsPanelCards)
+                }
+
+                virtuszie = virtusizeBuilder.build()
+
                 result.success(call.arguments.toString())
             }
             "getProductDataCheck" -> {
