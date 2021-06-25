@@ -91,7 +91,7 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 				}
 			case "openVirtusizeWebView":
 				if let viewController = VirtusizeWebViewController(processPool: Virtusize.processPool) {
-					let flutterRootViewController = UIApplication.shared.windows.first?.rootViewController as? UIViewController
+					let flutterRootViewController = UIApplication.shared.windows.first?.rootViewController
 					flutterRootViewController?.present(viewController, animated: true)
 				}
 			default:
