@@ -9,13 +9,19 @@ Pod::Spec.new do |s|
   s.description      = <<-DESC
 Virtusize integration in Flutter
                        DESC
-  s.homepage         = 'http://example.com'
+  s.homepage         = 'https://www.virtusize.com/'
   s.license          = { :file => '../LICENSE' }
-  s.author           = { 'Your Company' => 'email@example.com' }
+  s.author           = { 'Virtusize' => 'client.support@virtusize.com' }
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'
-  s.platform = :ios, '8.0'
+	
+#	s.dependency 'Virtusize', '~> 2.2.1'
+  s.preserve_paths = 'Virtusize.framework'
+  s.xcconfig = { 'OTHER_LDFLAGS' => '-framework Virtusize' }
+  s.vendored_frameworks = 'Virtusize.framework'
+
+  s.platform = :ios, '10.3'
 
   # Flutter.framework does not contain a i386 slice.
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386' }
