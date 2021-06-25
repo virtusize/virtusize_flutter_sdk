@@ -8,9 +8,9 @@ class ProductDataCheck extends VirtusizeModel {
     _decodedData = decodeJson(_data);
   }
 
-  Map<String, dynamic> get data => _decodedData["data"];
-  bool get isValidProduct => data["validProduct"];
+  Map<String, dynamic> get data => _decodedData["data"] ?? {};
 
-  String get productId => _decodedData["productId"];
+  bool get isValidProduct => data["validProduct"] ?? false;
 
+  String get productId  => data["productId"];
 }
