@@ -71,7 +71,8 @@ class _MyAppState extends State<MyApp> {
                     ),
                     VirtusizeButton(
                       child: Text("Custom Text"),
-                    )
+                    ),
+                    VirtusizeInPageMini()
                   ])))),
     );
   }
