@@ -67,12 +67,21 @@ class _VirtusizeButtonState extends State<VirtusizeButton> {
   }
 
   ElevatedButton _createVSButton(Color color, Widget child) {
-    return ElevatedButton.icon(
-      label: child != null ? child : Text('サイズチェック'),
-      icon: VSImages.vsIcon,
+    return ElevatedButton(
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          ImageIcon(VSImages.vsIcon.image, size: 20),
+          Container(width: 4),
+          child != null ? child : Text('サイズチェック', style: TextStyle(fontSize: 12))
+        ],
+      ),
       style: ElevatedButton.styleFrom(
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          minimumSize: Size.zero,
           primary: color,
-          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(32.0)))),
       onPressed: _openVirtusizeWebview,

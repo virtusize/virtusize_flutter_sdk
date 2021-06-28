@@ -73,10 +73,12 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
 
   Widget _createVSSizeCheckButton() {
     return ElevatedButton(
-      child: Row(children: [
+      child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
         Text('サイズチェック', style: TextStyle(fontSize: 12)),
-        Container(width: 8.0),
-        VSImages.rightArrow
+        Container(width: 3.0),
+        ImageIcon(VSImages.rightArrow.image, size: 12)
       ]),
       style: ElevatedButton.styleFrom(
           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
