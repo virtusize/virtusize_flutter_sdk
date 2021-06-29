@@ -13,7 +13,7 @@ Future<void> main() async {
       // By default, the Virtusize environment will be set to GLOBAL
       Env.staging,
       // By default, the initial language will be set based on the Virtusize environment
-      Language.en,
+      Language.jp,
       // By default, ShowSGI is false
       true,
       // By default, Virtusize allows all the possible languages

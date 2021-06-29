@@ -18,15 +18,23 @@ class VirtusizeInPageMini extends StatefulWidget {
 
 class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
   StreamSubscription<ProductDataCheck> pdcSubscription;
+  StreamSubscription<String> recTextSubscription;
   bool _isValidProduct = false;
+  String _recText = "";
 
   @override
   void initState() {
     super.initState();
 
-    pdcSubscription = VirtusizePlugin.instance.pdcStream.listen((value) {
+    pdcSubscription = VirtusizePlugin.instance.pdcStream.listen((pdc) {
       setState(() {
-        _isValidProduct = value.isValidProduct;
+        _isValidProduct = pdc.isValidProduct;
+      });
+    });
+
+    recTextSubscription = VirtusizePlugin.instance.recTextStream.listen((recText) {
+      setState(() {
+        _recText = recText;
       });
     });
   }
@@ -34,6 +42,7 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
   @override
   void dispose() {
     pdcSubscription.cancel();
+    recTextSubscription.cancel();
     super.dispose();
   }
 
@@ -62,7 +71,7 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
           Flexible(
             child: Container(
                 margin: EdgeInsets.only(top: 8, bottom: 8, left: 12),
-                child: Text("こちらにメッセージがはいります",
+                child: Text(_recText,
                     style: TextStyle(fontSize: 12, color: Colors.white))),
           ),
           Container(

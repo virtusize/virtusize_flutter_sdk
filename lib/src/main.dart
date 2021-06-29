@@ -10,6 +10,7 @@ class VirtusizePlugin {
 
   ClientProduct product;
   StreamController _pdcController;
+  StreamController _recTextController;
 
   StreamSink<ProductDataCheck> get _pdcSink =>
       _pdcController.sink;
@@ -17,8 +18,15 @@ class VirtusizePlugin {
   Stream<ProductDataCheck> get pdcStream =>
       _pdcController.stream;
 
+  StreamSink<String> get _recTextSink =>
+      _recTextController.sink;
+
+  Stream<String> get recTextStream =>
+      _recTextController.stream;
+
   VirtusizePlugin._() {
     _pdcController = StreamController<ProductDataCheck>.broadcast();
+    _recTextController = StreamController<String>.broadcast();
   }
 
   static const MethodChannel _channel =
@@ -52,7 +60,11 @@ class VirtusizePlugin {
 
   Future<void> setProduct({@required String externalId, String imageUrl}) async {
     product = ClientProduct(externalId: externalId, imageUrl: imageUrl);
-    _pdcSink.add(await currentProductDataCheck);
+    ProductDataCheck productDataCheck = await currentProductDataCheck;
+    _pdcSink.add(productDataCheck);
+    if(productDataCheck.isValidProduct) {
+      getRecommendationText();
+    }
   }
 
   Future<ProductDataCheck> get currentProductDataCheck async {
@@ -81,6 +93,15 @@ class VirtusizePlugin {
           'setVirtusizeView', {'viewType': viewType.toString(), 'viewId': id});
     } on PlatformException catch (error) {
       print('Failed to set VirtusizeView: $error');
+    }
+  }
+
+  Future<void> getRecommendationText() async {
+    try {
+      _recTextSink.add(await _channel.invokeMethod('getRecommendationText'));
+    } on PlatformException catch (error) {
+      print('Failed to get RecommendationText: $error');
+      _recTextSink.add(null);
     }
   }
 }

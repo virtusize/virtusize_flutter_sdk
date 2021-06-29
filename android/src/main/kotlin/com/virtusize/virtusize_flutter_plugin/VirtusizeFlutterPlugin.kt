@@ -2,11 +2,9 @@ package com.virtusize.virtusize_flutter_plugin
 
 import android.content.Context
 import androidx.annotation.NonNull
-import com.virtusize.libsource.Virtusize
-import com.virtusize.libsource.VirtusizeBuilder
-import com.virtusize.libsource.VirtusizeFlutterHelper
-import com.virtusize.libsource.VirtusizeFlutterRepository
+import com.virtusize.libsource.*
 import com.virtusize.libsource.data.local.*
+import com.virtusize.libsource.data.remote.BodyProfileRecommendedSize
 import com.virtusize.libsource.data.remote.ProductCheck
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin
@@ -27,10 +25,10 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     private lateinit var channel: MethodChannel
 
     private lateinit var context: Context
-    private var virtuszie: Virtusize? = null
+    private var virtusize: Virtusize? = null
+    private lateinit var repository: VirtusizeFlutterRepository
     private var virtusizeProduct: VirtusizeProduct? = null
     private var productDataCheck: ProductCheck? = null
-    private lateinit var repository: VirtusizeFlutterRepository
     private var helper: VirtusizeFlutterHelper? = null
 
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
@@ -63,7 +61,7 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 call.argument<String>("apiKey")?.let { apiKey ->
                     virtusizeBuilder = virtusizeBuilder.setApiKey(apiKey)
                 } ?: run {
-                    result.error("Missing Arguments", "apiKey is null", null)
+                    result.error("-1", "apiKey is null", null)
                     return
                 }
 
@@ -91,11 +89,12 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
                 call.argument<List<String>>("detailsPanelCards")?.let { detailsPanelCardList ->
                     val detailsPanelCards =
-                        detailsPanelCardList.map { VirtusizeInfoCategory.valueOf(it) }.toMutableList()
+                        detailsPanelCardList.map { VirtusizeInfoCategory.valueOf(it) }
+                            .toMutableList()
                     virtusizeBuilder = virtusizeBuilder.setDetailsPanelCards(detailsPanelCards)
                 }
 
-                virtuszie = virtusizeBuilder.build()
+                virtusize = virtusizeBuilder.build()
 
                 result.success(call.arguments.toString())
             }
@@ -115,19 +114,83 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 if (virtusizeProduct == null || productDataCheck == null) {
                     throw IllegalArgumentException("Please invoke getProductDataCheck")
                 }
-                helper?.openVirtusizeView(virtuszie, virtusizeProduct!!, productDataCheck!!)
+                helper?.openVirtusizeView(virtusize, virtusizeProduct!!, productDataCheck!!)
             }
             "setVirtusizeView" -> {
                 val type = call.argument<String>("viewType")
                 call.argument<Int>("viewId")?.let {
-                    if(type == "VirtusizeButton") {
-                        virtuszie?.setupVirtusizeView(FLVirtusizeButton.virtusizeButtons.get(it))
+                    if (type == "VirtusizeButton") {
+                        virtusize?.setupVirtusizeView(FLVirtusizeButton.virtusizeButtons.get(it))
                     } else if (type == "VirtusizeInPageStandard") {
-                        virtuszie?.setupVirtusizeView(FLVirtusizeInPageStandard.virtusizeInPageStandards.get(it))
+                        virtusize?.setupVirtusizeView(
+                            FLVirtusizeInPageStandard.virtusizeInPageStandards.get(
+                                it
+                            )
+                        )
                     }
                     result.success(true)
                 } ?: run {
-                    result.error("Missing Arguments", "viewId is null", null)
+                    result.error("-1", "viewId is null", null)
+                }
+            }
+            "getRecommendationText" -> {
+                CoroutineScope(Dispatchers.Main).launch {
+                    if (productDataCheck?.data?.productDataId == null) {
+                        result.error("-1", "this code shouldn't get executed", null)
+                        return@launch
+                    }
+
+                    val storeProduct =
+                        repository.getStoreProduct(productDataCheck?.data?.productDataId!!)
+                    if (storeProduct == null) {
+                        result.error("-1", "storeProduct is null", null)
+                        return@launch
+                    }
+
+                    val productTypes = repository.getProductTypes()
+                    if (productTypes == null) {
+                        result.error("-1", "productTypes is null", null)
+                        return@launch
+                    }
+
+                    val i18nLocalization = repository.getI18nLocalization(virtusize?.displayLanguage)
+                    if (i18nLocalization == null) {
+                        result.error("-1", "i18nLocalization is null", null)
+                        return@launch
+                    }
+
+                    val userSessionResponse = repository.getUserSessionResponse()
+                    if (userSessionResponse == null) {
+                        result.error("-1", "userSessionResponse is null", null)
+                        return@launch
+                    }
+
+                    val userProducts = repository.getUserProducts()
+                    if (userProducts == null) {
+                        result.error("-1", "userProducts is null", null)
+                        return@launch
+                    }
+
+                    val userBodyProfile = repository.getUserBodyProfile()
+                    val bodyProfileRecommendedSize: BodyProfileRecommendedSize? = if (userBodyProfile == null) {
+                        null
+                    } else {
+                        repository.getBodyProfileRecommendedSize(
+                            productTypes,
+                            storeProduct,
+                            userBodyProfile
+                        )
+                    }
+
+                    result.success(
+                        helper?.getRecommendationText(
+                            userProducts,
+                            storeProduct,
+                            productTypes,
+                            bodyProfileRecommendedSize,
+                            i18nLocalization
+                        )
+                    )
                 }
             }
             else -> {
