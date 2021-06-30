@@ -8,9 +8,9 @@ import '../../virtusize_plugin.dart';
 import 'fading_dots.dart';
 
 class VirtusizeInPageMini extends StatefulWidget {
-  VirtusizeStyle style = VirtusizeStyle.None;
+  final VirtusizeStyle style;
 
-  VirtusizeInPageMini({this.style});
+  VirtusizeInPageMini({this.style = VirtusizeStyle.None});
 
   @override
   _VirtusizeInPageMiniState createState() => _VirtusizeInPageMiniState();
