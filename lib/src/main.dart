@@ -27,6 +27,10 @@ class VirtusizePlugin {
   VirtusizePlugin._() {
     _pdcController = StreamController<ProductDataCheck>.broadcast();
     _recTextController = StreamController<String>.broadcast();
+    _channel.setMethodCallHandler((call) {
+      print(call);
+      return null;
+    });
   }
 
   static const MethodChannel _channel =

@@ -4,8 +4,7 @@ import android.content.Context
 import androidx.annotation.NonNull
 import com.virtusize.libsource.*
 import com.virtusize.libsource.data.local.*
-import com.virtusize.libsource.data.remote.BodyProfileRecommendedSize
-import com.virtusize.libsource.data.remote.ProductCheck
+import com.virtusize.libsource.data.remote.*
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
@@ -16,6 +15,7 @@ import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.lang.IllegalArgumentException
 
@@ -25,21 +25,67 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     private lateinit var channel: MethodChannel
 
     private lateinit var context: Context
-    private var virtusize: Virtusize? = null
     private lateinit var repository: VirtusizeFlutterRepository
+    private lateinit var messageHandler: VirtusizeMessageHandler
+    private lateinit var job: Job
+
+    private var virtusize: Virtusize? = null
     private var virtusizeProduct: VirtusizeProduct? = null
     private var productDataCheck: ProductCheck? = null
+    private var storeProduct: Product? = null
+    private var productTypes: List<ProductType>? = null
+    private var i18nLocalization: I18nLocalization? = null
     private var helper: VirtusizeFlutterHelper? = null
 
-    override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
-        context = flutterPluginBinding.applicationContext
-        repository = VirtusizeFlutterRepository(context)
 
+    override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         channel = MethodChannel(
             flutterPluginBinding.binaryMessenger,
             "com.virtusize/virtusize_flutter_plugin"
         )
         channel.setMethodCallHandler(this)
+
+        context = flutterPluginBinding.applicationContext
+        messageHandler = object: VirtusizeMessageHandler{
+            override fun onError(error: VirtusizeError) {
+                CoroutineScope(Dispatchers.Main).launch {
+                    channel.invokeMethod("vsError", error.toString())
+                }
+            }
+
+            override fun onEvent(event: VirtusizeEvent) {
+                job = CoroutineScope(Dispatchers.Main).launch {
+                    when (event.name) {
+                        VirtusizeEvents.UserOpenedWidget.getEventName() -> {
+                            channel.invokeMethod("vsEvent", event.data.toString())
+                        }
+                        VirtusizeEvents.UserAuthData.getEventName() -> {
+                            channel.invokeMethod("vsEvent", event.data.toString())
+                        }
+                        VirtusizeEvents.UserSelectedProduct.getEventName() -> {
+                            channel.invokeMethod("vsEvent", event.data.toString())
+                        }
+                        VirtusizeEvents.UserAddedProduct.getEventName() -> {
+                            channel.invokeMethod("vsEvent", event.data.toString())
+                        }
+                        VirtusizeEvents.UserChangedRecommendationType.getEventName() -> {
+                            channel.invokeMethod("vsEvent", event.data.toString())
+                        }
+                        VirtusizeEvents.UserUpdatedBodyMeasurements.getEventName() -> {
+                            channel.invokeMethod("vsEvent", event.data.toString())
+                        }
+                        VirtusizeEvents.UserLoggedIn.getEventName() -> {
+                            channel.invokeMethod("vsEvent", event.data.toString())
+                        }
+                        VirtusizeEvents.UserLoggedOut.getEventName(), VirtusizeEvents.UserDeletedData.getEventName() -> {
+                            channel.invokeMethod("vsEvent", event.data.toString())
+                        }
+                    }
+                }
+            }
+
+        }
+        repository = VirtusizeFlutterRepository(context, messageHandler)
 
         // Register the VirtusizeButton
         flutterPluginBinding.platformViewRegistry.registerViewFactory(
@@ -114,7 +160,7 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 if (virtusizeProduct == null || productDataCheck == null) {
                     throw IllegalArgumentException("Please invoke getProductDataCheck")
                 }
-                helper?.openVirtusizeView(virtusize, virtusizeProduct!!, productDataCheck!!)
+                helper?.openVirtusizeView(virtusize, virtusizeProduct!!, productDataCheck!!, messageHandler)
             }
             "setVirtusizeView" -> {
                 val type = call.argument<String>("viewType")
@@ -134,69 +180,78 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 }
             }
             "getRecommendationText" -> {
-                CoroutineScope(Dispatchers.Main).launch {
+                job = CoroutineScope(Dispatchers.Main).launch {
                     if (productDataCheck?.data?.productDataId == null) {
                         result.error("-1", "this code shouldn't get executed", null)
                         return@launch
                     }
-
-                    val storeProduct =
-                        repository.getStoreProduct(productDataCheck?.data?.productDataId!!)
-                    if (storeProduct == null) {
-                        result.error("-1", "storeProduct is null", null)
-                        return@launch
-                    }
-
-                    val productTypes = repository.getProductTypes()
-                    if (productTypes == null) {
-                        result.error("-1", "productTypes is null", null)
-                        return@launch
-                    }
-
-                    val i18nLocalization = repository.getI18nLocalization(virtusize?.displayLanguage)
-                    if (i18nLocalization == null) {
-                        result.error("-1", "i18nLocalization is null", null)
-                        return@launch
-                    }
-
-                    val userSessionResponse = repository.getUserSessionResponse()
-                    if (userSessionResponse == null) {
-                        result.error("-1", "userSessionResponse is null", null)
-                        return@launch
-                    }
-
-                    val userProducts = repository.getUserProducts()
-                    if (userProducts == null) {
-                        result.error("-1", "userProducts is null", null)
-                        return@launch
-                    }
-
-                    val userBodyProfile = repository.getUserBodyProfile()
-                    val bodyProfileRecommendedSize: BodyProfileRecommendedSize? = if (userBodyProfile == null) {
-                        null
-                    } else {
-                        repository.getBodyProfileRecommendedSize(
-                            productTypes,
-                            storeProduct,
-                            userBodyProfile
-                        )
-                    }
-
-                    result.success(
-                        helper?.getRecommendationText(
-                            userProducts,
-                            storeProduct,
-                            productTypes,
-                            bodyProfileRecommendedSize,
-                            i18nLocalization
-                        )
-                    )
+                    fetchInitialData(result)
+                    updateUserSession(result)
+                    getRecommendation(result)
                 }
             }
             else -> {
                 result.notImplemented()
             }
         }
+    }
+
+    private suspend fun fetchInitialData(result: Result) {
+        storeProduct =
+            repository.getStoreProduct(productDataCheck?.data?.productDataId!!)
+        if (storeProduct == null) {
+            result.error("-1", "storeProduct is null", null)
+            job.cancel()
+        }
+
+        productTypes = repository.getProductTypes()
+        if (productTypes == null) {
+            result.error("-1", "productTypes is null", null)
+            job.cancel()
+        }
+
+        i18nLocalization = repository.getI18nLocalization(virtusize?.displayLanguage)
+        if (i18nLocalization == null) {
+            result.error("-1", "i18nLocalization is null", null)
+            job.cancel()
+        }
+    }
+
+    private suspend fun updateUserSession(result: Result) {
+        val userSessionResponse = repository.getUserSessionResponse()
+        if (userSessionResponse == null) {
+            result.error("-1", "userSessionResponse is null", null)
+            job.cancel()
+        }
+    }
+
+    private suspend fun getRecommendation(result: Result) {
+        val userProducts = repository.getUserProducts()
+        if (userProducts == null) {
+            result.error("-1", "userProducts is null", null)
+            job.cancel()
+        }
+
+        val userBodyProfile = repository.getUserBodyProfile()
+        val bodyProfileRecommendedSize: BodyProfileRecommendedSize? = if (userBodyProfile == null) {
+            null
+        } else {
+            repository.getBodyProfileRecommendedSize(
+                productTypes!!,
+                storeProduct!!,
+                userBodyProfile
+            )
+        }
+
+        result.success(
+            helper?.getRecommendationText(
+                userProducts!!,
+                storeProduct!!,
+                productTypes!!,
+                bodyProfileRecommendedSize,
+                i18nLocalization!!
+            )
+        )
     }
 
     override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
