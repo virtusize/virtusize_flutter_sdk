@@ -290,7 +290,7 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             if (result != null) {
                 result.error("-1", "userSessionResponse is null", null)
             } else {
-                channel.invokeMethod("onError", mutableMapOf("error" to "userSessionResponse is null"))
+                channel.invokeMethod("onRecTextChange", null)
             }
             scope.cancel()
         }
@@ -308,7 +308,7 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 if (result != null) {
                     result.error("-1", "userProducts is null", null)
                 } else {
-                    channel.invokeMethod("onError", mutableMapOf("error" to "userProducts is null"))
+                    channel.invokeMethod("onRecTextChange", mutableMapOf("error" to "userProducts is null"))
                 }
                 scope.cancel()
             }
