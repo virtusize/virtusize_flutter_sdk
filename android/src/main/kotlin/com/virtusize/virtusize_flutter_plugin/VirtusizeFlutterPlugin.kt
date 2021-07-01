@@ -5,6 +5,7 @@ import androidx.annotation.NonNull
 import com.virtusize.libsource.*
 import com.virtusize.libsource.data.local.*
 import com.virtusize.libsource.data.remote.*
+import com.virtusize.libsource.util.valueOf
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
@@ -13,10 +14,7 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import java.lang.IllegalArgumentException
 
 
@@ -27,7 +25,7 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     private lateinit var context: Context
     private lateinit var repository: VirtusizeFlutterRepository
     private lateinit var messageHandler: VirtusizeMessageHandler
-    private lateinit var job: Job
+    private lateinit var scope: CoroutineScope
 
     private var virtusize: Virtusize? = null
     private var virtusizeProduct: VirtusizeProduct? = null
@@ -35,6 +33,9 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     private var storeProduct: Product? = null
     private var productTypes: List<ProductType>? = null
     private var i18nLocalization: I18nLocalization? = null
+    private var userProducts: List<Product>? = null
+    private var bodyProfileRecommendedSize: BodyProfileRecommendedSize? = null
+    private var selectedUserProductId: Int? = null
     private var helper: VirtusizeFlutterHelper? = null
 
 
@@ -46,44 +47,105 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         channel.setMethodCallHandler(this)
 
         context = flutterPluginBinding.applicationContext
-        messageHandler = object: VirtusizeMessageHandler{
+        scope = CoroutineScope(Dispatchers.Main)
+        messageHandler = object : VirtusizeMessageHandler {
             override fun onError(error: VirtusizeError) {
-                CoroutineScope(Dispatchers.Main).launch {
-                    channel.invokeMethod("vsError", error.toString())
+                scope.launch {
+                    channel.invokeMethod("onVSError", error.toString())
                 }
             }
 
             override fun onEvent(event: VirtusizeEvent) {
-                job = CoroutineScope(Dispatchers.Main).launch {
-                    when (event.name) {
-                        VirtusizeEvents.UserOpenedWidget.getEventName() -> {
-                            channel.invokeMethod("vsEvent", event.data.toString())
+                when (event.name) {
+                    VirtusizeEvents.UserOpenedWidget.getEventName() -> {
+                        scope.launch {
+                            channel.invokeMethod("onVSEvent", event.data.toString())
+                            selectedUserProductId = null
+                            getRecommendation(
+                                shouldUpdateUserProducts = false,
+                                shouldUpdateUserBodyProfile = false
+                            )
                         }
-                        VirtusizeEvents.UserAuthData.getEventName() -> {
-                            channel.invokeMethod("vsEvent", event.data.toString())
+                    }
+                    VirtusizeEvents.UserAuthData.getEventName() -> {
+                        scope.launch {
+                            channel.invokeMethod("onVSEvent", event.data.toString())
                         }
-                        VirtusizeEvents.UserSelectedProduct.getEventName() -> {
-                            channel.invokeMethod("vsEvent", event.data.toString())
+                        event.data?.let { data ->
+                            repository.updateUserAuthData(data)
                         }
-                        VirtusizeEvents.UserAddedProduct.getEventName() -> {
-                            channel.invokeMethod("vsEvent", event.data.toString())
+                    }
+                    VirtusizeEvents.UserSelectedProduct.getEventName() -> {
+                        scope.launch {
+                            channel.invokeMethod("onVSEvent", event.data.toString())
+                            event.data?.optInt("userProductId")?.let { userProductId ->
+                                selectedUserProductId = userProductId
+                            }
+                            getRecommendation(
+                                selectedRecommendedType = SizeRecommendationType.compareProduct,
+                                shouldUpdateUserProducts = false
+                            )
                         }
-                        VirtusizeEvents.UserChangedRecommendationType.getEventName() -> {
-                            channel.invokeMethod("vsEvent", event.data.toString())
+                    }
+                    VirtusizeEvents.UserAddedProduct.getEventName() -> {
+                        scope.launch {
+                            channel.invokeMethod("onVSEvent", event.data.toString())
+                            event.data?.optInt("userProductId")?.let { userProductId ->
+                                selectedUserProductId = userProductId
+                            }
+                            getRecommendation(
+                                selectedRecommendedType = SizeRecommendationType.compareProduct,
+                                shouldUpdateUserBodyProfile = false
+                            )
                         }
-                        VirtusizeEvents.UserUpdatedBodyMeasurements.getEventName() -> {
-                            channel.invokeMethod("vsEvent", event.data.toString())
+                    }
+                    VirtusizeEvents.UserChangedRecommendationType.getEventName() -> {
+                        scope.launch {
+                            channel.invokeMethod("onVSEvent", event.data.toString())
+                            var recommendationType: SizeRecommendationType? = null
+                            event.data?.optString("recommendationType")?.let {
+                                recommendationType = valueOf<SizeRecommendationType>(it)
+                            }
+                            getRecommendation(
+                                selectedRecommendedType = recommendationType,
+                                shouldUpdateUserProducts = false,
+                                shouldUpdateUserBodyProfile = false
+                            )
                         }
-                        VirtusizeEvents.UserLoggedIn.getEventName() -> {
-                            channel.invokeMethod("vsEvent", event.data.toString())
+                    }
+                    VirtusizeEvents.UserUpdatedBodyMeasurements.getEventName() -> {
+                        scope.launch {
+                            channel.invokeMethod("onVSEvent", event.data.toString())
+                            event.data?.optString("sizeRecName")?.let { sizeRecName ->
+                                bodyProfileRecommendedSize = BodyProfileRecommendedSize(sizeRecName)
+                                getRecommendation(
+                                    selectedRecommendedType = SizeRecommendationType.body,
+                                    shouldUpdateUserProducts = false,
+                                    shouldUpdateUserBodyProfile = false
+                                )
+                            }
                         }
-                        VirtusizeEvents.UserLoggedOut.getEventName(), VirtusizeEvents.UserDeletedData.getEventName() -> {
-                            channel.invokeMethod("vsEvent", event.data.toString())
+                    }
+                    VirtusizeEvents.UserLoggedIn.getEventName() -> {
+                        scope.launch {
+                            channel.invokeMethod("onVSEvent", event.data.toString())
+                            updateUserSession()
+                            getRecommendation()
+                        }
+                    }
+                    VirtusizeEvents.UserLoggedOut.getEventName(), VirtusizeEvents.UserDeletedData.getEventName() -> {
+                        scope.launch {
+                            channel.invokeMethod("onVSEvent", event.data.toString())
+                            clearUserData()
+                            updateUserSession()
+                            getRecommendation(
+                                shouldUpdateUserProducts = false,
+                                shouldUpdateUserBodyProfile = false
+                            )
                         }
                     }
                 }
             }
-
         }
         repository = VirtusizeFlutterRepository(context, messageHandler)
 
@@ -160,7 +222,12 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 if (virtusizeProduct == null || productDataCheck == null) {
                     throw IllegalArgumentException("Please invoke getProductDataCheck")
                 }
-                helper?.openVirtusizeView(virtusize, virtusizeProduct!!, productDataCheck!!, messageHandler)
+                helper?.openVirtusizeView(
+                    virtusize,
+                    virtusizeProduct!!,
+                    productDataCheck!!,
+                    messageHandler
+                )
             }
             "setVirtusizeView" -> {
                 val type = call.argument<String>("viewType")
@@ -180,7 +247,7 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 }
             }
             "getRecommendationText" -> {
-                job = CoroutineScope(Dispatchers.Main).launch {
+                scope.launch {
                     if (productDataCheck?.data?.productDataId == null) {
                         result.error("-1", "this code shouldn't get executed", null)
                         return@launch
@@ -201,57 +268,84 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             repository.getStoreProduct(productDataCheck?.data?.productDataId!!)
         if (storeProduct == null) {
             result.error("-1", "storeProduct is null", null)
-            job.cancel()
+            scope.cancel()
         }
 
         productTypes = repository.getProductTypes()
         if (productTypes == null) {
             result.error("-1", "productTypes is null", null)
-            job.cancel()
+            scope.cancel()
         }
 
         i18nLocalization = repository.getI18nLocalization(virtusize?.displayLanguage)
         if (i18nLocalization == null) {
             result.error("-1", "i18nLocalization is null", null)
-            job.cancel()
+            scope.cancel()
         }
     }
 
-    private suspend fun updateUserSession(result: Result) {
+    private suspend fun updateUserSession(result: Result? = null) {
         val userSessionResponse = repository.getUserSessionResponse()
         if (userSessionResponse == null) {
-            result.error("-1", "userSessionResponse is null", null)
-            job.cancel()
+            if (result != null) {
+                result.error("-1", "userSessionResponse is null", null)
+            } else {
+                channel.invokeMethod("onError", mutableMapOf("error" to "userSessionResponse is null"))
+            }
+            scope.cancel()
         }
     }
 
-    private suspend fun getRecommendation(result: Result) {
-        val userProducts = repository.getUserProducts()
-        if (userProducts == null) {
-            result.error("-1", "userProducts is null", null)
-            job.cancel()
+    private suspend fun getRecommendation(
+        result: Result? = null,
+        selectedRecommendedType: SizeRecommendationType? = null,
+        shouldUpdateUserProducts: Boolean = true,
+        shouldUpdateUserBodyProfile: Boolean = true
+    ) {
+        if (shouldUpdateUserProducts) {
+            userProducts = repository.getUserProducts()
+            if (userProducts == null) {
+                if (result != null) {
+                    result.error("-1", "userProducts is null", null)
+                } else {
+                    channel.invokeMethod("onError", mutableMapOf("error" to "userProducts is null"))
+                }
+                scope.cancel()
+            }
         }
 
-        val userBodyProfile = repository.getUserBodyProfile()
-        val bodyProfileRecommendedSize: BodyProfileRecommendedSize? = if (userBodyProfile == null) {
-            null
-        } else {
-            repository.getBodyProfileRecommendedSize(
-                productTypes!!,
-                storeProduct!!,
-                userBodyProfile
-            )
+        if (shouldUpdateUserBodyProfile) {
+            val userBodyProfile = repository.getUserBodyProfile()
+            bodyProfileRecommendedSize =
+                if (userBodyProfile == null) {
+                    null
+                } else {
+                    repository.getBodyProfileRecommendedSize(
+                        productTypes!!,
+                        storeProduct!!,
+                        userBodyProfile
+                    )
+                }
         }
 
-        result.success(
-            helper?.getRecommendationText(
-                userProducts!!,
-                storeProduct!!,
-                productTypes!!,
-                bodyProfileRecommendedSize,
-                i18nLocalization!!
-            )
+        val recText = helper?.getRecommendationText(
+            selectedRecommendedType,
+            if (selectedUserProductId != null) userProducts?.filter { it.id == selectedUserProductId } else userProducts,
+            storeProduct!!,
+            productTypes!!,
+            bodyProfileRecommendedSize,
+            i18nLocalization!!
         )
+        result?.success(recText) ?: run {
+            channel.invokeMethod("onRecTextChange", recText)
+        }
+    }
+
+    private suspend fun clearUserData() {
+        repository.deleteUser()
+
+        userProducts = null
+        bodyProfileRecommendedSize = null
     }
 
     override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {

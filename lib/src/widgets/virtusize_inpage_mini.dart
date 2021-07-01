@@ -37,7 +37,8 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
         VirtusizePlugin.instance.recTextStream.listen((recText) {
       setState(() {
         _isLoading = false;
-        _recText = recText;
+        _recText =
+            recText.replaceAll("%{boldStart}", "").replaceAll("%{boldEnd}", "");
       });
     });
   }

@@ -29,6 +29,9 @@ class VirtusizePlugin {
     _recTextController = StreamController<String>.broadcast();
     _channel.setMethodCallHandler((call) {
       print(call);
+      if(call.method == "onRecTextChange") {
+        _recTextSink.add(call.arguments);
+      }
       return null;
     });
   }
