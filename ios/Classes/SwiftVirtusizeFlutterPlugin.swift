@@ -95,7 +95,7 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 					imageURL = URL(string: imageURLString)
 				}
 				
-				DispatchQueue.main.async {
+				DispatchQueue.global().async {
 					var pdcJsonString: String? = nil
 					(self.product, pdcJsonString) = self.repository.getProductDataCheck(
 						product:
@@ -132,23 +132,24 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 				let workItem3 = DispatchWorkItem { [weak self] in
 					self?.getRecommendation(self?.workItem, result)
 				}
+
+				workItem = workItem1
+				DispatchQueue.global().async(execute: workItem1)
 				
-				workItem1.notify(queue: .main) { [weak self] in
+				workItem1.notify(queue: .global()) { [weak self] in
 					if self?.workItem?.isCancelled != true {
 						self?.workItem = workItem2
 						workItem2.perform()
 					}
 				}
 				
-				workItem2.notify(queue: .main) { [weak self] in
+				workItem2.notify(queue: .global()) { [weak self] in
 					if self?.workItem?.isCancelled != true {
 						self?.workItem = workItem3
 						workItem3.perform()
 					}
 				}
 
-				workItem = workItem1
-				DispatchQueue.main.async(execute: workItem1)
 			default:
 				result(FlutterMethodNotImplemented)
 		}
@@ -252,7 +253,7 @@ extension SwiftVirtusizeFlutterPlugin: VirtusizeMessageHandler {
 		workItem = DispatchWorkItem { [weak self] in
 			self?.flutterChannel?.invokeMethod("onVSError", arguments: error.debugDescription)
 		}
-		DispatchQueue.main.async(execute: workItem!)
+		DispatchQueue.global().async(execute: workItem!)
 	}
 	
 	public func virtusizeController(_ controller: VirtusizeWebViewController, didReceiveEvent event: VirtusizeEvent) {
@@ -344,22 +345,22 @@ extension SwiftVirtusizeFlutterPlugin: VirtusizeMessageHandler {
 			default:
 				break
 		}
+
+		workItem = workItem1
+		DispatchQueue.global().async(execute: workItem1)
 		
-		workItem1.notify(queue: .main) { [weak self] in
+		workItem1.notify(queue: .global()) { [weak self] in
 			if self?.workItem?.isCancelled != true {
 				self?.workItem = workItem2
 				workItem2?.perform()
 			}
 		}
 		
-		workItem2?.notify(queue: .main) { [weak self] in
+		workItem2?.notify(queue: .global()) { [weak self] in
 			if self?.workItem?.isCancelled != true {
 				self?.workItem = workItem3
 				workItem3?.perform()
 			}
 		}
-		
-		workItem = workItem1
-		DispatchQueue.main.async(execute: workItem1)
 	}
 }
