@@ -111,7 +111,7 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 				if let viewController = VirtusizeWebViewController(
 					product: product,
 					userSessionResponse: userSessionResponse,
-					eventHandler: self,
+					messageHandler: self,
 					processPool: Virtusize.processPool) {
 					let flutterRootViewController = UIApplication.shared.windows.first?.rootViewController
 					flutterRootViewController?.present(viewController, animated: true)
@@ -121,38 +121,63 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 					result(FlutterError.unKnownError)
 					return
 				}
-				workItem = DispatchWorkItem {
-					self.fetchInitialData(result, storeProductId: storeProductId)
-					self.updateUserSession(result)
-					self.getRecommendation(result)
+				let workItem1 = DispatchWorkItem { [weak self] in
+					self?.fetchInitialData(self?.workItem, result, storeProductId: storeProductId)
 				}
-				DispatchQueue.main.async(execute: workItem!)
+				
+				let workItem2 = DispatchWorkItem { [weak self] in
+					self?.updateUserSession(self?.workItem, result)
+				}
+				
+				let workItem3 = DispatchWorkItem { [weak self] in
+					self?.getRecommendation(self?.workItem, result)
+				}
+				
+				workItem1.notify(queue: .main) { [weak self] in
+					if self?.workItem?.isCancelled != true {
+						self?.workItem = workItem2
+						workItem2.perform()
+					}
+				}
+				
+				workItem2.notify(queue: .main) { [weak self] in
+					if self?.workItem?.isCancelled != true {
+						self?.workItem = workItem3
+						workItem3.perform()
+					}
+				}
+
+				workItem = workItem1
+				DispatchQueue.main.async(execute: workItem1)
 			default:
 				result(FlutterMethodNotImplemented)
 		}
 	}
 	
-	private func fetchInitialData(_ result: @escaping FlutterResult, storeProductId: Int) {
+	private func fetchInitialData(_ workItem: DispatchWorkItem?, _ result: @escaping FlutterResult, storeProductId: Int) {
 		storeProduct = repository.getStoreProduct(productId: storeProductId)
 		if storeProduct == nil {
 			result(FlutterError.nullAPIResult("storeProduct"))
 			workItem?.cancel()
+			return
 		}
 		
 		productTypes = repository.getProductTypes()
 		if productTypes == nil {
 			result(FlutterError.nullAPIResult("productTypes"))
 			workItem?.cancel()
+			return
 		}
 
 		i18nLocalization = repository.getI18nLocalization()
 		if i18nLocalization == nil {
 			result(FlutterError.nullAPIResult("i18nLocalization"))
 			workItem?.cancel()
+			return
 		}
 	}
 	
-	private func updateUserSession(_ result: FlutterResult? = nil) {
+	private func updateUserSession(_ workItem: DispatchWorkItem?, _ result: FlutterResult? = nil) {
 		userSessionResponse = repository.getUserSessionResponse()
 		if userSessionResponse == nil {
 			if let result = result {
@@ -161,10 +186,12 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 				flutterChannel?.invokeMethod("onRecTextChange", arguments: nil)
 			}
 			workItem?.cancel()
+			return
 		}
 	}
 	
 	private func getRecommendation(
+		_ workItem: DispatchWorkItem?,
 		_ result: FlutterResult? = nil,
 		selectedRecommendedType: SizeRecommendationType? = nil,
 		shouldUpdateUserProducts: Bool = true,
@@ -179,6 +206,7 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 					flutterChannel?.invokeMethod("onRecTextChange", arguments: nil)
 				}
 				workItem?.cancel()
+				return
 			}
 		}
 
@@ -210,38 +238,128 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 			flutterChannel?.invokeMethod("onRecTextChange", arguments: recText)
 		}
 	}
+	
+	private func clearUserData() {
+		repository.deleteUser()
+		
+		userProducts = nil
+		bodyProfileRecommendedSize = nil
+	}
 }
 
-extension SwiftVirtusizeFlutterPlugin: VirtusizeEventHandler {
-	public func userOpenedWidget() {
-		
+extension SwiftVirtusizeFlutterPlugin: VirtusizeMessageHandler {
+	public func virtusizeController(_ controller: VirtusizeWebViewController, didReceiveError error: VirtusizeError) {
+		workItem = DispatchWorkItem { [weak self] in
+			self?.flutterChannel?.invokeMethod("onVSError", arguments: error.debugDescription)
+		}
+		DispatchQueue.main.async(execute: workItem!)
 	}
 	
-	public func userAuthData(bid: String?, auth: String?) {
+	public func virtusizeController(_ controller: VirtusizeWebViewController, didReceiveEvent event: VirtusizeEvent) {
+		let workItem1 = DispatchWorkItem { [weak self] in
+			self?.flutterChannel?.invokeMethod("onVSEvent", arguments: event.data)
+		}
 		
-	}
-	
-	public func userLoggedIn() {
+		var workItem2: DispatchWorkItem? = nil
+		var workItem3: DispatchWorkItem? = nil
 		
-	}
-	
-	public func clearUserData() {
+		switch VirtusizeEventName.init(rawValue: event.name) {
+			case .userOpenedWidget:
+				selectedUserProductId = nil
+				workItem2 = DispatchWorkItem { [weak self] in
+					self?.getRecommendation(
+						self?.workItem,
+						shouldUpdateUserProducts: false,
+						shouldUpdateUserBodyProfile: false
+					)
+				}
+			case .userAuthData:
+				if let data = event.data as? [String: Any] {
+					repository.updateUserAuthData(bid: data["x-vs-bid"] as? String, auth: data["x-vs-auth"] as? String)
+				}
+			case .userSelectedProduct:
+				if let userProductId = (event.data as? [String: Any])?["userProductId"] as? Int {
+					selectedUserProductId = userProductId
+				}
+				workItem2 = DispatchWorkItem { [weak self] in
+					self?.getRecommendation(
+						self?.workItem,
+						selectedRecommendedType: SizeRecommendationType.compareProduct,
+						shouldUpdateUserProducts: false
+					)
+				}
+			case .userAddedProduct:
+				if let userProductId = (event.data as? [String: Any])?["userProductId"] as? Int {
+					selectedUserProductId = userProductId
+				}
+				workItem2 = DispatchWorkItem { [weak self] in
+					self?.getRecommendation(
+						self?.workItem,
+						selectedRecommendedType: SizeRecommendationType.compareProduct,
+						shouldUpdateUserBodyProfile: false
+					)
+				}
+			case .userChangedRecommendationType:
+				let recommendationType = (event.data as? [String: Any])?["recommendationType"] as? String
+				let changedType = (recommendationType != nil) ? SizeRecommendationType.init(rawValue: recommendationType!) : nil
+				workItem2 = DispatchWorkItem { [weak self] in
+					self?.getRecommendation(
+						self?.workItem,
+						selectedRecommendedType: changedType,
+						shouldUpdateUserProducts: false,
+						shouldUpdateUserBodyProfile: false
+					)
+				}
+			case .userUpdatedBodyMeasurements:
+				if let sizeRecName = (event.data as? [String: Any])?["sizeRecName"] as? String {
+					bodyProfileRecommendedSize = BodyProfileRecommendedSize(sizeName: sizeRecName)
+					workItem2 = DispatchWorkItem { [weak self] in
+						self?.getRecommendation(
+							self?.workItem,
+							selectedRecommendedType: SizeRecommendationType.body,
+							shouldUpdateUserProducts: false,
+							shouldUpdateUserBodyProfile: false
+						)
+					}
+				}
+			case .userLoggedIn:
+				workItem2 = DispatchWorkItem { [weak self] in
+					self?.updateUserSession(self?.workItem)
+				}
+				workItem3 = DispatchWorkItem { [weak self] in
+					self?.getRecommendation(self?.workItem)
+				}
+			case .userLoggedOut, .userDeletedData:
+				workItem2 = DispatchWorkItem { [weak self] in
+					self?.clearUserData()
+					self?.updateUserSession(self?.workItem)
+				}
+				workItem3 = DispatchWorkItem { [weak self] in
+					self?.getRecommendation(
+						self?.workItem,
+						shouldUpdateUserProducts: false,
+						shouldUpdateUserBodyProfile: false
+					)
+				}
+			default:
+				break
+		}
 		
-	}
-	
-	public func userSelectedProduct(userProductId: Int?) {
+		workItem1.notify(queue: .main) { [weak self] in
+			if self?.workItem?.isCancelled != true {
+				self?.workItem = workItem2
+				workItem2?.perform()
+			}
+		}
 		
-	}
-	
-	public func userAddedProduct(userProductId: Int?) {
+		workItem2?.notify(queue: .main) { [weak self] in
+			if self?.workItem?.isCancelled != true {
+				self?.workItem = workItem3
+				workItem3?.perform()
+			}
+		}
 		
-	}
-	
-	public func userUpdatedBodyMeasurements(recommendedSize: String?) {
-		
-	}
-	
-	public func userChangedRecommendationType(changedType: SizeRecommendationType?) {
-		
+		workItem = workItem1
+		DispatchQueue.main.async(execute: workItem1)
 	}
 }
