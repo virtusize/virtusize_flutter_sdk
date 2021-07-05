@@ -76,7 +76,9 @@ class _MyAppState extends State<MyApp> {
                       child: Text("Custom Text"),
                     ),
                     Container(height: 16),
-                    VirtusizeInPageMini()
+                    VirtusizeInPageMini(),
+                    Container(height: 16),
+                    VirtusizeInPageMini(backgroundColor: Colors.blue, horizontalMargin: 32)
                   ])))),
     );
   }

@@ -9,8 +9,13 @@ import 'fading_dots.dart';
 
 class VirtusizeInPageMini extends StatefulWidget {
   final VirtusizeStyle style;
+  final Color backgroundColor;
+  final double horizontalMargin;
 
-  VirtusizeInPageMini({this.style = VirtusizeStyle.None});
+  VirtusizeInPageMini(
+      {this.style = VirtusizeStyle.Black,
+      this.backgroundColor = VSColor.vsGray900,
+      this.horizontalMargin = 16});
 
   @override
   _VirtusizeInPageMiniState createState() => _VirtusizeInPageMiniState();
@@ -62,7 +67,7 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
     if (_isValidProduct) {
       return GestureDetector(
         child: _createVSInPageMini(),
-        onTap: _openVirtusizeWebview,
+        onTap: !_hasError ? _openVirtusizeWebview : () => {},
       );
     }
     return Container();
@@ -73,15 +78,32 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
   }
 
   Widget _createVSInPageMini() {
+    Color color = widget.backgroundColor;
+    switch (widget.style) {
+      case VirtusizeStyle.Black:
+        if (color == null) {
+          color = VSColor.vsGray900;
+        }
+        break;
+      case VirtusizeStyle.None:
+        color = widget.backgroundColor;
+        break;
+      case VirtusizeStyle.Teal:
+        if (color == null) {
+          color = VSColor.vsTeal;
+        }
+        break;
+      }
     return Container(
-        margin: EdgeInsets.symmetric(horizontal: 16.0),
-        color: _isLoading || _hasError ? Colors.white : VSColor.vsGray900,
+        margin: EdgeInsets.symmetric(horizontal: widget.horizontalMargin),
+        color: _isLoading || _hasError ? Colors.white : color,
         width: double.infinity,
         child: _hasError
             ? _createVSInPageMiniOnError()
             : _isLoading
-                ? _createVSInPageMiniOnLoading()
-                : _createVSInPageMiniOnFinishedLoading());
+            ? _createVSInPageMiniOnLoading()
+            : _createVSInPageMiniOnFinishedLoading(themeColor: color));
+
   }
 
   Widget _createVSInPageMiniOnLoading() {
@@ -102,7 +124,7 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
     ]);
   }
 
-  Widget _createVSInPageMiniOnFinishedLoading() {
+  Widget _createVSInPageMiniOnFinishedLoading({Color themeColor}) {
     return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
       Flexible(
           child: Container(
@@ -112,26 +134,27 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
       )),
       Container(
           margin: EdgeInsets.only(top: 5, bottom: 5, left: 4, right: 8),
-          child: _createVSSizeCheckButton())
+          child: _createVSSizeCheckButton(themeColor: themeColor))
     ]);
   }
 
-  Widget _createVSSizeCheckButton() {
+  Widget _createVSSizeCheckButton({Color themeColor}) {
     return ElevatedButton(
       child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
         Text('サイズチェック',
             style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
         Container(width: 1.0),
-        ImageIcon(VSImages.rightArrow.image, size: 9)
+        ImageIcon(VSImages.rightArrow.image, size: 9, color: themeColor)
       ]),
       style: ElevatedButton.styleFrom(
+          elevation: 0,
           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
           minimumSize: Size.zero,
           padding: EdgeInsets.symmetric(vertical: 4, horizontal: 6),
           //change background color of button
           primary: Colors.white,
           //change text color of button
-          onPrimary: VSColor.vsGray900,
+          onPrimary: themeColor,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(100),
           )),
