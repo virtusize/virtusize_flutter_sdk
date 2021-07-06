@@ -5,6 +5,7 @@ class ProductDataCheck extends VirtusizeModel {
   Map<String, dynamic> _decodedData;
 
   ProductDataCheck(this._data) {
+    print(this._data);
     _decodedData = decodeJson(_data);
   }
 

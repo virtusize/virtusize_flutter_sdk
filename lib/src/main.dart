@@ -83,7 +83,8 @@ class VirtusizePlugin {
       return await _channel.invokeMethod('getProductDataCheck', {
         'externalId': product.externalId,
         'imageUrl': product.imageUrl
-      }).then((value) => ProductDataCheck(value));
+      }).then((value) =>
+          ProductDataCheck(value));
     } on PlatformException catch (error) {
       print('Failed to set VirtusizeProduct: $error');
     }
