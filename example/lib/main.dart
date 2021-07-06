@@ -7,19 +7,19 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   VirtusizePlugin.instance.setVirtusizeProps(
       // Only the API key is required
-      '15cc36e1d7dad62b8e11722ce1a245cb6c5e6692',
+      apiKey: '15cc36e1d7dad62b8e11722ce1a245cb6c5e6692',
       // For using the Order API, a user ID is required
-      '123',
+      externalUserId: '123',
       // By default, the Virtusize environment will be set to GLOBAL
-      Env.staging,
+      env: Env.staging,
       // By default, the initial language will be set based on the Virtusize environment
-      Language.jp,
+      language: Language.jp,
       // By default, ShowSGI is false
-      true,
+      showSGI: true,
       // By default, Virtusize allows all the possible languages
-      [Language.en, Language.jp],
+      allowedLanguages: [Language.en, Language.jp],
       // By default, Virtusize displays all the possible info categories in the Product Details tab
-      [InfoCategory.generalFit, InfoCategory.brandSizing]);
+      detailsPanelCards: [InfoCategory.generalFit, InfoCategory.brandSizing]);
 
   runApp(MyApp());
 }

@@ -39,13 +39,17 @@ class VirtusizePlugin {
   static const MethodChannel _channel =
       const MethodChannel('com.virtusize/virtusize_flutter_plugin');
 
-  Future<void> setVirtusizeProps(String apiKey,
-      [String externalUserId,
-      Env env,
-      Language language,
-      bool showSGI,
-      List<Language> allowedLanguages,
-      List<InfoCategory> detailsPanelCards]) async {
+  Future<void> setVirtusizeProps({@required String apiKey,
+      String externalUserId,
+      Env env = Env.global,
+      Language language = Language.jp,
+      bool showSGI = false,
+      List<Language> allowedLanguages = Language.values,
+      List<InfoCategory> detailsPanelCards = InfoCategory.values
+  }) async {
+    if(apiKey == null) {
+      throw FlutterError("The API key is required");
+    }
     try {
       await _channel.invokeMethod('setVirtusizeProps', {
         'apiKey': apiKey,
