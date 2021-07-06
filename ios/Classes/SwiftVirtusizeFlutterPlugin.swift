@@ -96,14 +96,14 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 				}
 				
 				DispatchQueue.global().async {
-					var pdcJsonString: String? = nil
-					(self.product, pdcJsonString) = self.repository.getProductDataCheck(
+					let (product, pdcJsonString) = self.repository.getProductDataCheck(
 						product:
 							VirtusizeProduct(
 								externalId: productId,
 								imageURL: imageURL
 							)
 					)
+					self.product = product
 					self.productCheckData = self.product?.dictionary["data"] as? [String: Any]
 					result(pdcJsonString)
 				}
@@ -149,7 +149,6 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 						workItem3.perform()
 					}
 				}
-
 			default:
 				result(FlutterMethodNotImplemented)
 		}
@@ -212,7 +211,11 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 		}
 
 		if shouldUpdateUserBodyProfile {
-			let userBodyProfile = repository.getUserBodyProfile()
+			let (userBodyProfile, errorCode) = repository.getUserBodyProfile()
+			if let errorCode = errorCode, errorCode != 404 {
+				workItem?.cancel()
+				return
+			}
 			bodyProfileRecommendedSize = (userBodyProfile != nil) ?
 				repository.getBodyProfileRecommendedSize(
 					productTypes: productTypes!,
