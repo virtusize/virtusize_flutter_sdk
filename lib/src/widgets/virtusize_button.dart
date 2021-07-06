@@ -2,10 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:virtusize_flutter_plugin/src/main.dart';
-import 'package:virtusize_flutter_plugin/src/models/product_data_check.dart';
-import 'package:virtusize_flutter_plugin/src/ui/images.dart';
 
+import '../main.dart';
+import '../models/product_data_check.dart';
+import '../ui/images.dart';
 import '../../virtusize_plugin.dart';
 import '../ui/colors.dart';
 

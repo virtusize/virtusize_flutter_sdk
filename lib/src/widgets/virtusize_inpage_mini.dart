@@ -1,21 +1,22 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:virtusize_flutter_plugin/src/ui/colors.dart';
-import 'package:virtusize_flutter_plugin/src/ui/images.dart';
 
+import '../ui/colors.dart';
+import '../ui/images.dart';
 import '../../virtusize_plugin.dart';
 import 'fading_dots.dart';
 
 class VirtusizeInPageMini extends StatefulWidget {
-  final VirtusizeStyle style;
-  final Color backgroundColor;
+  VirtusizeStyle style = VirtusizeStyle.None;
+  Color backgroundColor;
   final double horizontalMargin;
 
   VirtusizeInPageMini(
-      {this.style = VirtusizeStyle.Black,
-      this.backgroundColor = VSColor.vsGray900,
-      this.horizontalMargin = 16});
+      {this.backgroundColor = VSColor.vsGray900, this.horizontalMargin = 16});
+
+  VirtusizeInPageMini.vsStyle(
+      {this.style = VirtusizeStyle.Black, this.horizontalMargin = 16});
 
   @override
   _VirtusizeInPageMiniState createState() => _VirtusizeInPageMiniState();
@@ -78,20 +79,16 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
   }
 
   Widget _createVSInPageMini() {
-    Color color = widget.backgroundColor;
+    Color color;
     switch (widget.style) {
       case VirtusizeStyle.Black:
-        if (color == null) {
-          color = VSColor.vsGray900;
-        }
+        color = VSColor.vsGray900;
         break;
       case VirtusizeStyle.None:
         color = widget.backgroundColor;
         break;
       case VirtusizeStyle.Teal:
-        if (color == null) {
-          color = VSColor.vsTeal;
-        }
+        color = VSColor.vsTeal;
         break;
       }
     return Container(

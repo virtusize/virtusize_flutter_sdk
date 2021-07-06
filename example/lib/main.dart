@@ -59,7 +59,8 @@ class _MyAppState extends State<MyApp> {
                     Container(height: 16),
                     VirtusizeButton(
                       child: ElevatedButton.icon(
-                          label: Text('サイズチェック', style: TextStyle(fontSize: 12)),
+                          label:
+                              Text('サイズチェック', style: TextStyle(fontSize: 12)),
                           icon: Icon(Icons.account_circle_rounded),
                           style: ElevatedButton.styleFrom(
                               primary: Color(0xFF191919),
@@ -76,9 +77,10 @@ class _MyAppState extends State<MyApp> {
                       child: Text("Custom Text"),
                     ),
                     Container(height: 16),
-                    VirtusizeInPageMini(),
+                    VirtusizeInPageMini.vsStyle(style: VirtusizeStyle.Teal),
                     Container(height: 16),
-                    VirtusizeInPageMini(backgroundColor: Colors.blue, horizontalMargin: 32)
+                    VirtusizeInPageMini(
+                        backgroundColor: Colors.blue, horizontalMargin: 32)
                   ])))),
     );
   }
