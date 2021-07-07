@@ -25,7 +25,7 @@ class ProductImageView extends StatelessWidget {
                 : null,
             border: productImageType == ProductImageType.store
                 ? Border.all(
-                    color: VSColor.vsGray800,
+                    color: VSColors.vsGray800,
                     width: 0.5,
                   )
                 : null,

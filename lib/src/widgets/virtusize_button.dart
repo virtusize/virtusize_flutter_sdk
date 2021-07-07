@@ -50,11 +50,11 @@ class _VirtusizeButtonState extends State<VirtusizeButton> {
           return widget.child;
           break;
         case VirtusizeStyle.Black:
-          Color color = VSColor.vsGray900;
+          Color color = VSColors.vsGray900;
           return _createVSButton(color, widget.child);
           break;
         case VirtusizeStyle.Teal:
-          Color color = VSColor.vsTeal;
+          Color color = VSColors.vsTeal;
           return _createVSButton(color, widget.child);
           break;
       }

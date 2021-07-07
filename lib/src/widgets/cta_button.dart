@@ -12,7 +12,7 @@ class CTAButton extends StatelessWidget {
   const CTAButton(
       {Key key,
       this.backgroundColor = Colors.white,
-      this.textColor = VSColor.vsGray900,
+      this.textColor = VSColors.vsGray900,
       this.onPressed})
       : super(key: key);
 

@@ -59,7 +59,7 @@ class _AnimatedDotsState extends State<AnimatedDots> with TickerProviderStateMix
           opacity: entry.key as Animation<double>,
           child: Text(entry.value,
               style: TextStyle(
-                  fontWeight: FontWeight.bold, color: VSColor.vsGray900)),
+                  fontWeight: FontWeight.bold, color: VSColors.vsGray900)),
         )).toList()
     );
   }

@@ -15,7 +15,7 @@ class VirtusizeInPageMini extends StatefulWidget {
   final double horizontalMargin;
 
   VirtusizeInPageMini(
-      {this.backgroundColor = VSColor.vsGray900, this.horizontalMargin = 16});
+      {this.backgroundColor = VSColors.vsGray900, this.horizontalMargin = 16});
 
   VirtusizeInPageMini.vsStyle(
       {this.style = VirtusizeStyle.Black, this.horizontalMargin = 16});
@@ -84,13 +84,13 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
     Color color;
     switch (widget.style) {
       case VirtusizeStyle.Black:
-        color = VSColor.vsGray900;
+        color = VSColors.vsGray900;
         break;
       case VirtusizeStyle.None:
         color = widget.backgroundColor;
         break;
       case VirtusizeStyle.Teal:
-        color = VSColor.vsTeal;
+        color = VSColors.vsTeal;
         break;
     }
     return Container(
@@ -113,7 +113,7 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
             child: Image(
                 image: VSImages.vsIcon.image,
                 fit: BoxFit.cover,
-                color: VSColor.vsGray900),
+                color: VSColors.vsGray900),
           )),
       Container(
         margin: EdgeInsets.only(top: 6, bottom: 6, left: 5),
@@ -121,7 +121,7 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
             style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 12,
-                color: _isLoading ? VSColor.vsGray900 : Colors.white)),
+                color: _isLoading ? VSColors.vsGray900 : Colors.white)),
       ),
       Container(width: 1.0),
       AnimatedDots()
@@ -152,12 +152,12 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
             child: Image(
                 image: VSImages.errorHanger.image,
                 fit: BoxFit.cover,
-                color: VSColor.vsGray700),
+                color: VSColors.vsGray700),
           )),
       Container(
         margin: EdgeInsets.only(top: 6, bottom: 6, left: 5),
         child: Text("現在バーチャサイズは使えません。",
-            style: TextStyle(fontSize: 12, color: VSColor.vsGray700)),
+            style: TextStyle(fontSize: 12, color: VSColors.vsGray700)),
       )
     ]);
   }

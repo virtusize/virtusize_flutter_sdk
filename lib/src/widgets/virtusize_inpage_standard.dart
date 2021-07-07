@@ -152,7 +152,7 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
                                             fontSize: 16,
                                             fontWeight: FontWeight.bold)))),
                             CTAButton(
-                                backgroundColor: VSColor.vsGray900,
+                                backgroundColor: VSColors.vsGray900,
                                 textColor: Colors.white,
                                 onPressed: _openVirtusizeWebview)
                           ],
