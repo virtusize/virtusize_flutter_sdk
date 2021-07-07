@@ -7,7 +7,7 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 	private var flutterChannel: FlutterMethodChannel?
 	
 	private let repository = VirtusizeFlutterRepository.shared
-	private var workItem: DispatchWorkItem?
+	private var currentWorkItem: DispatchWorkItem?
 	private var product: VirtusizeProduct?
 	private var productCheckData: [String: Any]?
 	private var storeProduct: VirtusizeStoreProduct? = nil
@@ -121,32 +121,32 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 					result(FlutterError.unKnownError)
 					return
 				}
-				let workItem1 = DispatchWorkItem { [weak self] in
-					self?.fetchInitialData(self?.workItem, result, storeProductId: storeProductId)
+				let initialDataWorkItem = DispatchWorkItem { [weak self] in
+					self?.fetchInitialData(self?.currentWorkItem, result, storeProductId: storeProductId)
 				}
 				
-				let workItem2 = DispatchWorkItem { [weak self] in
-					self?.updateUserSession(self?.workItem, result)
+				let userDataWorkItem = DispatchWorkItem { [weak self] in
+					self?.updateUserSession(self?.currentWorkItem, result)
 				}
 				
-				let workItem3 = DispatchWorkItem { [weak self] in
-					self?.getRecommendation(self?.workItem, result)
+				let recommendationItem = DispatchWorkItem { [weak self] in
+					self?.getRecommendation(self?.currentWorkItem, result)
 				}
 
-				workItem = workItem1
-				DispatchQueue.global().async(execute: workItem1)
+				currentWorkItem = initialDataWorkItem
+				DispatchQueue.global().async(execute: initialDataWorkItem)
 				
-				workItem1.notify(queue: .global()) { [weak self] in
-					if self?.workItem?.isCancelled != true {
-						self?.workItem = workItem2
-						workItem2.perform()
+				initialDataWorkItem.notify(queue: .global()) { [weak self] in
+					if self?.currentWorkItem?.isCancelled != true {
+						self?.currentWorkItem = userDataWorkItem
+						userDataWorkItem.perform()
 					}
 				}
 				
-				workItem2.notify(queue: .global()) { [weak self] in
-					if self?.workItem?.isCancelled != true {
-						self?.workItem = workItem3
-						workItem3.perform()
+				userDataWorkItem.notify(queue: .global()) { [weak self] in
+					if self?.currentWorkItem?.isCancelled != true {
+						self?.currentWorkItem = recommendationItem
+						recommendationItem.perform()
 					}
 				}
 			default:
@@ -253,26 +253,26 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 
 extension SwiftVirtusizeFlutterPlugin: VirtusizeMessageHandler {
 	public func virtusizeController(_ controller: VirtusizeWebViewController, didReceiveError error: VirtusizeError) {
-		workItem = DispatchWorkItem { [weak self] in
+		currentWorkItem = DispatchWorkItem { [weak self] in
 			self?.flutterChannel?.invokeMethod("onVSError", arguments: error.debugDescription)
 		}
-		DispatchQueue.global().async(execute: workItem!)
+		DispatchQueue.global().async(execute: currentWorkItem!)
 	}
 	
 	public func virtusizeController(_ controller: VirtusizeWebViewController, didReceiveEvent event: VirtusizeEvent) {
-		let workItem1 = DispatchWorkItem { [weak self] in
+		let eventsWorkItem = DispatchWorkItem { [weak self] in
 			self?.flutterChannel?.invokeMethod("onVSEvent", arguments: event.data)
 		}
 		
-		var workItem2: DispatchWorkItem? = nil
-		var workItem3: DispatchWorkItem? = nil
+		var userDataWorkItem: DispatchWorkItem = DispatchWorkItem {}
+		var recommendationWorkItem: DispatchWorkItem? = nil
 		
 		switch VirtusizeEventName.init(rawValue: event.name) {
 			case .userOpenedWidget:
 				selectedUserProductId = nil
-				workItem2 = DispatchWorkItem { [weak self] in
+				recommendationWorkItem = DispatchWorkItem { [weak self] in
 					self?.getRecommendation(
-						self?.workItem,
+						self?.currentWorkItem,
 						shouldUpdateUserProducts: false,
 						shouldUpdateUserBodyProfile: false
 					)
@@ -285,9 +285,9 @@ extension SwiftVirtusizeFlutterPlugin: VirtusizeMessageHandler {
 				if let userProductId = (event.data as? [String: Any])?["userProductId"] as? Int {
 					selectedUserProductId = userProductId
 				}
-				workItem2 = DispatchWorkItem { [weak self] in
+				recommendationWorkItem = DispatchWorkItem { [weak self] in
 					self?.getRecommendation(
-						self?.workItem,
+						self?.currentWorkItem,
 						selectedRecommendedType: SizeRecommendationType.compareProduct,
 						shouldUpdateUserProducts: false
 					)
@@ -296,9 +296,9 @@ extension SwiftVirtusizeFlutterPlugin: VirtusizeMessageHandler {
 				if let userProductId = (event.data as? [String: Any])?["userProductId"] as? Int {
 					selectedUserProductId = userProductId
 				}
-				workItem2 = DispatchWorkItem { [weak self] in
+				recommendationWorkItem = DispatchWorkItem { [weak self] in
 					self?.getRecommendation(
-						self?.workItem,
+						self?.currentWorkItem,
 						selectedRecommendedType: SizeRecommendationType.compareProduct,
 						shouldUpdateUserBodyProfile: false
 					)
@@ -306,9 +306,9 @@ extension SwiftVirtusizeFlutterPlugin: VirtusizeMessageHandler {
 			case .userChangedRecommendationType:
 				let recommendationType = (event.data as? [String: Any])?["recommendationType"] as? String
 				let changedType = (recommendationType != nil) ? SizeRecommendationType.init(rawValue: recommendationType!) : nil
-				workItem2 = DispatchWorkItem { [weak self] in
+				recommendationWorkItem = DispatchWorkItem { [weak self] in
 					self?.getRecommendation(
-						self?.workItem,
+						self?.currentWorkItem,
 						selectedRecommendedType: changedType,
 						shouldUpdateUserProducts: false,
 						shouldUpdateUserBodyProfile: false
@@ -317,9 +317,9 @@ extension SwiftVirtusizeFlutterPlugin: VirtusizeMessageHandler {
 			case .userUpdatedBodyMeasurements:
 				if let sizeRecName = (event.data as? [String: Any])?["sizeRecName"] as? String {
 					bodyProfileRecommendedSize = BodyProfileRecommendedSize(sizeName: sizeRecName)
-					workItem2 = DispatchWorkItem { [weak self] in
+					recommendationWorkItem = DispatchWorkItem { [weak self] in
 						self?.getRecommendation(
-							self?.workItem,
+							self?.currentWorkItem,
 							selectedRecommendedType: SizeRecommendationType.body,
 							shouldUpdateUserProducts: false,
 							shouldUpdateUserBodyProfile: false
@@ -327,20 +327,20 @@ extension SwiftVirtusizeFlutterPlugin: VirtusizeMessageHandler {
 					}
 				}
 			case .userLoggedIn:
-				workItem2 = DispatchWorkItem { [weak self] in
-					self?.updateUserSession(self?.workItem)
+				userDataWorkItem = DispatchWorkItem { [weak self] in
+					self?.updateUserSession(self?.currentWorkItem)
 				}
-				workItem3 = DispatchWorkItem { [weak self] in
-					self?.getRecommendation(self?.workItem)
+				recommendationWorkItem = DispatchWorkItem { [weak self] in
+					self?.getRecommendation(self?.currentWorkItem)
 				}
 			case .userLoggedOut, .userDeletedData:
-				workItem2 = DispatchWorkItem { [weak self] in
+				userDataWorkItem = DispatchWorkItem { [weak self] in
 					self?.clearUserData()
-					self?.updateUserSession(self?.workItem)
+					self?.updateUserSession(self?.currentWorkItem)
 				}
-				workItem3 = DispatchWorkItem { [weak self] in
+				recommendationWorkItem = DispatchWorkItem { [weak self] in
 					self?.getRecommendation(
-						self?.workItem,
+						self?.currentWorkItem,
 						shouldUpdateUserProducts: false,
 						shouldUpdateUserBodyProfile: false
 					)
@@ -349,20 +349,20 @@ extension SwiftVirtusizeFlutterPlugin: VirtusizeMessageHandler {
 				break
 		}
 
-		workItem = workItem1
-		DispatchQueue.global().async(execute: workItem1)
+		currentWorkItem = eventsWorkItem
+		DispatchQueue.global().async(execute: eventsWorkItem)
 		
-		workItem1.notify(queue: .global()) { [weak self] in
-			if self?.workItem?.isCancelled != true {
-				self?.workItem = workItem2
-				workItem2?.perform()
+		eventsWorkItem.notify(queue: .global()) { [weak self] in
+			if self?.currentWorkItem?.isCancelled != true {
+				self?.currentWorkItem = userDataWorkItem
+				userDataWorkItem.perform()
 			}
 		}
 		
-		workItem2?.notify(queue: .global()) { [weak self] in
-			if self?.workItem?.isCancelled != true {
-				self?.workItem = workItem3
-				workItem3?.perform()
+		userDataWorkItem.notify(queue: .global()) { [weak self] in
+			if self?.currentWorkItem?.isCancelled != true {
+				self?.currentWorkItem = recommendationWorkItem
+				recommendationWorkItem?.perform()
 			}
 		}
 	}
