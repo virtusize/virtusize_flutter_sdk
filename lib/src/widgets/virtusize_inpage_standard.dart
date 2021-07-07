@@ -36,8 +36,8 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
   ProductDataCheck _productDataCheck;
   bool _hasError = false;
   bool _isLoading = true;
-  String _storeImageUrl;
-  String _userImageUrl;
+  Image _storeNetworkProductImage;
+  Image _userNetworkProductImage;
   String _recText = "読み込み中";
 
   @override
@@ -53,14 +53,27 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
     productSubscription =
         VirtusizePlugin.instance.productImageUrlStream.listen((product) {
       String productType = product.imageType;
-      String imageUrl = product.imageUrl;
-      setState(() {
-        if (productType == "store") {
-          _storeImageUrl = imageUrl;
-        } else if (productType == "user") {
-          _userImageUrl = imageUrl;
-        }
-      });
+      String imageUrl = product.imageUrl ?? "";
+      Image networkImage = Image.network(imageUrl);
+      final ImageStream stream = networkImage.image.resolve(ImageConfiguration.empty);
+      stream.addListener(
+          ImageStreamListener((ImageInfo image, bool synchronousCall) {
+        setState(() {
+          if (productType == "store") {
+            _storeNetworkProductImage = networkImage;
+          } else if (productType == "user") {
+            _userNetworkProductImage = networkImage;
+          }
+        });
+      }, onError: (dynamic exception, StackTrace stackTrace) {
+        setState(() {
+          if (productType == "store") {
+            _storeNetworkProductImage = null;
+          } else if (productType == "user") {
+            _userNetworkProductImage = null;
+          }
+        });
+      }));
     });
 
     recTextSubscription =
@@ -130,7 +143,7 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
                     elevation: 4,
                     child: Container(
                         padding:
-                        EdgeInsets.symmetric(horizontal: 8, vertical: 14),
+                            EdgeInsets.symmetric(horizontal: 8, vertical: 14),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -138,10 +151,17 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
                               children: [
                                 Container(width: 78),
                                 Positioned(
-                                    child: ProductImageView(productImageType: ProductImageType.user, src: _userImageUrl)),
+                                    child: ProductImageView(
+                                        productImageType: ProductImageType.user,
+                                        networkProductImage:
+                                            _userNetworkProductImage)),
                                 Positioned(
                                     left: 38,
-                                    child: ProductImageView(productImageType: ProductImageType.store, src: _storeImageUrl)),
+                                    child: ProductImageView(
+                                        productImageType:
+                                            ProductImageType.store,
+                                        networkProductImage:
+                                            _storeNetworkProductImage)),
                               ],
                             ),
                             Expanded(

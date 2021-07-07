@@ -6,9 +6,9 @@ import '../ui/images.dart';
 
 class ProductImageView extends StatelessWidget {
   final ProductImageType productImageType;
-  final String src;
+  final Image networkProductImage;
 
-  ProductImageView({@required this.productImageType, @required this.src});
+  ProductImageView({@required this.productImageType, @required this.networkProductImage});
 
   @override
   Widget build(BuildContext context) {
@@ -31,14 +31,23 @@ class ProductImageView extends StatelessWidget {
                 : null,
           )),
       Container(
-          width: 36,
-          height: 36,
+          width: networkProductImage != null ? 36 : 24,
+          height: networkProductImage != null ? 36 : 24,
           decoration: BoxDecoration(
             color: Colors.white,
-            image: src != null
-                ? DecorationImage(image: NetworkImage(src), fit: BoxFit.cover)
+            image: networkProductImage != null
+                ? DecorationImage(image: networkProductImage.image, fit: BoxFit.contain)
+                : DecorationImage(
+                    image: VSImages.getProuctTypeImage(productType: 1).image,
+                    colorFilter: ColorFilter.mode(
+                        productImageType == ProductImageType.store
+                            ? VSColors.vsGray800
+                            : VSColors.vsTeal,
+                        BlendMode.srcIn),
+                    fit: BoxFit.contain),
+            borderRadius: networkProductImage != null
+                ? BorderRadius.all(Radius.circular(18.0))
                 : null,
-            borderRadius: BorderRadius.all(Radius.circular(18.0)),
           )),
     ]);
   }
