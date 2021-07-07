@@ -44,7 +44,7 @@ class _VirtusizeButtonState extends State<VirtusizeButton> {
 
   @override
   Widget build(BuildContext context) {
-    if(_isValidProduct) {
+    if (_isValidProduct) {
       switch (widget.style) {
         case VirtusizeStyle.None:
           return widget.child;
@@ -72,9 +72,14 @@ class _VirtusizeButtonState extends State<VirtusizeButton> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          ImageIcon(VSImages.vsIcon.image, size: 20),
+          Container(
+            width: 22,
+            child: Image(image: VSImages.vsIcon.image, fit: BoxFit.cover),
+          ),
           Container(width: 4),
-          child != null ? child : Text('サイズチェック', style: TextStyle(fontSize: 12))
+          child != null
+              ? child
+              : Text('サイズチェック', style: TextStyle(fontSize: 12))
         ],
       ),
       style: ElevatedButton.styleFrom(

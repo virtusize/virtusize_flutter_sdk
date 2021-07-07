@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../ui/colors.dart';
 import '../ui/images.dart';
 import '../../virtusize_plugin.dart';
+import 'cta_button.dart';
 import 'fading_dots.dart';
 
 class VirtusizeInPageMini extends StatefulWidget {
@@ -90,7 +91,7 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
       case VirtusizeStyle.Teal:
         color = VSColor.vsTeal;
         break;
-      }
+    }
     return Container(
         margin: EdgeInsets.symmetric(horizontal: widget.horizontalMargin),
         color: _isLoading || _hasError ? Colors.white : color,
@@ -98,16 +99,21 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
         child: _hasError
             ? _createVSInPageMiniOnError()
             : _isLoading
-            ? _createVSInPageMiniOnLoading()
-            : _createVSInPageMiniOnFinishedLoading(themeColor: color));
-
+                ? _createVSInPageMiniOnLoading()
+                : _createVSInPageMiniOnFinishedLoading(themeColor: color));
   }
 
   Widget _createVSInPageMiniOnLoading() {
     return Row(children: [
       Container(
           margin: EdgeInsets.only(left: 6),
-          child: ImageIcon(VSImages.vsIcon.image, size: 16)),
+          child: Container(
+            width: 16,
+            child: Image(
+                image: VSImages.vsIcon.image,
+                fit: BoxFit.cover,
+                color: VSColor.vsGray900),
+          )),
       Container(
         margin: EdgeInsets.only(top: 6, bottom: 6, left: 5),
         child: Text(_recText,
@@ -131,40 +137,22 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
       )),
       Container(
           margin: EdgeInsets.only(top: 5, bottom: 5, left: 4, right: 8),
-          child: _createVSSizeCheckButton(themeColor: themeColor))
+          child: CTAButton(
+              textColor: themeColor, onPressed: _openVirtusizeWebview))
     ]);
-  }
-
-  Widget _createVSSizeCheckButton({Color themeColor}) {
-    return ElevatedButton(
-      child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
-        Text('サイズチェック',
-            style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
-        Container(width: 1.0),
-        ImageIcon(VSImages.rightArrow.image, size: 9, color: themeColor)
-      ]),
-      style: ElevatedButton.styleFrom(
-          elevation: 0,
-          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          minimumSize: Size.zero,
-          padding: EdgeInsets.symmetric(vertical: 4, horizontal: 6),
-          //change background color of button
-          primary: Colors.white,
-          //change text color of button
-          onPrimary: themeColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(100),
-          )),
-      onPressed: _openVirtusizeWebview,
-    );
   }
 
   Widget _createVSInPageMiniOnError() {
     return Row(children: [
       Container(
           margin: EdgeInsets.only(left: 6),
-          child: ImageIcon(VSImages.errorHanger.image,
-              size: 20, color: VSColor.vsGray700)),
+          child: Container(
+            width: 20,
+            child: Image(
+                image: VSImages.errorHanger.image,
+                fit: BoxFit.cover,
+                color: VSColor.vsGray700),
+          )),
       Container(
         margin: EdgeInsets.only(top: 6, bottom: 6, left: 5),
         child: Text("現在バーチャサイズは使えません。",

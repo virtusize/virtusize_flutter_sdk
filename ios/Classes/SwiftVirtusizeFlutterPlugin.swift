@@ -161,7 +161,15 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 			workItem?.cancel()
 			return
 		}
-		
+
+		flutterChannel?.invokeMethod(
+			"onProduct",
+			arguments: [
+				"imageType": "store",
+				"imageUrl" : storeProduct?.cloudinaryImageUrlString
+			]
+		)
+
 		productTypes = repository.getProductTypes()
 		if productTypes == nil {
 			result(FlutterError.nullAPIResult("productTypes"))
@@ -225,11 +233,20 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 				: nil
 		}
 		
+		let filteredUserProducts = (selectedUserProductId != nil) ?
+		userProducts?.filter { $0.id == selectedUserProductId } : userProducts
+		
+		flutterChannel?.invokeMethod(
+			"onProduct",
+			arguments:  [
+				"imageType": "user",
+				"imageUrl" : filteredUserProducts?.first?.cloudinaryImageUrlString
+			]
+		)
 
 		let recText = repository.getRecommendationText(
 			selectedRecType: selectedRecommendedType,
-			userProducts: (selectedUserProductId != nil) ?
-				userProducts?.filter { $0.id == selectedUserProductId } : userProducts,
+			userProducts: filteredUserProducts,
 			storeProduct: storeProduct!,
 			productTypes: productTypes!,
 			bodyProfileRecommendedSize: bodyProfileRecommendedSize,

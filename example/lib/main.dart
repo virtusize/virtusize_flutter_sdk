@@ -80,7 +80,9 @@ class _MyAppState extends State<MyApp> {
                     VirtusizeInPageMini.vsStyle(style: VirtusizeStyle.Teal),
                     Container(height: 16),
                     VirtusizeInPageMini(
-                        backgroundColor: Colors.blue, horizontalMargin: 32)
+                        backgroundColor: Colors.blue, horizontalMargin: 32),
+                    Container(height: 16),
+                    VirtusizeInPageStandard()
                   ])))),
     );
   }

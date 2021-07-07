@@ -1,23 +1,27 @@
-import 'package:flutter/foundation.dart';
-import 'package:flutter/gestures.dart';
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:virtusize_flutter_plugin/src/ui/colors.dart';
+import 'package:virtusize_flutter_plugin/src/ui/images.dart';
+import 'package:virtusize_flutter_plugin/src/widgets/cta_button.dart';
 
+import '../models/product.dart';
 import '../../virtusize_plugin.dart';
+import 'product_image_view.dart';
 
 class VirtusizeInPageStandard extends StatefulWidget {
-  const VirtusizeInPageStandard(
+  final VirtusizeStyle virtusizeStyle;
+  final Color buttonBackgroundColor;
+  final double horizontalMargin;
+
+  VirtusizeInPageStandard(
       {Key key,
       this.virtusizeStyle,
       this.buttonBackgroundColor,
       this.horizontalMargin = 16.0})
       : super(key: key);
-
-  final VirtusizeStyle virtusizeStyle;
-  final Color buttonBackgroundColor;
-  final double horizontalMargin;
 
   @override
   _VirtusizeInPageStandardState createState() =>
@@ -25,89 +29,158 @@ class VirtusizeInPageStandard extends StatefulWidget {
 }
 
 class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
-  static const defaultScaleForZeroMargin = 1.08;
-  static const defaultHeightForZeroMargin = 133;
-  double _height;
-  double _calculatedScale;
+  StreamSubscription<ProductDataCheck> pdcSubscription;
+  StreamSubscription<String> recTextSubscription;
+  StreamSubscription<Product> productSubscription;
+  ProductDataCheck _productDataCheck;
+  bool _hasError = false;
+  bool _isLoading = true;
+  String _storeImageUrl;
+  String _userImageUrl;
+  String _recText = "読み込み中";
+
+  @override
+  void initState() {
+    super.initState();
+
+    pdcSubscription = VirtusizePlugin.instance.pdcStream.listen((pdc) {
+      setState(() {
+        _productDataCheck = pdc;
+      });
+    });
+
+    productSubscription =
+        VirtusizePlugin.instance.productImageUrlStream.listen((product) {
+      String productType = product.imageType;
+      String imageUrl = product.imageUrl;
+      setState(() {
+        if (productType == "store") {
+          _storeImageUrl = imageUrl;
+        } else if (productType == "user") {
+          _userImageUrl = imageUrl;
+        }
+      });
+    });
+
+    recTextSubscription =
+        VirtusizePlugin.instance.recTextStream.listen((recText) {
+      setState(() {
+        _isLoading = false;
+        try {
+          _recText = recText
+              .replaceAll("%{boldStart}", "")
+              .replaceAll("%{boldEnd}", "");
+          _hasError = false;
+        } catch (e) {
+          _hasError = true;
+        }
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    pdcSubscription.cancel();
+    productSubscription.cancel();
+    recTextSubscription.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    // This is used in the platform side to register the view.
-    final String viewType = 'com.virtusize/virtusize_inpage_standard';
-    // Pass parameters to the platform side.
-    final Map<String, dynamic> creationParams = <String, dynamic>{};
-    if (widget.virtusizeStyle != null) {
-      creationParams['virtusizeStyle'] = widget.virtusizeStyle.value;
+    if (_productDataCheck != null && _productDataCheck.isValidProduct) {
+      return _createVSInPageStandard();
     }
-    if (widget.buttonBackgroundColor != null) {
-      creationParams['buttonBackgroundColor'] =
-          '#${widget.buttonBackgroundColor.value.toRadixString(16)}';
-    }
+    return Container();
+  }
 
-    double screenWidth = MediaQuery.of(context).size.width;
+  Future<void> _openVirtusizeWebview() async {
+    await VirtusizePlugin.instance.openVirtusizeWebView();
+  }
 
-    if (_calculatedScale == null) {
-      double expectedInPageWidth =
-          MediaQuery.of(context).size.width - widget.horizontalMargin * 2;
-      _calculatedScale =
-          defaultScaleForZeroMargin * (expectedInPageWidth / screenWidth);
-    }
-    if (_height == null) {
-      _height = defaultHeightForZeroMargin * _calculatedScale;
-    }
+  Widget _createVSInPageStandard() {
+    return _hasError
+        ? _createVSInPageStandardOnError()
+        : _isLoading
+            ? _createVSInPageStandardOnLoading()
+            : _createVSInPageStandardOnFinishedLoading();
+  }
 
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return Transform.scale(
-            scale: _calculatedScale,
-            child: SizedBox(
-                width: screenWidth,
-                height: _height,
-                child: PlatformViewLink(
-                    viewType: viewType,
-                    surfaceFactory: (BuildContext context,
-                        PlatformViewController controller) {
-                      return AndroidViewSurface(
-                        controller: controller,
-                        gestureRecognizers: const <
-                            Factory<OneSequenceGestureRecognizer>>{},
-                        hitTestBehavior: PlatformViewHitTestBehavior.opaque,
-                      );
-                    },
-                    onCreatePlatformView: (PlatformViewCreationParams params) {
-                      return PlatformViewsService.initSurfaceAndroidView(
-                        id: params.id,
-                        viewType: viewType,
-                        layoutDirection: TextDirection.ltr,
-                        creationParams: creationParams,
-                        creationParamsCodec: StandardMessageCodec(),
-                      )
-                        ..addOnPlatformViewCreatedListener(
-                            params.onPlatformViewCreated)
-                        ..addOnPlatformViewCreatedListener((int id) {
-                          VirtusizePlugin.instance.setVirtusizeView(
-                              widget.toString(), id);
-                          MethodChannel _channel = MethodChannel(
-                              'com.virtusize/virtusize_inpage_standard_$id');
-                          _channel.setMethodCallHandler((call) {
-                            if (call.method == 'onInPageCardViewSizeChanged') {
-                              print(
-                                  'onInPageCardViewSizeChanged ${call.arguments}');
-                              setState(() {
-                                _height = call.arguments['height'] + 40;
-                              });
-                            } else if (call.method == 'onFinishLoading') {
-                              print('onFinishLoading');
-                            }
-                            return null;
-                          });
-                        })
-                        ..create();
-                    })));
-      case TargetPlatform.iOS:
-        throw UnsupportedError("Unsupported platform view");
-      default:
-        throw UnsupportedError("Unsupported platform view");
-    }
+  Widget _createVSInPageStandardOnLoading() {
+    return Container();
+  }
+
+  Widget _createVSInPageStandardOnError() {
+    return Container();
+  }
+
+  Widget _createVSInPageStandardOnFinishedLoading() {
+    return Container(
+        margin: EdgeInsets.symmetric(horizontal: widget.horizontalMargin),
+        width: double.infinity,
+        child: Column(
+          children: [
+            GestureDetector(
+              child: Container(
+                  child: Card(
+                    shape: RoundedRectangleBorder(),
+                    color: Colors.white,
+                    margin: EdgeInsets.zero,
+                    elevation: 4,
+                    child: Container(
+                        padding:
+                        EdgeInsets.symmetric(horizontal: 8, vertical: 14),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Stack(
+                              children: [
+                                Container(width: 78),
+                                Positioned(
+                                    child: ProductImageView(src: _userImageUrl)),
+                                Positioned(
+                                    left: 38,
+                                    child: ProductImageView(src: _storeImageUrl)),
+                              ],
+                            ),
+                            Expanded(
+                                child: Container(
+                                    margin: EdgeInsets.only(left: 4, right: 8),
+                                    child: Text(_recText,
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold)))),
+                            CTAButton(
+                                backgroundColor: VSColor.vsGray900,
+                                textColor: Colors.white,
+                                onPressed: _openVirtusizeWebview)
+                          ],
+                        )),
+                  ),
+                  decoration: new BoxDecoration(
+                    boxShadow: [
+                      new BoxShadow(
+                        color: Colors.black.withOpacity(0.13),
+                        blurRadius: 14,
+                        spreadRadius: 0,
+                        offset: Offset(0, 4),
+                      ),
+                    ],
+                  )),
+              onTap: _openVirtusizeWebview,
+            ),
+            Container(height: 10),
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+              Container(
+                  height: 11,
+                  child: Image(
+                      image: VSImages.vsSignature.image, fit: BoxFit.cover)),
+              Text(
+                "プライバシーポリシー",
+                style: TextStyle(fontSize: 10),
+              )
+            ])
+          ],
+        ));
   }
 }

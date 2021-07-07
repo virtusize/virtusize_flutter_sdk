@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'models/product.dart';
 import 'models/product_data_check.dart';
 import 'models/virtusize_enums.dart';
 import 'models/virtusize_product.dart';
@@ -11,26 +13,34 @@ class VirtusizePlugin {
   ClientProduct product;
   StreamController _pdcController;
   StreamController _recTextController;
+  StreamController _productController;
 
   StreamSink<ProductDataCheck> get _pdcSink =>
       _pdcController.sink;
-
   Stream<ProductDataCheck> get pdcStream =>
       _pdcController.stream;
 
+  StreamSink<Product> get _productSink =>
+      _productController.sink;
+  Stream<Product> get productImageUrlStream =>
+      _productController.stream;
+
   StreamSink<String> get _recTextSink =>
       _recTextController.sink;
-
   Stream<String> get recTextStream =>
       _recTextController.stream;
 
   VirtusizePlugin._() {
     _pdcController = StreamController<ProductDataCheck>.broadcast();
+    _productController = StreamController<Product>.broadcast();
     _recTextController = StreamController<String>.broadcast();
     _channel.setMethodCallHandler((call) {
       print(call);
       if(call.method == "onRecTextChange") {
         _recTextSink.add(call.arguments);
+      } else if(call.method == "onProduct") {
+        print(call.arguments.toString());
+        _productSink.add(Product(json.encode(call.arguments)));
       }
       return null;
     });
