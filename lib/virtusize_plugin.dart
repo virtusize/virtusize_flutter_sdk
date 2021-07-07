@@ -1,14 +1,7 @@
+library virtusize_plugin;
 
-import 'dart:async';
-
-import 'package:flutter/services.dart';
-
-class VirtusizePlugin {
-  static const MethodChannel _channel =
-      const MethodChannel('com.virtusize/virtusize_flutter_plugin');
-
-  static Future<String> get platformVersion async {
-    final String version = await _channel.invokeMethod('getPlatformVersion');
-    return version;
-  }
-}
+export 'src/main.dart';
+export 'src/models/virtusize_enums.dart';
+export 'src/models/product_data_check.dart';
+export 'src/widgets/virtusize_button.dart';
+export 'src/widgets/virtusize_inpage_standard.dart';
