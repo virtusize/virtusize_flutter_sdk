@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../models/product_data_check.dart';
 import '../ui/colors.dart';
 import '../ui/images.dart';
 import '../../virtusize_plugin.dart';

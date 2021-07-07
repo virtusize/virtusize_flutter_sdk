@@ -34,3 +34,5 @@ extension InfoCategoryExtension on InfoCategory {
     ][this.index];
   }
 }
+
+enum ProductImageType { store, user }

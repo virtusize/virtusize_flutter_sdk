@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:virtusize_flutter_plugin/src/ui/colors.dart';
+
+import '../ui/colors.dart';
 import '../ui/images.dart';
 
 class CTAButton extends StatelessWidget {

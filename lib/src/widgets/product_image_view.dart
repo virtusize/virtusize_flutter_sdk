@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:virtusize_flutter_plugin/src/ui/colors.dart';
+
+import '../models/virtusize_enums.dart';
+import '../ui/colors.dart';
+import '../ui/images.dart';
 
 class ProductImageView extends StatelessWidget {
+  final ProductImageType productImageType;
   final String src;
 
-  ProductImageView({this.src});
+  ProductImageView({@required this.productImageType, @required this.src});
 
   @override
   Widget build(BuildContext context) {
@@ -15,10 +19,16 @@ class ProductImageView extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.all(Radius.circular(20.0)),
-            border: Border.all(
-              color: VSColor.vsGray800,
-              width: 0.5,
-            ),
+            image: productImageType == ProductImageType.user
+                ? DecorationImage(
+                    image: VSImages.circleDashedBorder.image, fit: BoxFit.cover)
+                : null,
+            border: productImageType == ProductImageType.store
+                ? Border.all(
+                    color: VSColor.vsGray800,
+                    width: 0.5,
+                  )
+                : null,
           )),
       Container(
           width: 36,

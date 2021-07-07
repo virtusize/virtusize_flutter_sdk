@@ -3,12 +3,13 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
-import 'package:virtusize_flutter_plugin/src/ui/colors.dart';
-import 'package:virtusize_flutter_plugin/src/ui/images.dart';
-import 'package:virtusize_flutter_plugin/src/widgets/cta_button.dart';
 
 import '../models/product.dart';
+import '../models/product_data_check.dart';
 import '../../virtusize_plugin.dart';
+import '../ui/colors.dart';
+import '../ui/images.dart';
+import 'cta_button.dart';
 import 'product_image_view.dart';
 
 class VirtusizeInPageStandard extends StatefulWidget {
@@ -137,10 +138,10 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
                               children: [
                                 Container(width: 78),
                                 Positioned(
-                                    child: ProductImageView(src: _userImageUrl)),
+                                    child: ProductImageView(productImageType: ProductImageType.user, src: _userImageUrl)),
                                 Positioned(
                                     left: 38,
-                                    child: ProductImageView(src: _storeImageUrl)),
+                                    child: ProductImageView(productImageType: ProductImageType.store, src: _storeImageUrl)),
                               ],
                             ),
                             Expanded(
