@@ -38,7 +38,8 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
   bool _isLoading = true;
   Image _storeNetworkProductImage;
   Image _userNetworkProductImage;
-  String _recText = "読み込み中";
+  String _topRecText;
+  String _bottomRecText = "サイズを分析中";
 
   @override
   void initState() {
@@ -55,7 +56,8 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
       String productType = product.imageType;
       String imageUrl = product.imageUrl ?? "";
       Image networkImage = Image.network(imageUrl);
-      final ImageStream stream = networkImage.image.resolve(ImageConfiguration.empty);
+      final ImageStream stream =
+          networkImage.image.resolve(ImageConfiguration.empty);
       stream.addListener(
           ImageStreamListener((ImageInfo image, bool synchronousCall) {
         setState(() {
@@ -81,15 +83,24 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
       setState(() {
         _isLoading = false;
         try {
-          _recText = recText
-              .replaceAll("%{boldStart}", "")
-              .replaceAll("%{boldEnd}", "");
+          _splitRecTexts(recText);
           _hasError = false;
         } catch (e) {
           _hasError = true;
         }
       });
     });
+  }
+
+  void _splitRecTexts(String recText) {
+    List<String> recTextArray = recText.split("<br>");
+    if (recTextArray.length == 2) {
+      _topRecText = recTextArray.first;
+      _bottomRecText = recTextArray.last;
+    } else {
+      _topRecText = null;
+      _bottomRecText = recTextArray.first;
+    }
   }
 
   @override
@@ -164,13 +175,21 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
                                             _storeNetworkProductImage)),
                               ],
                             ),
-                            Expanded(
-                                child: Container(
-                                    margin: EdgeInsets.only(left: 4, right: 8),
-                                    child: Text(_recText,
+                            Expanded(child: Container(
+                                margin: EdgeInsets.only(left: 4, right: 8),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    _topRecText != null ?
+                                    Text(_topRecText,
+                                        style: TextStyle(fontSize: 12))
+                                    : Container(),
+                                    Text(_bottomRecText,
                                         style: TextStyle(
                                             fontSize: 16,
-                                            fontWeight: FontWeight.bold)))),
+                                            fontWeight: FontWeight.bold))
+                                  ],
+                                ))),
                             CTAButton(
                                 backgroundColor: VSColors.vsGray900,
                                 textColor: Colors.white,

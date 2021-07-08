@@ -30,7 +30,7 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
   bool _isValidProduct = false;
   bool _isLoading = true;
   bool _hasError = false;
-  String _recText = "読み込み中";
+  String _recText = "サイズを分析中";
 
   @override
   void initState() {
@@ -47,9 +47,7 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
       setState(() {
         _isLoading = false;
         try {
-          _recText = recText
-              .replaceAll("%{boldStart}", "")
-              .replaceAll("%{boldEnd}", "");
+          _recText = recText.replaceAll("<br>", "");
           _hasError = false;
         } catch (e) {
           _hasError = true;
