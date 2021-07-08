@@ -126,111 +126,117 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
 
   Future<void> _openPrivacyPolicyLink() async {
     String _url = await VirtusizePlugin.instance.getPrivacyPolicyLink();
-    await canLaunch(_url) ? await launch(_url, forceSafariVC: false) : throw 'Could not launch $_url';
+    await canLaunch(_url)
+        ? await launch(_url, forceSafariVC: false)
+        : throw 'Could not launch $_url';
   }
 
   Widget _createVSInPageStandard() {
-    return _hasError
-        ? _createVSInPageStandardOnError()
-        : _isLoading
-            ? _createVSInPageStandardOnLoading()
-            : _createVSInPageStandardOnFinishedLoading();
-  }
-
-  Widget _createVSInPageStandardOnLoading() {
-    return Container();
-  }
-
-  Widget _createVSInPageStandardOnError() {
-    return Container();
-  }
-
-  Widget _createVSInPageStandardOnFinishedLoading() {
     return Container(
         margin: EdgeInsets.symmetric(horizontal: widget.horizontalMargin),
         width: double.infinity,
-        child: Column(
-          children: [
-            GestureDetector(
-              child: Container(
-                  child: Card(
-                    shape: RoundedRectangleBorder(),
-                    color: Colors.white,
-                    margin: EdgeInsets.zero,
-                    elevation: 0,
-                    child: Container(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 8, vertical: 14),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: Column(children: [
+          _hasError
+              ? _createVSInPageStandardOnError()
+              : _isLoading
+                  ? _createVSInPageStandardOnLoading()
+                  : _createVSInPageStandardOnFinishedLoading(),
+          !_hasError && !_isLoading ? Container(height: 10) : Container(),
+          !_hasError && !_isLoading
+              ? Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                      Container(
+                          height: 11,
+                          child: Image(
+                              image: VSImages.vsSignature.image,
+                              fit: BoxFit.cover)),
+                      GestureDetector(
+                          child: Text(
+                            "プライバシーポリシー",
+                            style: TextStyle(fontSize: 10),
+                          ),
+                          onTap: _openPrivacyPolicyLink)
+                    ])
+              : Container()
+        ]));
+  }
+
+  Widget _createVSInPageStandardOnLoading() {
+    return Container(child: Text("loading"));
+  }
+
+  Widget _createVSInPageStandardOnError() {
+    return Container(child: Text("has error"));
+  }
+
+  Widget _createVSInPageStandardOnFinishedLoading() {
+    return Column(
+      children: [
+        GestureDetector(
+          child: Container(
+              child: Card(
+                shape: RoundedRectangleBorder(),
+                color: Colors.white,
+                margin: EdgeInsets.zero,
+                elevation: 0,
+                child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 14),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Stack(
                           children: [
-                            Stack(
-                              children: [
-                                Container(width: 78),
-                                Positioned(
-                                    child: ProductImageView(
-                                        productImageType: ProductImageType.user,
-                                        networkProductImage:
-                                            _userNetworkProductImage)),
-                                Positioned(
-                                    left: 38,
-                                    child: ProductImageView(
-                                        productImageType:
-                                            ProductImageType.store,
-                                        networkProductImage:
-                                            _storeNetworkProductImage)),
-                              ],
-                            ),
-                            Expanded(
-                                child: Container(
-                                    margin: EdgeInsets.only(left: 4, right: 8),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        _topRecText != null
-                                            ? Text(_topRecText,
-                                                style: TextStyle(fontSize: 12))
-                                            : Container(),
-                                        Text(_bottomRecText,
-                                            style: TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.bold))
-                                      ],
-                                    ))),
-                            CTAButton(
-                                backgroundColor: VSColors.vsGray900,
-                                textColor: Colors.white,
-                                onPressed: _openVirtusizeWebview)
+                            Container(width: 78),
+                            Positioned(
+                                child: ProductImageView(
+                                    productImageType: ProductImageType.user,
+                                    networkProductImage:
+                                        _userNetworkProductImage)),
+                            Positioned(
+                                left: 38,
+                                child: ProductImageView(
+                                    productImageType: ProductImageType.store,
+                                    networkProductImage:
+                                        _storeNetworkProductImage)),
                           ],
-                        )),
+                        ),
+                        Expanded(
+                            child: Container(
+                                margin: EdgeInsets.only(left: 4, right: 8),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    _topRecText != null
+                                        ? Text(_topRecText,
+                                            style: TextStyle(fontSize: 12))
+                                        : Container(),
+                                    Text(_bottomRecText,
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold))
+                                  ],
+                                ))),
+                        CTAButton(
+                            backgroundColor: VSColors.vsGray900,
+                            textColor: Colors.white,
+                            onPressed: _openVirtusizeWebview)
+                      ],
+                    )),
+              ),
+              decoration: new BoxDecoration(
+                boxShadow: [
+                  new BoxShadow(
+                    color: Colors.black.withOpacity(0.13),
+                    blurRadius: 14,
+                    spreadRadius: 0,
+                    offset: Offset(0, 4),
                   ),
-                  decoration: new BoxDecoration(
-                    boxShadow: [
-                      new BoxShadow(
-                        color: Colors.black.withOpacity(0.13),
-                        blurRadius: 14,
-                        spreadRadius: 0,
-                        offset: Offset(0, 4),
-                      ),
-                    ],
-                  )),
-              onTap: _openVirtusizeWebview,
-            ),
-            Container(height: 10),
-            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              Container(
-                  height: 11,
-                  child: Image(
-                      image: VSImages.vsSignature.image, fit: BoxFit.cover)),
-              GestureDetector(
-                  child: Text(
-                    "プライバシーポリシー",
-                    style: TextStyle(fontSize: 10),
-                  ),
-                  onTap: _openPrivacyPolicyLink)
-            ])
-          ],
-        ));
+                ],
+              )),
+          onTap: _openVirtusizeWebview,
+        ),
+      ],
+    );
   }
 }
