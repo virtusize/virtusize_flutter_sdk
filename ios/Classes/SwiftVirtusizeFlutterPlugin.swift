@@ -149,6 +149,8 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 						recommendationItem.perform()
 					}
 				}
+			case "getPrivacyPolicyLink":
+				result(repository.getPrivacyPolicyLink())
 			default:
 				result(FlutterMethodNotImplemented)
 		}

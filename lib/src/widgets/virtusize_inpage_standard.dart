@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../models/product.dart';
 import '../models/product_data_check.dart';
@@ -123,6 +124,11 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
     await VirtusizePlugin.instance.openVirtusizeWebView();
   }
 
+  Future<void> _openPrivacyPolicyLink() async {
+    String _url = await VirtusizePlugin.instance.getPrivacyPolicyLink();
+    await canLaunch(_url) ? await launch(_url, forceSafariVC: false) : throw 'Could not launch $_url';
+  }
+
   Widget _createVSInPageStandard() {
     return _hasError
         ? _createVSInPageStandardOnError()
@@ -175,21 +181,23 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
                                             _storeNetworkProductImage)),
                               ],
                             ),
-                            Expanded(child: Container(
-                                margin: EdgeInsets.only(left: 4, right: 8),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    _topRecText != null ?
-                                    Text(_topRecText,
-                                        style: TextStyle(fontSize: 12))
-                                    : Container(),
-                                    Text(_bottomRecText,
-                                        style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold))
-                                  ],
-                                ))),
+                            Expanded(
+                                child: Container(
+                                    margin: EdgeInsets.only(left: 4, right: 8),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        _topRecText != null
+                                            ? Text(_topRecText,
+                                                style: TextStyle(fontSize: 12))
+                                            : Container(),
+                                        Text(_bottomRecText,
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold))
+                                      ],
+                                    ))),
                             CTAButton(
                                 backgroundColor: VSColors.vsGray900,
                                 textColor: Colors.white,
@@ -206,8 +214,7 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
                         offset: Offset(0, 4),
                       ),
                     ],
-                  )
-              ),
+                  )),
               onTap: _openVirtusizeWebview,
             ),
             Container(height: 10),
@@ -216,10 +223,12 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
                   height: 11,
                   child: Image(
                       image: VSImages.vsSignature.image, fit: BoxFit.cover)),
-              Text(
-                "プライバシーポリシー",
-                style: TextStyle(fontSize: 10),
-              )
+              GestureDetector(
+                  child: Text(
+                    "プライバシーポリシー",
+                    style: TextStyle(fontSize: 10),
+                  ),
+                  onTap: _openPrivacyPolicyLink)
             ])
           ],
         ));

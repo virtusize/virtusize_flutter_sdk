@@ -125,4 +125,13 @@ class VirtusizePlugin {
       _recTextSink.add(null);
     }
   }
+
+  Future<String> getPrivacyPolicyLink() async {
+    try {
+      return await _channel.invokeMethod('getPrivacyPolicyLink');
+    } on PlatformException catch (error) {
+      print('Failed to get the privacy policy link: $error');
+      return null;
+    }
+  }
 }
