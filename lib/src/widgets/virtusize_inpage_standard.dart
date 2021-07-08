@@ -151,7 +151,7 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
                     shape: RoundedRectangleBorder(),
                     color: Colors.white,
                     margin: EdgeInsets.zero,
-                    elevation: 4,
+                    elevation: 0,
                     child: Container(
                         padding:
                             EdgeInsets.symmetric(horizontal: 8, vertical: 14),
@@ -206,7 +206,8 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
                         offset: Offset(0, 4),
                       ),
                     ],
-                  )),
+                  )
+              ),
               onTap: _openVirtusizeWebview,
             ),
             Container(height: 10),
