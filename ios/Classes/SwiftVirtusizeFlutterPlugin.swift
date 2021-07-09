@@ -283,7 +283,7 @@ extension SwiftVirtusizeFlutterPlugin: VirtusizeMessageHandler {
 			self?.flutterChannel?.invokeMethod("onVSEvent", arguments: event.data)
 		}
 		
-		var userDataWorkItem: DispatchWorkItem = DispatchWorkItem {}
+		var userDataWorkItem: DispatchWorkItem = DispatchWorkItem { [weak self] in }
 		var recommendationWorkItem: DispatchWorkItem? = nil
 		
 		switch VirtusizeEventName.init(rawValue: event.name) {
