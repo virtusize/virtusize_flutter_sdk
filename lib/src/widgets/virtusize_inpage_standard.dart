@@ -36,8 +36,8 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
   ProductDataCheck _productDataCheck;
   bool _hasError = false;
   bool _isLoading = true;
-  Image _storeNetworkProductImage;
-  Image _userNetworkProductImage;
+  Product _storeProduct;
+  Product _userProduct;
   String _topRecText;
   String _bottomRecText;
 
@@ -52,8 +52,7 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
     });
 
     productSubscription =
-        VirtusizePlugin.instance.productImageUrlStream.listen((product) {
-      String productType = product.imageType;
+        VirtusizePlugin.instance.productStream.listen((product) {
       String imageUrl = product.imageUrl ?? "";
       Image networkImage = Image.network(imageUrl);
       final ImageStream stream =
@@ -61,18 +60,20 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
       stream.addListener(
           ImageStreamListener((ImageInfo image, bool synchronousCall) {
         setState(() {
-          if (productType == "store") {
-            _storeNetworkProductImage = networkImage;
-          } else if (productType == "user") {
-            _userNetworkProductImage = networkImage;
+          if (product.imageType == ProductImageType.store) {
+            product.networkProductImage = networkImage;
+            _storeProduct = product;
+          } else if (product.imageType == ProductImageType.user) {
+            product.networkProductImage = networkImage;
+            _userProduct = product;
           }
         });
       }, onError: (dynamic exception, StackTrace stackTrace) {
         setState(() {
-          if (productType == "store") {
-            _storeNetworkProductImage = null;
-          } else if (productType == "user") {
-            _userNetworkProductImage = null;
+          if (product.imageType == ProductImageType.store) {
+            _storeProduct = product;
+          } else if (product.imageType == ProductImageType.user) {
+            _userProduct = product;
           }
         });
       }));
@@ -184,16 +185,12 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
                             children: [
                               Container(width: 78),
                               Positioned(
-                                  child: ProductImageView(
-                                      productImageType: ProductImageType.user,
-                                      networkProductImage:
-                                          _userNetworkProductImage)),
+                                  child:
+                                      ProductImageView(product: _userProduct)),
                               Positioned(
                                   left: 38,
-                                  child: ProductImageView(
-                                      productImageType: ProductImageType.store,
-                                      networkProductImage:
-                                          _storeNetworkProductImage)),
+                                  child:
+                                      ProductImageView(product: _storeProduct)),
                             ],
                           ),
                     Expanded(

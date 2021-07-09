@@ -10,11 +10,11 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 	private var currentWorkItem: DispatchWorkItem?
 	private var product: VirtusizeProduct?
 	private var productCheckData: [String: Any]?
-	private var storeProduct: VirtusizeStoreProduct? = nil
+	private var storeProduct: VirtusizeServerProduct? = nil
 	private var productTypes: [VirtusizeProductType]? = nil
 	private var i18nLocalization: VirtusizeI18nLocalization? = nil
 	private var userSessionResponse: String? = ""
-	private var userProducts: [VirtusizeStoreProduct]? = nil
+	private var userProducts: [VirtusizeServerProduct]? = nil
 	private var bodyProfileRecommendedSize: BodyProfileRecommendedSize? = nil
 	private var selectedUserProductId: Int? = nil
 
@@ -168,7 +168,9 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 			"onProduct",
 			arguments: [
 				"imageType": "store",
-				"imageUrl" : storeProduct?.cloudinaryImageUrlString
+				"imageUrl" : storeProduct?.cloudinaryImageUrlString,
+				"productType": storeProduct?.productType,
+				"productStyle": storeProduct?.productStyle
 			]
 		)
 
@@ -242,7 +244,9 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 			"onProduct",
 			arguments:  [
 				"imageType": "user",
-				"imageUrl" : filteredUserProducts?.first?.cloudinaryImageUrlString
+				"imageUrl" : filteredUserProducts?.first?.cloudinaryImageUrlString,
+				"productType": filteredUserProducts?.first?.productType,
+				"productStyle": filteredUserProducts?.first?.productStyle
 			]
 		)
 

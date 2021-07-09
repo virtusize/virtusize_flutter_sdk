@@ -22,7 +22,7 @@ class VirtusizePlugin {
 
   StreamSink<Product> get _productSink =>
       _productController.sink;
-  Stream<Product> get productImageUrlStream =>
+  Stream<Product> get productStream =>
       _productController.stream;
 
   StreamSink<String> get _recTextSink =>
