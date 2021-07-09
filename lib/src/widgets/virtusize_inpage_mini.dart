@@ -7,7 +7,7 @@ import '../ui/colors.dart';
 import '../ui/images.dart';
 import '../../virtusize_plugin.dart';
 import 'cta_button.dart';
-import 'fading_dots.dart';
+import 'animated_dots.dart';
 
 class VirtusizeInPageMini extends StatefulWidget {
   VirtusizeStyle style = VirtusizeStyle.None;

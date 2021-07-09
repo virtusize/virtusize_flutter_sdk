@@ -18,7 +18,6 @@ class _AnimatedDotsState extends State<AnimatedDots> with TickerProviderStateMix
   void initState() {
     super.initState();
 
-
     _controller = AnimationController(
       vsync: this,
       duration: Duration(milliseconds: 500 * widget.dotNumbers),

@@ -1,8 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../models/product.dart';
@@ -10,6 +8,7 @@ import '../models/product_data_check.dart';
 import '../../virtusize_plugin.dart';
 import '../ui/colors.dart';
 import '../ui/images.dart';
+import 'animated_dots.dart';
 import 'cta_button.dart';
 import 'product_image_view.dart';
 
@@ -40,7 +39,7 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
   Image _storeNetworkProductImage;
   Image _userNetworkProductImage;
   String _topRecText;
-  String _bottomRecText = "サイズを分析中";
+  String _bottomRecText;
 
   @override
   void initState() {
@@ -138,9 +137,7 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
         child: Column(children: [
           _hasError
               ? _createVSInPageStandardOnError()
-              : _isLoading
-                  ? _createVSInPageStandardOnLoading()
-                  : _createVSInPageStandardOnFinishedLoading(),
+              : _createVSInPageCardView(),
           !_hasError && !_isLoading ? Container(height: 10) : Container(),
           !_hasError && !_isLoading
               ? Row(
@@ -162,80 +159,101 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
         ]));
   }
 
-  Widget _createVSInPageStandardOnLoading() {
-    return Container(child: Text("loading"));
+  Widget _createVSInPageCardView() {
+    return GestureDetector(
+      child: Container(
+          child: Card(
+            shape: RoundedRectangleBorder(),
+            color: Colors.white,
+            margin: EdgeInsets.zero,
+            elevation: 0,
+            child: Container(
+                padding: EdgeInsets.fromLTRB(_isLoading ? 13 : 8,
+                    _isLoading ? 22 : 14, 8, _isLoading ? 22 : 14),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _isLoading
+                        ? Image(
+                            image: VSImages.vsIcon.image,
+                            fit: BoxFit.cover,
+                            width: 29,
+                            height: 20,
+                            color: VSColors.vsGray900)
+                        : Stack(
+                            children: [
+                              Container(width: 78),
+                              Positioned(
+                                  child: ProductImageView(
+                                      productImageType: ProductImageType.user,
+                                      networkProductImage:
+                                          _userNetworkProductImage)),
+                              Positioned(
+                                  left: 38,
+                                  child: ProductImageView(
+                                      productImageType: ProductImageType.store,
+                                      networkProductImage:
+                                          _storeNetworkProductImage)),
+                            ],
+                          ),
+                    Expanded(
+                        child: Container(
+                            margin: EdgeInsets.only(
+                                left: _isLoading ? 9 : 4, right: 8),
+                            child: _isLoading
+                                ? _buildLoadingText()
+                                : _buildRecommendationText())),
+                    CTAButton(
+                        backgroundColor: VSColors.vsGray900,
+                        textColor: Colors.white,
+                        onPressed: _openVirtusizeWebview)
+                  ],
+                )),
+          ),
+          decoration: new BoxDecoration(
+            boxShadow: [
+              new BoxShadow(
+                color: Colors.black.withOpacity(0.13),
+                blurRadius: 14,
+                spreadRadius: 0,
+                offset: Offset(0, 4),
+              ),
+            ],
+          )),
+      onTap: _openVirtusizeWebview,
+    );
+  }
+
+  Widget _buildLoadingText() {
+    return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Text("サイズを分析中",
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+      AnimatedDots()
+    ]);
+  }
+
+  Widget _buildRecommendationText() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _topRecText != null
+            ? Text(_topRecText, style: TextStyle(fontSize: 12))
+            : Container(),
+        Text(_bottomRecText,
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold))
+      ],
+    );
   }
 
   Widget _createVSInPageStandardOnError() {
-    return Container(child: Text("has error"));
-  }
-
-  Widget _createVSInPageStandardOnFinishedLoading() {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        GestureDetector(
-          child: Container(
-              child: Card(
-                shape: RoundedRectangleBorder(),
-                color: Colors.white,
-                margin: EdgeInsets.zero,
-                elevation: 0,
-                child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 14),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Stack(
-                          children: [
-                            Container(width: 78),
-                            Positioned(
-                                child: ProductImageView(
-                                    productImageType: ProductImageType.user,
-                                    networkProductImage:
-                                        _userNetworkProductImage)),
-                            Positioned(
-                                left: 38,
-                                child: ProductImageView(
-                                    productImageType: ProductImageType.store,
-                                    networkProductImage:
-                                        _storeNetworkProductImage)),
-                          ],
-                        ),
-                        Expanded(
-                            child: Container(
-                                margin: EdgeInsets.only(left: 4, right: 8),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    _topRecText != null
-                                        ? Text(_topRecText,
-                                            style: TextStyle(fontSize: 12))
-                                        : Container(),
-                                    Text(_bottomRecText,
-                                        style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold))
-                                  ],
-                                ))),
-                        CTAButton(
-                            backgroundColor: VSColors.vsGray900,
-                            textColor: Colors.white,
-                            onPressed: _openVirtusizeWebview)
-                      ],
-                    )),
-              ),
-              decoration: new BoxDecoration(
-                boxShadow: [
-                  new BoxShadow(
-                    color: Colors.black.withOpacity(0.13),
-                    blurRadius: 14,
-                    spreadRadius: 0,
-                    offset: Offset(0, 4),
-                  ),
-                ],
-              )),
-          onTap: _openVirtusizeWebview,
-        ),
+        Image(image: VSImages.errorHanger.image, width: 40, height: 32),
+        Container(height: 10),
+        Text("現在バーチャサイズは使えませんが、\nそのままでお買い物をお楽しみください。",
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 12, color: VSColors.vsGray700))
       ],
     );
   }
