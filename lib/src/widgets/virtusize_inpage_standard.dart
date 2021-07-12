@@ -15,16 +15,15 @@ import 'cta_button.dart';
 import 'product_image_view.dart';
 
 class VirtusizeInPageStandard extends StatefulWidget {
-  final VirtusizeStyle virtusizeStyle;
-  final Color buttonBackgroundColor;
+  VirtusizeStyle style;
+  Color buttonBackgroundColor;
   final double horizontalMargin;
 
   VirtusizeInPageStandard(
-      {Key key,
-      this.virtusizeStyle,
-      this.buttonBackgroundColor,
-      this.horizontalMargin = 16.0})
-      : super(key: key);
+      {this.buttonBackgroundColor = VSColors.vsGray900, this.horizontalMargin = 16});
+
+  VirtusizeInPageStandard.vsStyle(
+      {this.style = VirtusizeStyle.Black, this.horizontalMargin = 16});
 
   @override
   _VirtusizeInPageStandardState createState() =>
@@ -171,6 +170,20 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
     double _inpageCardWidth =
         MediaQuery.of(context).size.width - widget.horizontalMargin * 2;
     bool overlayImages = _inpageCardWidth <= 411;
+
+    Color color;
+    switch (widget.style) {
+      case VirtusizeStyle.Black:
+        color = VSColors.vsGray900;
+        break;
+      case VirtusizeStyle.None:
+        color = widget.buttonBackgroundColor;
+        break;
+      case VirtusizeStyle.Teal:
+        color = VSColors.vsTeal;
+        break;
+    }
+
     return GestureDetector(
       child: Container(
           child: Card(
@@ -219,7 +232,7 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
                                 ? _buildLoadingText()
                                 : _buildRecommendationText())),
                     CTAButton(
-                        backgroundColor: VSColors.vsGray900,
+                        backgroundColor: color,
                         textColor: Colors.white,
                         onPressed: _openVirtusizeWebview)
                   ],
