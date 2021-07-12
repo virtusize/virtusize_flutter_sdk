@@ -70,7 +70,6 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
           } else if (product.imageType == ProductImageType.user) {
             product.networkProductImage = networkImage;
             _userProduct = product;
-            _isLoading = false;
           }
         });
       }, onError: (dynamic exception, StackTrace stackTrace) {
@@ -79,7 +78,6 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
             _storeProduct = product;
           } else if (product.imageType == ProductImageType.user) {
             _userProduct = product;
-            _isLoading = false;
           }
         });
       }));
@@ -93,8 +91,8 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
           _splitRecTexts(recommendation.text);
         } catch (e) {
           _hasError = true;
-          _isLoading = false;
         }
+        _isLoading = false;
       });
     });
   }
