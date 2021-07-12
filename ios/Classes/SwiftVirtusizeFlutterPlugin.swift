@@ -86,7 +86,7 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 					return
 				}
 				guard let productId = arguments["externalId"] as? String   else {
-					result(FlutterMethodNotImplemented)
+					result(FlutterError.argumentNotSet("externalId"))
 					return
 				}
 				
@@ -118,7 +118,7 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 				}
 			case "getRecommendationText":
 				guard let storeProductId = self.productCheckData?["productDataId"] as? Int else {
-					result(FlutterError.unKnownError)
+					result(FlutterError.unknown)
 					return
 				}
 				let initialDataWorkItem = DispatchWorkItem { [weak self] in
