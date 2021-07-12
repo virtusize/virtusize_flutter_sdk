@@ -10,6 +10,7 @@ import '../../virtusize_plugin.dart';
 import '../ui/colors.dart';
 import '../ui/images.dart';
 import 'animated_dots.dart';
+import 'animated_product_images.dart';
 import 'cta_button.dart';
 import 'product_image_view.dart';
 
@@ -118,7 +119,7 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
   @override
   Widget build(BuildContext context) {
     if (_productDataCheck != null && _productDataCheck.isValidProduct) {
-      return _createVSInPageStandard();
+      return _createVSInPageStandard(context);
     }
     return Container();
   }
@@ -134,14 +135,14 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
         : throw 'Could not launch $_url';
   }
 
-  Widget _createVSInPageStandard() {
+  Widget _createVSInPageStandard(BuildContext context) {
     return Container(
         margin: EdgeInsets.symmetric(horizontal: widget.horizontalMargin),
         width: double.infinity,
         child: Column(children: [
           _hasError
               ? _createVSInPageStandardOnError()
-              : _createVSInPageCardView(),
+              : _createVSInPageCardView(context),
           !_hasError && !_isLoading ? Container(height: 10) : Container(),
           !_hasError && !_isLoading
               ? Row(
@@ -163,7 +164,10 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
         ]));
   }
 
-  Widget _createVSInPageCardView() {
+  Widget _createVSInPageCardView(BuildContext context) {
+    double _inpageCardWidth =
+        MediaQuery.of(context).size.width - widget.horizontalMargin * 2;
+    bool overlayImages = _inpageCardWidth <= 411;
     return GestureDetector(
       child: Container(
           child: Card(
@@ -185,18 +189,24 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
                             height: 20,
                             color: VSColors.vsGray900)
                         : _showUserProductImage
-                            ? Stack(
-                                children: [
-                                  Container(width: 78),
-                                  Positioned(
-                                      child: ProductImageView(
-                                          product: _userProduct)),
-                                  Positioned(
-                                      left: 38,
-                                      child: ProductImageView(
-                                          product: _storeProduct)),
-                                ],
-                              )
+                            ? overlayImages
+                                ? AnimatedProductImages(
+                                    userProductImageView:
+                                        ProductImageView(product: _userProduct),
+                                    storeProductImageView: ProductImageView(
+                                        product: _storeProduct))
+                                : Stack(
+                                    children: [
+                                      Container(width: 78),
+                                      Positioned(
+                                          child: ProductImageView(
+                                              product: _userProduct)),
+                                      Positioned(
+                                          left: 38,
+                                          child: ProductImageView(
+                                              product: _storeProduct)),
+                                    ],
+                                  )
                             : ProductImageView(product: _storeProduct),
                     Expanded(
                         child: Container(

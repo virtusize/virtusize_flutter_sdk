@@ -63,7 +63,8 @@ class _AnimatedDotsState extends State<AnimatedDots> with TickerProviderStateMix
     );
   }
 
-  dispose() {
+  @override
+  void dispose() {
     _controller.dispose();
     super.dispose();
   }
