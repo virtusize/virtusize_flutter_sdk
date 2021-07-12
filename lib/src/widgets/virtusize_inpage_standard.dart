@@ -15,7 +15,7 @@ import 'cta_button.dart';
 import 'product_image_view.dart';
 
 class VirtusizeInPageStandard extends StatefulWidget {
-  VirtusizeStyle style;
+  VirtusizeStyle style = VirtusizeStyle.None;
   Color buttonBackgroundColor;
   final double horizontalMargin;
 
