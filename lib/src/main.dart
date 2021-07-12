@@ -108,15 +108,6 @@ class VirtusizePlugin {
     }
   }
 
-  Future<void> setVirtusizeView(String viewType, int id) async {
-    try {
-      await _channel.invokeMethod(
-          'setVirtusizeView', {'viewType': viewType.toString(), 'viewId': id});
-    } on PlatformException catch (error) {
-      print('Failed to set VirtusizeView: $error');
-    }
-  }
-
   Future<void> getRecommendationText() async {
     try {
       _recSink.add(Recommendation(
