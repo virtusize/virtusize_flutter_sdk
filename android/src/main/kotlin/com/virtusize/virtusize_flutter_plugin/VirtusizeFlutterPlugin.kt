@@ -229,6 +229,9 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                     getRecommendation(result)
                 }
             }
+            "getPrivacyPolicyLink" -> {
+                result.success(helper?.getPrivacyPolicyLink(virtusize?.displayLanguage))
+            }
             else -> {
                 result.notImplemented()
             }
@@ -242,6 +245,16 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             result.error("-1", "storeProduct is null", null)
             scope.cancel()
         }
+
+        channel.invokeMethod(
+            "onProduct",
+            mutableMapOf(
+                "imageType" to "store",
+                "imageUrl" to storeProduct!!.getProductImageURL(),
+                "productType" to storeProduct!!.productType,
+                "productStyle" to storeProduct!!.storeProductMeta?.additionalInfo?.style
+            )
+        )
 
         productTypes = repository.getProductTypes()
         if (productTypes == null) {
@@ -262,7 +275,13 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             if (result != null) {
                 result.error("-1", "userSessionResponse is null", null)
             } else {
-                channel.invokeMethod("onRecTextChange", null)
+                channel.invokeMethod(
+                    "onRecChange",
+                    mutableMapOf(
+                        "text" to null,
+                        "showUserProductImage" to false
+                    )
+                )
             }
             scope.cancel()
         }
@@ -280,7 +299,13 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 if (result != null) {
                     result.error("-1", "userProducts is null", null)
                 } else {
-                    channel.invokeMethod("onRecTextChange", mutableMapOf("error" to "userProducts is null"))
+                    channel.invokeMethod(
+                        "onRecChange",
+                        mutableMapOf(
+                            "text" to null,
+                            "showUserProductImage" to false
+                        )
+                    )
                 }
                 scope.cancel()
             }
@@ -300,16 +325,40 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 }
         }
 
+        val filteredUserProducts = if (selectedUserProductId != null) userProducts?.filter { it.id == selectedUserProductId } else userProducts
+
+        channel.invokeMethod(
+            "onProduct",
+            mutableMapOf(
+                "imageType" to "user",
+                "imageUrl" to filteredUserProducts?.firstOrNull()?.getProductImageURL(),
+                "productType" to filteredUserProducts?.firstOrNull()?.productType,
+                "productStyle" to filteredUserProducts?.firstOrNull()?.storeProductMeta?.additionalInfo?.style
+            )
+        )
+
+        val userProductRecommendedSize = helper?.getUserProductRecommendedSize(
+            selectedRecommendedType,
+            filteredUserProducts,
+            storeProduct!!,
+            productTypes!!
+        )
+
         val recText = helper?.getRecommendationText(
             selectedRecommendedType,
-            if (selectedUserProductId != null) userProducts?.filter { it.id == selectedUserProductId } else userProducts,
             storeProduct!!,
-            productTypes!!,
+            userProductRecommendedSize,
             bodyProfileRecommendedSize,
             i18nLocalization!!
         )
-        result?.success(recText) ?: run {
-            channel.invokeMethod("onRecTextChange", recText)
+
+        val resultMap = mutableMapOf(
+            "text" to recText,
+            "showUserProductImage" to (userProductRecommendedSize?.bestUserProduct != null)
+        )
+
+        result?.success(resultMap) ?: run {
+            channel.invokeMethod("onRecChange", resultMap)
         }
     }
 
