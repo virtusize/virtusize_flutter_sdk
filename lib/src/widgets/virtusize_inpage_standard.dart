@@ -70,8 +70,8 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
           } else if (product.imageType == ProductImageType.user) {
             product.networkProductImage = networkImage;
             _userProduct = product;
+            _isLoading = false;
           }
-          _isLoading = false;
         });
       }, onError: (dynamic exception, StackTrace stackTrace) {
         setState(() {
@@ -79,8 +79,8 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
             _storeProduct = product;
           } else if (product.imageType == ProductImageType.user) {
             _userProduct = product;
+            _isLoading = false;
           }
-          _isLoading = false;
         });
       }));
     });
