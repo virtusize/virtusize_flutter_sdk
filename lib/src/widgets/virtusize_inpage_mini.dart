@@ -29,8 +29,8 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
   StreamSubscription<ProductDataCheck> _pdcSubscription;
   StreamSubscription<Recommendation> _recSubscription;
   bool _isValidProduct = false;
-  bool _isLoading = true;
-  bool _hasError = false;
+  bool _isLoading;
+  bool _hasError;
   String _recText = "サイズを分析中";
 
   @override
@@ -39,6 +39,8 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
 
     _pdcSubscription = VirtusizePlugin.instance.pdcStream.listen((pdc) {
       setState(() {
+        _isLoading = true;
+        _hasError = false;
         _isValidProduct = pdc.isValidProduct;
       });
     });
@@ -46,13 +48,12 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
     _recSubscription =
         VirtusizePlugin.instance.recStream.listen((recommendation) {
       setState(() {
-        _isLoading = false;
         try {
           _recText = recommendation.text.replaceAll("<br>", "");
-          _hasError = false;
         } catch (e) {
           _hasError = true;
         }
+        _isLoading = false;
       });
     });
   }

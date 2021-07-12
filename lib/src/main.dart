@@ -40,7 +40,6 @@ class VirtusizePlugin {
       if(call.method == "onRecChange") {
         _recSink.add(Recommendation(json.encode(call.arguments)));
       } else if(call.method == "onProduct") {
-        print(call.arguments.toString());
         _productSink.add(Product(json.encode(call.arguments)));
       }
       return null;

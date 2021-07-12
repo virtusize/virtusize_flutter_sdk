@@ -36,8 +36,8 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
   StreamSubscription<Recommendation> _recSubscription;
   StreamSubscription<Product> _productSubscription;
   ProductDataCheck _productDataCheck;
-  bool _hasError = false;
-  bool _isLoading = true;
+  bool _hasError;
+  bool _isLoading;
   bool _showUserProductImage = false;
   Product _storeProduct;
   Product _userProduct;
@@ -50,6 +50,8 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
 
     _pdcSubscription = VirtusizePlugin.instance.pdcStream.listen((pdc) {
       setState(() {
+        _isLoading = true;
+        _hasError = false;
         _productDataCheck = pdc;
       });
     });
@@ -70,6 +72,7 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
             product.networkProductImage = networkImage;
             _userProduct = product;
           }
+          _isLoading = false;
         });
       }, onError: (dynamic exception, StackTrace stackTrace) {
         setState(() {
@@ -78,6 +81,7 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
           } else if (product.imageType == ProductImageType.user) {
             _userProduct = product;
           }
+          _isLoading = false;
         });
       }));
     });
@@ -85,13 +89,12 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
     _recSubscription =
         VirtusizePlugin.instance.recStream.listen((recommendation) {
       setState(() {
-        _isLoading = false;
         _showUserProductImage = recommendation.showUserProductImage;
         try {
           _splitRecTexts(recommendation.text);
-          _hasError = false;
         } catch (e) {
           _hasError = true;
+          _isLoading = false;
         }
       });
     });
