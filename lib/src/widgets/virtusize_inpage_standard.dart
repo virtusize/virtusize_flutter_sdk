@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../models/recommendation.dart';
 import '../models/product.dart';
 import '../models/product_data_check.dart';
 import '../../virtusize_plugin.dart';
@@ -30,12 +31,13 @@ class VirtusizeInPageStandard extends StatefulWidget {
 }
 
 class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
-  StreamSubscription<ProductDataCheck> pdcSubscription;
-  StreamSubscription<String> recTextSubscription;
-  StreamSubscription<Product> productSubscription;
+  StreamSubscription<ProductDataCheck> _pdcSubscription;
+  StreamSubscription<Recommendation> _recSubscription;
+  StreamSubscription<Product> _productSubscription;
   ProductDataCheck _productDataCheck;
   bool _hasError = false;
   bool _isLoading = true;
+  bool _showUserProductImage = false;
   Product _storeProduct;
   Product _userProduct;
   String _topRecText;
@@ -45,13 +47,13 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
   void initState() {
     super.initState();
 
-    pdcSubscription = VirtusizePlugin.instance.pdcStream.listen((pdc) {
+    _pdcSubscription = VirtusizePlugin.instance.pdcStream.listen((pdc) {
       setState(() {
         _productDataCheck = pdc;
       });
     });
 
-    productSubscription =
+    _productSubscription =
         VirtusizePlugin.instance.productStream.listen((product) {
       String imageUrl = product.imageUrl ?? "";
       Image networkImage = Image.network(imageUrl);
@@ -79,12 +81,13 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
       }));
     });
 
-    recTextSubscription =
-        VirtusizePlugin.instance.recTextStream.listen((recText) {
+    _recSubscription =
+        VirtusizePlugin.instance.recStream.listen((recommendation) {
       setState(() {
         _isLoading = false;
+        _showUserProductImage = recommendation.showUserProductImage;
         try {
-          _splitRecTexts(recText);
+          _splitRecTexts(recommendation.text);
           _hasError = false;
         } catch (e) {
           _hasError = true;
@@ -106,9 +109,9 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
 
   @override
   void dispose() {
-    pdcSubscription.cancel();
-    productSubscription.cancel();
-    recTextSubscription.cancel();
+    _pdcSubscription.cancel();
+    _productSubscription.cancel();
+    _recSubscription.cancel();
     super.dispose();
   }
 
@@ -181,18 +184,20 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
                             width: 29,
                             height: 20,
                             color: VSColors.vsGray900)
-                        : Stack(
-                            children: [
-                              Container(width: 78),
-                              Positioned(
-                                  child:
-                                      ProductImageView(product: _userProduct)),
-                              Positioned(
-                                  left: 38,
-                                  child:
-                                      ProductImageView(product: _storeProduct)),
-                            ],
-                          ),
+                        : _showUserProductImage
+                            ? Stack(
+                                children: [
+                                  Container(width: 78),
+                                  Positioned(
+                                      child: ProductImageView(
+                                          product: _userProduct)),
+                                  Positioned(
+                                      left: 38,
+                                      child: ProductImageView(
+                                          product: _storeProduct)),
+                                ],
+                              )
+                            : ProductImageView(product: _storeProduct),
                     Expanded(
                         child: Container(
                             margin: EdgeInsets.only(

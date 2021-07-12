@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../models/recommendation.dart';
 import '../models/product_data_check.dart';
 import '../ui/colors.dart';
 import '../ui/images.dart';
@@ -25,8 +26,8 @@ class VirtusizeInPageMini extends StatefulWidget {
 }
 
 class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
-  StreamSubscription<ProductDataCheck> pdcSubscription;
-  StreamSubscription<String> recTextSubscription;
+  StreamSubscription<ProductDataCheck> _pdcSubscription;
+  StreamSubscription<Recommendation> _recSubscription;
   bool _isValidProduct = false;
   bool _isLoading = true;
   bool _hasError = false;
@@ -36,18 +37,18 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
   void initState() {
     super.initState();
 
-    pdcSubscription = VirtusizePlugin.instance.pdcStream.listen((pdc) {
+    _pdcSubscription = VirtusizePlugin.instance.pdcStream.listen((pdc) {
       setState(() {
         _isValidProduct = pdc.isValidProduct;
       });
     });
 
-    recTextSubscription =
-        VirtusizePlugin.instance.recTextStream.listen((recText) {
+    _recSubscription =
+        VirtusizePlugin.instance.recStream.listen((recommendation) {
       setState(() {
         _isLoading = false;
         try {
-          _recText = recText.replaceAll("<br>", "");
+          _recText = recommendation.text.replaceAll("<br>", "");
           _hasError = false;
         } catch (e) {
           _hasError = true;
@@ -58,8 +59,8 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
 
   @override
   void dispose() {
-    pdcSubscription.cancel();
-    recTextSubscription.cancel();
+    _pdcSubscription.cancel();
+    _recSubscription.cancel();
     super.dispose();
   }
 

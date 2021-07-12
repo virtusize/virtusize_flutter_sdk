@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'models/recommendation.dart';
 import 'models/product.dart';
 import 'models/product_data_check.dart';
 import 'models/virtusize_enums.dart';
@@ -12,7 +13,7 @@ class VirtusizePlugin {
 
   ClientProduct product;
   StreamController _pdcController;
-  StreamController _recTextController;
+  StreamController _recController;
   StreamController _productController;
 
   StreamSink<ProductDataCheck> get _pdcSink =>
@@ -25,19 +26,19 @@ class VirtusizePlugin {
   Stream<Product> get productStream =>
       _productController.stream;
 
-  StreamSink<String> get _recTextSink =>
-      _recTextController.sink;
-  Stream<String> get recTextStream =>
-      _recTextController.stream;
+  StreamSink<Recommendation> get _recSink =>
+      _recController.sink;
+  Stream<Recommendation> get recStream =>
+      _recController.stream;
 
   VirtusizePlugin._() {
     _pdcController = StreamController<ProductDataCheck>.broadcast();
     _productController = StreamController<Product>.broadcast();
-    _recTextController = StreamController<String>.broadcast();
+    _recController = StreamController<Recommendation>.broadcast();
     _channel.setMethodCallHandler((call) {
       print(call);
-      if(call.method == "onRecTextChange") {
-        _recTextSink.add(call.arguments);
+      if(call.method == "onRecChange") {
+        _recSink.add(Recommendation(json.encode(call.arguments)));
       } else if(call.method == "onProduct") {
         print(call.arguments.toString());
         _productSink.add(Product(json.encode(call.arguments)));
@@ -119,10 +120,11 @@ class VirtusizePlugin {
 
   Future<void> getRecommendationText() async {
     try {
-      _recTextSink.add(await _channel.invokeMethod('getRecommendationText'));
+      _recSink.add(Recommendation(
+          json.encode(await _channel.invokeMethod('getRecommendationText'))));
     } on PlatformException catch (error) {
       print('Failed to get RecommendationText: $error');
-      _recTextSink.add(null);
+      _recSink.add(Recommendation(null));
     }
   }
 

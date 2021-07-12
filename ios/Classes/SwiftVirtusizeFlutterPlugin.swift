@@ -195,7 +195,13 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 			if let result = result {
 				result(FlutterError.nullAPIResult("userSessionResponse"))
 			} else {
-				flutterChannel?.invokeMethod("onRecTextChange", arguments: nil)
+				flutterChannel?.invokeMethod(
+					"onRecChange",
+					arguments: [
+						"text": nil,
+						"showUserProductImage": false
+					]
+				)
 			}
 			workItem?.cancel()
 			return
@@ -215,7 +221,13 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 				if let result = result {
 					result(FlutterError.nullAPIResult("userProducts"))
 				} else {
-					flutterChannel?.invokeMethod("onRecTextChange", arguments: nil)
+					flutterChannel?.invokeMethod(
+						"onRecChange",
+						arguments: [
+							"text": nil,
+							"showUserProductImage": false
+						]
+					)
 				}
 				workItem?.cancel()
 				return
@@ -249,20 +261,34 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 				"productStyle": filteredUserProducts?.first?.productStyle
 			]
 		)
-
-		let recText = repository.getRecommendationText(
+		
+		let userProductRecommendedSize = repository.getUserProductRecommendedSize(
 			selectedRecType: selectedRecommendedType,
 			userProducts: filteredUserProducts,
 			storeProduct: storeProduct!,
-			productTypes: productTypes!,
+			productTypes: productTypes!
+		)
+		
+		let recText = repository.getRecommendationText(
+			selectedRecType: selectedRecommendedType,
+			storeProduct: storeProduct!,
+			userProductRecommendedSize: userProductRecommendedSize,
 			bodyProfileRecommendedSize: bodyProfileRecommendedSize,
 			i18nLocalization: i18nLocalization!
 		)
 		
+		let arguments: [String : Any] = [
+			"text": recText,
+			"showUserProductImage": userProductRecommendedSize?.bestUserProduct != nil
+		]
+
 		if let result = result {
-			result(recText)
+			result(arguments)
 		} else {
-			flutterChannel?.invokeMethod("onRecTextChange", arguments: recText)
+			flutterChannel?.invokeMethod(
+				"onRecChange",
+				arguments: arguments
+			)
 		}
 	}
 	
