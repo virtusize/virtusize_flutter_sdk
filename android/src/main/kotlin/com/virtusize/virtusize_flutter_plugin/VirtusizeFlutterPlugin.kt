@@ -148,17 +148,6 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             }
         }
         repository = VirtusizeFlutterRepository(context, messageHandler)
-
-        // Register the VirtusizeButton
-        flutterPluginBinding.platformViewRegistry.registerViewFactory(
-            "com.virtusize/virtusize_button",
-            FLVirtusizeButtonFactory()
-        )
-
-        flutterPluginBinding.platformViewRegistry.registerViewFactory(
-            "com.virtusize/virtusize_inpage_standard",
-            FLVirtusizeInPageStandardFactory(flutterPluginBinding.binaryMessenger)
-        )
     }
 
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
@@ -228,23 +217,6 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                     productDataCheck!!,
                     messageHandler
                 )
-            }
-            "setVirtusizeView" -> {
-                val type = call.argument<String>("viewType")
-                call.argument<Int>("viewId")?.let {
-                    if (type == "VirtusizeButton") {
-                        virtusize?.setupVirtusizeView(FLVirtusizeButton.virtusizeButtons.get(it))
-                    } else if (type == "VirtusizeInPageStandard") {
-                        virtusize?.setupVirtusizeView(
-                            FLVirtusizeInPageStandard.virtusizeInPageStandards.get(
-                                it
-                            )
-                        )
-                    }
-                    result.success(true)
-                } ?: run {
-                    result.error("-1", "viewId is null", null)
-                }
             }
             "getRecommendationText" -> {
                 scope.launch {
