@@ -124,8 +124,8 @@ class _MyAppState extends State<MyApp> {
           quantity: 1,
           url: "http://example.com/products/A001")
     ]);
-    VirtusizePlugin.instance.sendOrder(order: order, onSuccess: () {
-      print("Successfully sent the order");
+    VirtusizePlugin.instance.sendOrder(order: order, onSuccess: (order) {
+      print("Successfully sent the order $order");
     }, onError: (error) {
       print(error);
     });
