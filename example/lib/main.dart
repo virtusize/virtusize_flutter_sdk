@@ -100,9 +100,34 @@ class _MyAppState extends State<MyApp> {
                   VirtusizeInPageStandard.vsStyle(style: VirtusizeStyle.Black),
                   Container(height: 16),
                   VirtusizeInPageStandard(
-                      buttonBackgroundColor: Colors.amber, horizontalMargin: 32)
+                      buttonBackgroundColor: Colors.amber, horizontalMargin: 32),
+                  Container(height: 16),
+                  Center(child: ElevatedButton(child: Text("Send a Test Order"), onPressed: _sendOrder))
                 ],
               ))),
     );
+  }
+
+  void _sendOrder() {
+    VirtusizeOrder order =
+        VirtusizeOrder(externalOrderId: "20200601586", items: [
+      VirtusizeOrderItem(
+          productId: "A001",
+          size: "L",
+          sizeAlias: "Large",
+          variantId: "A001_SIZEL_RED",
+          imageUrl: "http://images.example.com/products/A001/red/image1xl.jpg",
+          color: "Red",
+          gender: "W",
+          unitPrice: 5100.00,
+          currency: "JPY",
+          quantity: 1,
+          url: "http://example.com/products/A001")
+    ]);
+    VirtusizePlugin.instance.sendOrder(order: order, onSuccess: () {
+      print("Successfully sent the order");
+    }, onError: (error) {
+      print(error);
+    });
   }
 }

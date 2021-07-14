@@ -7,6 +7,7 @@ import 'models/recommendation.dart';
 import 'models/product.dart';
 import 'models/product_data_check.dart';
 import 'models/virtusize_enums.dart';
+import 'models/virtusize_order.dart';
 import 'models/virtusize_product.dart';
 
 
@@ -47,6 +48,7 @@ class VirtusizePlugin {
       } else if(call.method == "onProduct") {
         _productSink.add(Product(json.encode(call.arguments)));
       } else if(call.method == "onVSEvent") {
+        // TODO: should get the events from the SDK as well
         if(_virtusizeEventListener != null) {
           _virtusizeEventListener.vsEvent.call(call.arguments);
         }
@@ -86,6 +88,18 @@ class VirtusizePlugin {
       });
     } on PlatformException catch (error) {
       print('Failed to set the Virtusize props: $error');
+    }
+  }
+
+  Future<void> setUserID(String userId) async {
+    if(userId == null || userId.isEmpty) {
+      print('Failed to set the external user ID: userId is null or empty');
+      return;
+    }
+    try {
+      await _channel.invokeMethod('setUserID', userId);
+    } on PlatformException catch (error) {
+      print('Failed to set the external user ID: $error');
     }
   }
 
@@ -146,5 +160,15 @@ class VirtusizePlugin {
 
   void setVirtusizeMessageListener(VirtusizeMessageListener listener) {
     _virtusizeEventListener = listener;
+  }
+
+  Future<void> sendOrder({@required VirtusizeOrder order, Function onSuccess, Function(Exception e) onError}) async {
+    try {
+      await _channel.invokeMethod('sendOrder', order.toJson());
+      onSuccess();
+    } on PlatformException catch (error) {
+      print('Failed to send the order: $error');
+      onError(error);
+    }
   }
 }
