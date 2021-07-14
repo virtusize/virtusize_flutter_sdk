@@ -80,6 +80,12 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 				}
 				
 				Virtusize.params = virtusizeBuilder.build()
+			case "setUserID":
+				guard let userID = call.arguments as? String, !userID.isEmpty else {
+					result(FlutterError.invalidUserID)
+					return
+				}
+				Virtusize.userID = userID
 			case "getProductDataCheck":
 				guard let arguments = call.arguments as? [String: Any] else {
 					result(FlutterError.noArguments)
@@ -151,6 +157,16 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 				}
 			case "getPrivacyPolicyLink":
 				result(repository.getPrivacyPolicyLink())
+			case "sendOrder":
+				guard let orderDict = call.arguments as? [String : Any?] else {
+					result(FlutterError.noArguments)
+					return
+				}
+				repository.sendOrder(orderDict, onSuccess: {
+					result(orderDict)
+				},onError: { error in
+					result(FlutterError.sendOrder(error.localizedDescription))
+				})
 			default:
 				result(FlutterMethodNotImplemented)
 		}

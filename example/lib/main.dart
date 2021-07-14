@@ -109,6 +109,7 @@ class _MyAppState extends State<MyApp> {
   }
 
   void _sendOrder() {
+    // VirtusizePlugin.instance.setUserID("123456");
     VirtusizeOrder order =
         VirtusizeOrder(externalOrderId: "20200601586", items: [
       VirtusizeOrderItem(
@@ -124,6 +125,7 @@ class _MyAppState extends State<MyApp> {
           quantity: 1,
           url: "http://example.com/products/A001")
     ]);
+    
     VirtusizePlugin.instance.sendOrder(order: order, onSuccess: (order) {
       print("Successfully sent the order $order");
     }, onError: (error) {
