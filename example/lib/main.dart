@@ -36,9 +36,20 @@ class _MyAppState extends State<MyApp> {
 
     VirtusizePlugin.instance.setProduct(
         // Set the product's external ID
-        externalId: '694',
+        externalId: 'vs_dress',
         // Set the product image URL
         imageUrl: 'http://www.image.com/goods/12345.jpg');
+
+    VirtusizePlugin.instance
+        .setVirtusizeMessageListener(VirtusizeMessageListener(vsEvent: (event) {
+      print("Virtusize event: $event");
+    }, vsError: (error) {
+      print("Virtusize error: $error");
+    }, productDataCheckData: (productDataCheck) {
+      print('ProductDataCheck: $productDataCheck');
+    }, productDataCheckError: (error) {
+      print('ProductDataCheck error: $error');
+    }));
   }
 
   @override
@@ -82,9 +93,12 @@ class _MyAppState extends State<MyApp> {
                     VirtusizeInPageMini(
                         backgroundColor: Colors.blue, horizontalMargin: 32),
                     Container(height: 16),
-                    VirtusizeInPageStandard.vsStyle(style: VirtusizeStyle.Black),
+                    VirtusizeInPageStandard.vsStyle(
+                        style: VirtusizeStyle.Black),
                     Container(height: 16),
-                    VirtusizeInPageStandard(buttonBackgroundColor: Colors.amber, horizontalMargin: 32)
+                    VirtusizeInPageStandard(
+                        buttonBackgroundColor: Colors.amber,
+                        horizontalMargin: 32)
                   ])))),
     );
   }

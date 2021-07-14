@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../ui/colors.dart';
+import '../resources/colors.dart';
 
 class AnimatedDots extends StatefulWidget {
   final int dotNumbers;

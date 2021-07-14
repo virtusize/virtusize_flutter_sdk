@@ -5,9 +5,9 @@ import 'package:flutter/widgets.dart';
 
 import '../main.dart';
 import '../models/product_data_check.dart';
-import '../ui/images.dart';
+import '../resources/images.dart';
 import '../../virtusize_plugin.dart';
-import '../ui/colors.dart';
+import '../resources/colors.dart';
 
 class VirtusizeButton extends StatefulWidget {
   final Widget child;
