@@ -20,7 +20,8 @@ class VirtusizeInPageStandard extends StatefulWidget {
   final double horizontalMargin;
 
   VirtusizeInPageStandard(
-      {this.buttonBackgroundColor = VSColors.vsGray900, this.horizontalMargin = 16});
+      {this.buttonBackgroundColor = VSColors.vsGray900,
+      this.horizontalMargin = 16});
 
   VirtusizeInPageStandard.vsStyle(
       {this.style = VirtusizeStyle.Black, this.horizontalMargin = 16});
@@ -251,7 +252,7 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
   }
 
   Widget _buildLoadingText() {
-    return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+    return Wrap(children: [
       Text("サイズを分析中",
           style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
       AnimatedDots()
