@@ -154,7 +154,7 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             "setVirtusizeProps" -> {
                 if(call.arguments == null) {
                     val error = VirtusizeFlutterErrors.noArguments
-                    result.error(error.errorCode, error.errorCode, null)
+                    result.error(error.errorCode, error.errorMessage, null)
                     return
                 }
 
@@ -201,6 +201,15 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
                 result.success(call.arguments.toString())
             }
+            "setUserID" -> {
+                if(call.arguments == null) {
+                    val error = VirtusizeFlutterErrors.noArguments
+                    result.error(error.errorCode, error.errorMessage, null)
+                    return
+                }
+                virtusize?.setUserId(call.arguments.toString())
+                result.success(null)
+            }
             "getProductDataCheck" -> {
                 val externalId = call.argument<String>("externalId")
                 if (externalId == null) {
@@ -242,6 +251,15 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             }
             "getPrivacyPolicyLink" -> {
                 result.success(helper?.getPrivacyPolicyLink(virtusize?.displayLanguage))
+            }
+            "sendOrder" -> {
+                scope.launch {
+                    repository.sendOrder(virtusize, call.arguments as Map<String, Any?>, onSuccess = {
+                        result.success(null)
+                    }, onError = {
+                        result.error("ORDER_ERROR", it.message, null)
+                    })
+                }
             }
             else -> {
                 result.notImplemented()
