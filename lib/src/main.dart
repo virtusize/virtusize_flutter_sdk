@@ -13,6 +13,9 @@ import 'models/virtusize_product.dart';
 class VirtusizePlugin {
   static final VirtusizePlugin instance = VirtusizePlugin._();
 
+  static const MethodChannel _channel =
+  const MethodChannel('com.virtusize/virtusize_flutter_plugin');
+
   ClientProduct product;
   StreamController _pdcController;
   StreamController _recController;
@@ -55,9 +58,6 @@ class VirtusizePlugin {
       return null;
     });
   }
-
-  static const MethodChannel _channel =
-      const MethodChannel('com.virtusize/virtusize_flutter_plugin');
 
   Future<void> setVirtusizeProps({@required String apiKey,
       String externalUserId,

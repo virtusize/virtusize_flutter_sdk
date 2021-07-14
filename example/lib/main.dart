@@ -59,47 +59,50 @@ class _MyAppState extends State<MyApp> {
           appBar: AppBar(
             title: const Text('Virtusize Plugin Example App'),
           ),
-          body: Center(
-              child: Padding(
-                  padding: EdgeInsets.only(top: 16),
-                  child: Column(mainAxisSize: MainAxisSize.min, children: [
-                    VirtusizeButton.vsStyle(),
-                    Container(height: 16),
-                    VirtusizeButton.vsStyle(
-                        style: VirtusizeStyle.Teal, child: Text("Custom Text")),
-                    Container(height: 16),
-                    VirtusizeButton(
-                      child: ElevatedButton.icon(
-                          label:
-                              Text('サイズチェック', style: TextStyle(fontSize: 12)),
-                          icon: Icon(Icons.account_circle_rounded),
-                          style: ElevatedButton.styleFrom(
-                              primary: Color(0xFF191919),
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 10, vertical: 8),
-                              shape: RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(32.0)))),
-                          onPressed:
-                              VirtusizePlugin.instance.openVirtusizeWebView),
-                    ),
-                    Container(height: 16),
-                    VirtusizeButton(
-                      child: Text("Custom Text"),
-                    ),
-                    Container(height: 16),
-                    VirtusizeInPageMini.vsStyle(style: VirtusizeStyle.Teal),
-                    Container(height: 16),
-                    VirtusizeInPageMini(
-                        backgroundColor: Colors.blue, horizontalMargin: 32),
-                    Container(height: 16),
-                    VirtusizeInPageStandard.vsStyle(
-                        style: VirtusizeStyle.Black),
-                    Container(height: 16),
-                    VirtusizeInPageStandard(
-                        buttonBackgroundColor: Colors.amber,
-                        horizontalMargin: 32)
-                  ])))),
+          body: Padding(
+              padding: EdgeInsets.only(top: 16),
+              child: ListView(
+                shrinkWrap: true,
+                children: [
+                  Center(child: VirtusizeButton.vsStyle()),
+                  Container(height: 16),
+                  Center(
+                      child: VirtusizeButton.vsStyle(
+                          style: VirtusizeStyle.Teal,
+                          child: Text("Custom Text"))),
+                  Container(height: 16),
+                  Center(
+                      child: VirtusizeButton(
+                    child: ElevatedButton.icon(
+                        label: Text('サイズチェック', style: TextStyle(fontSize: 12)),
+                        icon: Icon(Icons.account_circle_rounded),
+                        style: ElevatedButton.styleFrom(
+                            primary: Color(0xFF191919),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 8),
+                            shape: RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(32.0)))),
+                        onPressed:
+                            VirtusizePlugin.instance.openVirtusizeWebView),
+                  )),
+                  Container(height: 16),
+                  Center(
+                      child: VirtusizeButton(
+                    child: Text("Custom Text"),
+                  )),
+                  Container(height: 16),
+                  VirtusizeInPageMini.vsStyle(style: VirtusizeStyle.Teal),
+                  Container(height: 16),
+                  VirtusizeInPageMini(
+                      backgroundColor: Colors.blue, horizontalMargin: 32),
+                  Container(height: 16),
+                  VirtusizeInPageStandard.vsStyle(style: VirtusizeStyle.Black),
+                  Container(height: 16),
+                  VirtusizeInPageStandard(
+                      buttonBackgroundColor: Colors.amber, horizontalMargin: 32)
+                ],
+              ))),
     );
   }
 }
