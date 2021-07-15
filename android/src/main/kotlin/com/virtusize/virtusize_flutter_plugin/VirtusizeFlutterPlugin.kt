@@ -260,7 +260,8 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                     repository.sendOrder(virtusize, call.arguments as Map<String, Any?>, onSuccess = {
                         result.success(null)
                     }, onError = {
-                        result.error("ORDER_ERROR", it.message, null)
+                        val error = VirtusizeFlutterErrors.sendOrder(it.message)
+                        result.error(error.errorCode, error.errorMessage, null)
                     })
                 }
             }
