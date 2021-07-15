@@ -21,7 +21,7 @@ class VirtusizePlugin {
   StreamController _pdcController;
   StreamController _recController;
   StreamController _productController;
-  VirtusizeMessageListener _virtusizeEventListener;
+  VirtusizeMessageListener _virtusizeMessageListener;
 
   StreamSink<ProductDataCheck> get _pdcSink =>
       _pdcController.sink;
@@ -48,12 +48,12 @@ class VirtusizePlugin {
       } else if(call.method == "onProduct") {
         _productSink.add(Product(json.encode(call.arguments)));
       } else if(call.method == "onVSEvent") {
-        if(_virtusizeEventListener != null) {
-          _virtusizeEventListener.vsEvent.call(call.arguments);
+        if(_virtusizeMessageListener != null) {
+          _virtusizeMessageListener.vsEvent.call(call.arguments);
         }
       } else if(call.method == "onVSError") {
-        if(_virtusizeEventListener != null) {
-          _virtusizeEventListener.vsError.call(call.arguments);
+        if(_virtusizeMessageListener != null) {
+          _virtusizeMessageListener.vsError.call(call.arguments);
         }
       }
       return null;
@@ -117,14 +117,14 @@ class VirtusizePlugin {
         'externalId': product.externalId,
         'imageUrl': product.imageUrl
       }).then((value) => ProductDataCheck(value, product.externalId));
-      if(_virtusizeEventListener != null) {
-        _virtusizeEventListener.productDataCheckData.call(productDataCheck);
+      if(_virtusizeMessageListener != null) {
+        _virtusizeMessageListener.productDataCheckData.call(productDataCheck);
       }
       return productDataCheck;
     } on PlatformException catch (error) {
       print('Failed to set VirtusizeProduct: $error');
-      if(_virtusizeEventListener != null) {
-        _virtusizeEventListener.productDataCheckError.call(error);
+      if(_virtusizeMessageListener != null) {
+        _virtusizeMessageListener.productDataCheckError.call(error);
       }
     }
     return null;
@@ -158,7 +158,7 @@ class VirtusizePlugin {
   }
 
   void setVirtusizeMessageListener(VirtusizeMessageListener listener) {
-    _virtusizeEventListener = listener;
+    _virtusizeMessageListener = listener;
   }
 
   Future<void> sendOrder({@required VirtusizeOrder order, Function(Map<String, dynamic> orderData) onSuccess, Function(Exception e) onError}) async {
