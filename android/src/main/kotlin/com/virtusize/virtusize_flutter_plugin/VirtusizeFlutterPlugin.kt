@@ -15,6 +15,7 @@ import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 import kotlinx.coroutines.*
+import org.json.JSONObject
 import java.lang.IllegalArgumentException
 
 class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
@@ -55,10 +56,21 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             }
 
             override fun onEvent(event: VirtusizeEvent) {
+                var eventName: String? = null
+                if (event.name.isNotEmpty()) {
+                    eventName = event.name
+                } else if (event.data != null){
+                    eventName = event.data!!.optString("name") ?: event.data!!.optString("eventName")
+                }
+                eventName?.let {
+                    scope.launch {
+                        channel.invokeMethod("onVSEvent", eventName)
+                    }
+                }
+
                 when (event.name) {
                     VirtusizeEvents.UserOpenedWidget.getEventName() -> {
                         scope.launch {
-                            channel.invokeMethod("onVSEvent", event.data.toString())
                             selectedUserProductId = null
                             getRecommendation(
                                 shouldUpdateUserProducts = false,
@@ -67,16 +79,12 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                         }
                     }
                     VirtusizeEvents.UserAuthData.getEventName() -> {
-                        scope.launch {
-                            channel.invokeMethod("onVSEvent", event.data.toString())
-                        }
                         event.data?.let { data ->
                             repository.updateUserAuthData(data)
                         }
                     }
                     VirtusizeEvents.UserSelectedProduct.getEventName() -> {
                         scope.launch {
-                            channel.invokeMethod("onVSEvent", event.data.toString())
                             event.data?.optInt("userProductId")?.let { userProductId ->
                                 selectedUserProductId = userProductId
                             }
@@ -88,7 +96,6 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                     }
                     VirtusizeEvents.UserAddedProduct.getEventName() -> {
                         scope.launch {
-                            channel.invokeMethod("onVSEvent", event.data.toString())
                             event.data?.optInt("userProductId")?.let { userProductId ->
                                 selectedUserProductId = userProductId
                             }
@@ -100,7 +107,6 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                     }
                     VirtusizeEvents.UserChangedRecommendationType.getEventName() -> {
                         scope.launch {
-                            channel.invokeMethod("onVSEvent", event.data.toString())
                             var recommendationType: SizeRecommendationType? = null
                             event.data?.optString("recommendationType")?.let {
                                 recommendationType = valueOf<SizeRecommendationType>(it)
@@ -114,7 +120,6 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                     }
                     VirtusizeEvents.UserUpdatedBodyMeasurements.getEventName() -> {
                         scope.launch {
-                            channel.invokeMethod("onVSEvent", event.data.toString())
                             event.data?.optString("sizeRecName")?.let { sizeRecName ->
                                 bodyProfileRecommendedSize = BodyProfileRecommendedSize(sizeRecName)
                                 getRecommendation(
@@ -127,14 +132,12 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                     }
                     VirtusizeEvents.UserLoggedIn.getEventName() -> {
                         scope.launch {
-                            channel.invokeMethod("onVSEvent", event.data.toString())
                             updateUserSession()
                             getRecommendation()
                         }
                     }
                     VirtusizeEvents.UserLoggedOut.getEventName(), VirtusizeEvents.UserDeletedData.getEventName() -> {
                         scope.launch {
-                            channel.invokeMethod("onVSEvent", event.data.toString())
                             clearUserData()
                             updateUserSession()
                             getRecommendation(

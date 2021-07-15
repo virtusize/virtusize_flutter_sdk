@@ -185,9 +185,9 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 			"onProduct",
 			arguments: [
 				"imageType": "store",
-				"imageUrl" : storeProduct?.cloudinaryImageUrlString as Any,
-				"productType": storeProduct?.productType as Any,
-				"productStyle": storeProduct?.productStyle as Any
+				"imageUrl" : storeProduct?.cloudinaryImageUrlString,
+				"productType": storeProduct?.productType,
+				"productStyle": storeProduct?.productStyle
 			]
 		)
 

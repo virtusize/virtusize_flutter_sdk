@@ -48,7 +48,6 @@ class VirtusizePlugin {
       } else if(call.method == "onProduct") {
         _productSink.add(Product(json.encode(call.arguments)));
       } else if(call.method == "onVSEvent") {
-        // TODO: should get the events from the SDK as well
         if(_virtusizeEventListener != null) {
           _virtusizeEventListener.vsEvent.call(call.arguments);
         }

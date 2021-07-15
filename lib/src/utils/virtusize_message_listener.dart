@@ -1,6 +1,6 @@
 import '../models/product_data_check.dart';
 
-typedef VSEventCallback = void Function(dynamic event);
+typedef VSEventCallback = void Function(String eventName);
 typedef VSErrorCallback = void Function(dynamic error);
 typedef ProductDataCheckDataCallback = void Function(ProductDataCheck productDataCheck);
 typedef ProductDataCheckErrorCallback = void Function(Exception exception);

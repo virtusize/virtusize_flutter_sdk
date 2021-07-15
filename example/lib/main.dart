@@ -41,8 +41,8 @@ class _MyAppState extends State<MyApp> {
         imageUrl: 'http://www.image.com/goods/12345.jpg');
 
     VirtusizePlugin.instance
-        .setVirtusizeMessageListener(VirtusizeMessageListener(vsEvent: (event) {
-      print("Virtusize event: $event");
+        .setVirtusizeMessageListener(VirtusizeMessageListener(vsEvent: (eventName) {
+      print("Virtusize event: $eventName");
     }, vsError: (error) {
       print("Virtusize error: $error");
     }, productDataCheckData: (productDataCheck) {
