@@ -103,6 +103,7 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 				
 				DispatchQueue.global().async {
 					let (product, pdcJsonString) = self.repository.getProductDataCheck(
+						messageHandler: self,
 						product:
 							VirtusizeProduct(
 								externalId: productId,
@@ -184,9 +185,9 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 			"onProduct",
 			arguments: [
 				"imageType": "store",
-				"imageUrl" : storeProduct?.cloudinaryImageUrlString,
-				"productType": storeProduct?.productType,
-				"productStyle": storeProduct?.productStyle
+				"imageUrl" : storeProduct?.cloudinaryImageUrlString as Any,
+				"productType": storeProduct?.productType as Any,
+				"productStyle": storeProduct?.productStyle as Any
 			]
 		)
 
@@ -317,16 +318,19 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 }
 
 extension SwiftVirtusizeFlutterPlugin: VirtusizeMessageHandler {
-	public func virtusizeController(_ controller: VirtusizeWebViewController, didReceiveError error: VirtusizeError) {
+	public func virtusizeController(_ controller: VirtusizeWebViewController?, didReceiveError error: VirtusizeError) {
 		currentWorkItem = DispatchWorkItem { [weak self] in
 			self?.flutterChannel?.invokeMethod("onVSError", arguments: error.debugDescription)
 		}
 		DispatchQueue.global().async(execute: currentWorkItem!)
 	}
 	
-	public func virtusizeController(_ controller: VirtusizeWebViewController, didReceiveEvent event: VirtusizeEvent) {
+	public func virtusizeController(_ controller: VirtusizeWebViewController?, didReceiveEvent event: VirtusizeEvent) {
 		let eventsWorkItem = DispatchWorkItem { [weak self] in
-			self?.flutterChannel?.invokeMethod("onVSEvent", arguments: event.data)
+			if let eventData = event.data as? [String: Any],
+			   let eventName = eventData["name"] ?? eventData["eventName"] {
+				self?.flutterChannel?.invokeMethod("onVSEvent", arguments: eventName)
+			}
 		}
 		
 		var userDataWorkItem: DispatchWorkItem = DispatchWorkItem { [weak self] in }
