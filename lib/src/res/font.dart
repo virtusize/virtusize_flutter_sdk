@@ -13,12 +13,12 @@ class VSFont {
       {@required VSFontSize fontSize, FontWeight fontWeight, Color color}) {
     return TextStyle(
         fontSize: _getFontSize(fontSize),
-        fontFamily: _getFontFamily(language),
+        fontFamily: _getFontFamily(),
         fontWeight: fontWeight,
         color: color);
   }
 
-  String _getFontFamily(Language language) {
+  String _getFontFamily() {
     String fontFamilyName;
     switch(language) {
       case Language.en:
