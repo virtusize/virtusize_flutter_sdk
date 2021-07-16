@@ -119,7 +119,7 @@ class VirtusizePlugin {
     ProductDataCheck productDataCheck = await _currentProductDataCheck;
     _pdcSink.add(productDataCheck);
     if(productDataCheck.isValidProduct) {
-      getRecommendationText();
+      _getRecommendationText();
     }
   }
 
@@ -150,7 +150,7 @@ class VirtusizePlugin {
     }
   }
 
-  Future<void> getRecommendationText() async {
+  Future<void> _getRecommendationText() async {
     try {
       _recSink.add(Recommendation(
           json.encode(await _channel.invokeMethod('getRecommendationText'))));
