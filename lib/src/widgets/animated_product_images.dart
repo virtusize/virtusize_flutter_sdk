@@ -13,7 +13,6 @@ class AnimatedProductImages extends StatefulWidget {
 }
 
 class _AnimatedProductImagesState extends State<AnimatedProductImages> with TickerProviderStateMixin {
-  Animation<double> animation;
   AnimationController _controller;
   bool _storeProductImageVisible = true;
 
