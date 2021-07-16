@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import '../models/product.dart';
 import '../models/virtusize_enums.dart';
-import '../resources/colors.dart';
-import '../resources/images.dart';
+import '../res/colors.dart';
+import '../res/images.dart';
 
 class ProductImageView extends StatelessWidget {
   final Product product;

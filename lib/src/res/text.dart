@@ -1,7 +1,7 @@
 import 'package:flutter/services.dart' show rootBundle;
 
 import '../../src/models/virtusize_enums.dart';
-import '../../src/resources/font.dart';
+import '../../src/res/font.dart';
 import '../../src/models/virtusize_localization.dart';
 
 class VSText {

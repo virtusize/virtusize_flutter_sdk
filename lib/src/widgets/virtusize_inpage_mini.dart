@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 
 import '../models/recommendation.dart';
 import '../models/product_data_check.dart';
-import '../resources/colors.dart';
-import '../resources/font.dart';
-import '../resources/images.dart';
-import '../resources/text.dart';
+import '../res/colors.dart';
+import '../res/font.dart';
+import '../res/images.dart';
+import '../res/text.dart';
 import '../../virtusize_plugin.dart';
 import 'cta_button.dart';
 import 'animated_dots.dart';

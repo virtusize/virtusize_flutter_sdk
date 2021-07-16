@@ -9,7 +9,7 @@ import 'models/product_data_check.dart';
 import 'models/virtusize_enums.dart';
 import 'models/virtusize_order.dart';
 import 'models/virtusize_product.dart';
-import 'resources/text.dart';
+import 'res/text.dart';
 import 'utils/virtusize_message_listener.dart';
 
 
