@@ -6,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../models/recommendation.dart';
 import '../models/product.dart';
 import '../models/product_data_check.dart';
+import '../models/virtusize_localization.dart';
 import '../../virtusize_plugin.dart';
 import '../resources/colors.dart';
 import '../resources/images.dart';
@@ -32,9 +33,12 @@ class VirtusizeInPageStandard extends StatefulWidget {
 }
 
 class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
+  StreamSubscription<VirtusizeLocalization> _localizationSubscription;
   StreamSubscription<ProductDataCheck> _pdcSubscription;
   StreamSubscription<Recommendation> _recSubscription;
   StreamSubscription<Product> _productSubscription;
+
+  VirtusizeLocalization _virtusizeLocalization;
   ProductDataCheck _productDataCheck;
   bool _hasError;
   bool _isLoading;
@@ -47,6 +51,10 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
   @override
   void initState() {
     super.initState();
+
+    _localizationSubscription = VirtusizePlugin.instance.localizationStream.listen((vsLocalization) {
+      _virtusizeLocalization = vsLocalization;
+    });
 
     _pdcSubscription = VirtusizePlugin.instance.pdcStream.listen((pdc) {
       setState(() {
@@ -111,6 +119,7 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
 
   @override
   void dispose() {
+    _localizationSubscription.cancel();
     _pdcSubscription.cancel();
     _productSubscription.cancel();
     _recSubscription.cancel();
@@ -156,7 +165,7 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
                               fit: BoxFit.cover)),
                       GestureDetector(
                           child: Text(
-                            "プライバシーポリシー",
+                            _virtusizeLocalization.vsPrivacyPolicy,
                             style: TextStyle(fontSize: 10),
                           ),
                           onTap: _openPrivacyPolicyLink)
@@ -231,6 +240,7 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
                                 ? _buildLoadingText()
                                 : _buildRecommendationText())),
                     CTAButton(
+                        text: _virtusizeLocalization.vsButtonText,
                         backgroundColor: color,
                         textColor: Colors.white,
                         onPressed: _openVirtusizeWebview)
@@ -253,7 +263,7 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
 
   Widget _buildLoadingText() {
     return Wrap(children: [
-      Text("サイズを分析中",
+      Text(_virtusizeLocalization.vsLoadingText,
           style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
       AnimatedDots()
     ]);
@@ -278,7 +288,7 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
       children: [
         Image(image: VSImages.errorHanger.image, width: 40, height: 32),
         Container(height: 10),
-        Text("現在バーチャサイズは使えませんが、\nそのままでお買い物をお楽しみください。",
+        Text(_virtusizeLocalization.vsLongErrorText,
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 12, color: VSColors.vsGray700))
       ],

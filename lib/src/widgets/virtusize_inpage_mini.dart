@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../models/recommendation.dart';
 import '../models/product_data_check.dart';
+import '../models/virtusize_localization.dart';
 import '../resources/colors.dart';
 import '../resources/images.dart';
 import '../../virtusize_plugin.dart';
@@ -26,16 +27,24 @@ class VirtusizeInPageMini extends StatefulWidget {
 }
 
 class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
+  StreamSubscription<VirtusizeLocalization> _localizationSubscription;
   StreamSubscription<ProductDataCheck> _pdcSubscription;
   StreamSubscription<Recommendation> _recSubscription;
+
+  VirtusizeLocalization _virtusizeLocalization;
   bool _isValidProduct = false;
   bool _isLoading;
   bool _hasError;
-  String _recText = "サイズを分析中";
+  String _recText;
 
   @override
   void initState() {
     super.initState();
+
+    _localizationSubscription = VirtusizePlugin.instance.localizationStream.listen((vsLocalization) {
+      _virtusizeLocalization = vsLocalization;
+      _recText = _virtusizeLocalization.vsLoadingText;
+    });
 
     _pdcSubscription = VirtusizePlugin.instance.pdcStream.listen((pdc) {
       setState(() {
@@ -60,6 +69,7 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
 
   @override
   void dispose() {
+    _localizationSubscription.cancel();
     _pdcSubscription.cancel();
     _recSubscription.cancel();
     super.dispose();
@@ -139,7 +149,9 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
       Container(
           margin: EdgeInsets.only(top: 5, bottom: 5, left: 4, right: 8),
           child: CTAButton(
-              textColor: themeColor, onPressed: _openVirtusizeWebview))
+              text: _virtusizeLocalization.vsButtonText,
+              textColor: themeColor,
+              onPressed: _openVirtusizeWebview))
     ]);
   }
 
@@ -156,7 +168,7 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
           )),
       Container(
         margin: EdgeInsets.only(top: 6, bottom: 6, left: 5),
-        child: Text("現在バーチャサイズは使えません。",
+        child: Text(_virtusizeLocalization.vsShortErrorText,
             style: TextStyle(fontSize: 12, color: VSColors.vsGray700)),
       )
     ]);

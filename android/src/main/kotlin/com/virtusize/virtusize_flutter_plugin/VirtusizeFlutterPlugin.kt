@@ -202,7 +202,12 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
                 virtusize = virtusizeBuilder.build()
 
-                result.success(call.arguments.toString())
+                result.success(
+                    mutableMapOf(
+                        "virtusizeProp" to call.arguments.toString(),
+                        "displayLang" to virtusize?.displayLanguage?.value
+                    )
+                )
             }
             "setUserID" -> {
                 if(call.arguments == null) {

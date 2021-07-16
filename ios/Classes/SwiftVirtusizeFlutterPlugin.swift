@@ -80,6 +80,10 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 				}
 				
 				Virtusize.params = virtusizeBuilder.build()
+				result([
+					"virtusizeProp": arguments,
+					"displayLang": Virtusize.displayLanguage?.rawValue
+				])
 			case "setUserID":
 				guard let userID = call.arguments as? String, !userID.isEmpty else {
 					result(FlutterError.invalidUserID)
