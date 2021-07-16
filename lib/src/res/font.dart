@@ -35,54 +35,29 @@ class VSFont {
   }
 
   double _getFontSize(VSFontSize fontSize) {
-    double size;
-    switch (language) {
-      case Language.en:
-        switch (fontSize) {
-          case VSFontSize.xsmall:
-            size = 12;
-            break;
-          case VSFontSize.small:
-            size = 14;
-            break;
-          case VSFontSize.normal:
-            size = 16;
-            break;
-          case VSFontSize.large:
-            size = 18;
-            break;
-          case VSFontSize.xlarge:
-            size = 22;
-            break;
-          case VSFontSize.xxlarge:
-            size = 28;
-            break;
-        }
-        break;
-      case Language.jp:
-      case Language.kr:
-        switch (fontSize) {
-          case VSFontSize.xsmall:
-            size = 10;
-            break;
-          case VSFontSize.small:
-            size = 12;
-            break;
-          case VSFontSize.normal:
-            size = 14;
-            break;
-          case VSFontSize.large:
-            size = 16;
-            break;
-          case VSFontSize.xlarge:
-            size = 20;
-            break;
-          case VSFontSize.xxlarge:
-            size = 24;
-            break;
-        }
-        break;
-    }
-    return size;
+    Map<List<Language>, Map<VSFontSize, double>> langFontSizeMap = {
+      [Language.en]: {
+        VSFontSize.xsmall: 12.0,
+        VSFontSize.small: 14.0,
+        VSFontSize.normal: 16.0,
+        VSFontSize.large: 18.0,
+        VSFontSize.xlarge: 22.0,
+        VSFontSize.xxlarge: 28.0
+      },
+      [Language.jp, Language.kr]: {
+        VSFontSize.xsmall: 10.0,
+        VSFontSize.small: 12.0,
+        VSFontSize.normal: 14.0,
+        VSFontSize.large: 16.0,
+        VSFontSize.xlarge: 20.0,
+        VSFontSize.xxlarge: 24.0
+      }
+    };
+    Map<VSFontSize, double> fontSizeMap = langFontSizeMap.entries
+        .firstWhere((entry) => entry.key.contains(language))
+        .value;
+    return fontSizeMap.entries
+        .firstWhere((entry) => entry.key == fontSize)
+        .value;
   }
 }
