@@ -20,27 +20,27 @@ class VirtusizePlugin {
   const MethodChannel('com.virtusize/virtusize_flutter_plugin');
 
   ClientProduct _product;
-  StreamController _vsTextController;
-  StreamController _pdcController;
-  StreamController _recController;
-  StreamController _productController;
   VirtusizeMessageListener _virtusizeMessageListener;
 
+  StreamController _vsTextController;
   StreamSink<VSText> get _vsTextSink =>
       _vsTextController.sink;
   Stream<VSText> get vsTextStream =>
       _vsTextController.stream;
 
+  StreamController _pdcController;
   StreamSink<ProductDataCheck> get _pdcSink =>
       _pdcController.sink;
   Stream<ProductDataCheck> get pdcStream =>
       _pdcController.stream;
 
+  StreamController _recController;
   StreamSink<Product> get _productSink =>
       _productController.sink;
   Stream<Product> get productStream =>
       _productController.stream;
 
+  StreamController _productController;
   StreamSink<Recommendation> get _recSink =>
       _recController.sink;
   Stream<Recommendation> get recStream =>
