@@ -22,7 +22,7 @@ extension LanguageExtension on Language {
   }
 
   String get langCode {
-    return ["en", "ja", "kr"][this.index];
+    return ["en", "ja", "ko"][this.index];
   }
 }
 
