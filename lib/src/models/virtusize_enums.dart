@@ -20,6 +20,10 @@ extension LanguageExtension on Language {
   String get value {
     return ["EN", "JP", "KR"][this.index];
   }
+
+  String get langCode {
+    return ["en", "ja", "kr"][this.index];
+  }
 }
 
 enum InfoCategory { modelInfo, generalFit, brandSizing, material }

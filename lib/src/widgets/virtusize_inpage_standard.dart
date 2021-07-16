@@ -6,10 +6,11 @@ import 'package:url_launcher/url_launcher.dart';
 import '../models/recommendation.dart';
 import '../models/product.dart';
 import '../models/product_data_check.dart';
-import '../models/virtusize_localization.dart';
 import '../../virtusize_plugin.dart';
 import '../resources/colors.dart';
+import '../resources/font.dart';
 import '../resources/images.dart';
+import '../resources/text.dart';
 import 'animated_dots.dart';
 import 'animated_product_images.dart';
 import 'cta_button.dart';
@@ -33,12 +34,12 @@ class VirtusizeInPageStandard extends StatefulWidget {
 }
 
 class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
-  StreamSubscription<VirtusizeLocalization> _localizationSubscription;
+  StreamSubscription<VSText> _vsTextSubscription;
   StreamSubscription<ProductDataCheck> _pdcSubscription;
   StreamSubscription<Recommendation> _recSubscription;
   StreamSubscription<Product> _productSubscription;
 
-  VirtusizeLocalization _virtusizeLocalization;
+  VSText _vsText;
   ProductDataCheck _productDataCheck;
   bool _hasError;
   bool _isLoading;
@@ -52,8 +53,8 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
   void initState() {
     super.initState();
 
-    _localizationSubscription = VirtusizePlugin.instance.localizationStream.listen((vsLocalization) {
-      _virtusizeLocalization = vsLocalization;
+    _vsTextSubscription = VirtusizePlugin.instance.vsTextStream.listen((vsText) {
+      _vsText = vsText;
     });
 
     _pdcSubscription = VirtusizePlugin.instance.pdcStream.listen((pdc) {
@@ -119,7 +120,7 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
 
   @override
   void dispose() {
-    _localizationSubscription.cancel();
+    _vsTextSubscription.cancel();
     _pdcSubscription.cancel();
     _productSubscription.cancel();
     _recSubscription.cancel();
@@ -165,8 +166,8 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
                               fit: BoxFit.cover)),
                       GestureDetector(
                           child: Text(
-                            _virtusizeLocalization.vsPrivacyPolicy,
-                            style: TextStyle(fontSize: 10),
+                            _vsText.localization.vsPrivacyPolicy,
+                            style: _vsText.vsFont.getTextStyle(fontSize: VSFontSize.xsmall),
                           ),
                           onTap: _openPrivacyPolicyLink)
                     ])
@@ -240,7 +241,8 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
                                 ? _buildLoadingText()
                                 : _buildRecommendationText())),
                     CTAButton(
-                        text: _virtusizeLocalization.vsButtonText,
+                        text: _vsText.localization.vsButtonText,
+                        textStyle: _vsText.vsFont.getTextStyle(fontSize: VSFontSize.xsmall, fontWeight: FontWeight.bold),
                         backgroundColor: color,
                         textColor: Colors.white,
                         onPressed: _openVirtusizeWebview)
@@ -263,8 +265,8 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
 
   Widget _buildLoadingText() {
     return Wrap(children: [
-      Text(_virtusizeLocalization.vsLoadingText,
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+      Text(_vsText.localization.vsLoadingText,
+          style: _vsText.vsFont.getTextStyle(fontSize: VSFontSize.large, fontWeight: FontWeight.bold)),
       AnimatedDots()
     ]);
   }
@@ -274,10 +276,10 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _topRecText != null
-            ? Text(_topRecText, style: TextStyle(fontSize: 12))
+            ? Text(_topRecText, style: _vsText.vsFont.getTextStyle(fontSize: VSFontSize.small))
             : Container(),
         Text(_bottomRecText,
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold))
+            style: _vsText.vsFont.getTextStyle(fontSize: VSFontSize.large, fontWeight: FontWeight.bold))
       ],
     );
   }
@@ -288,9 +290,9 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
       children: [
         Image(image: VSImages.errorHanger.image, width: 40, height: 32),
         Container(height: 10),
-        Text(_virtusizeLocalization.vsLongErrorText,
+        Text(_vsText.localization.vsLongErrorText,
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 12, color: VSColors.vsGray700))
+            style: _vsText.vsFont.getTextStyle(fontSize: VSFontSize.small, color: VSColors.vsGray700))
       ],
     );
   }

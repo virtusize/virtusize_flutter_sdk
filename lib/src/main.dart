@@ -7,10 +7,9 @@ import 'models/recommendation.dart';
 import 'models/product.dart';
 import 'models/product_data_check.dart';
 import 'models/virtusize_enums.dart';
-import 'models/virtusize_localization.dart';
 import 'models/virtusize_order.dart';
 import 'models/virtusize_product.dart';
-import 'resources/localizations.dart';
+import 'resources/text.dart';
 import 'utils/virtusize_message_listener.dart';
 
 
@@ -21,16 +20,16 @@ class VirtusizePlugin {
   const MethodChannel('com.virtusize/virtusize_flutter_plugin');
 
   ClientProduct _product;
-  StreamController _localizationController;
+  StreamController _vsTextController;
   StreamController _pdcController;
   StreamController _recController;
   StreamController _productController;
   VirtusizeMessageListener _virtusizeMessageListener;
 
-  StreamSink<VirtusizeLocalization> get _localizationSink =>
-      _localizationController.sink;
-  Stream<VirtusizeLocalization> get localizationStream =>
-      _localizationController.stream;
+  StreamSink<VSText> get _vsTextSink =>
+      _vsTextController.sink;
+  Stream<VSText> get vsTextStream =>
+      _vsTextController.stream;
 
   StreamSink<ProductDataCheck> get _pdcSink =>
       _pdcController.sink;
@@ -48,7 +47,7 @@ class VirtusizePlugin {
       _recController.stream;
 
   VirtusizePlugin._() {
-    _localizationController = StreamController<VirtusizeLocalization>.broadcast();
+    _vsTextController = StreamController<VSText>.broadcast();
     _pdcController = StreamController<ProductDataCheck>.broadcast();
     _productController = StreamController<Product>.broadcast();
     _recController = StreamController<Recommendation>.broadcast();
@@ -95,9 +94,8 @@ class VirtusizePlugin {
           return infoCategory.value;
         }).toList()
       });
-      print(result["displayLang"]);
-      VSLocalizations.load(result["displayLang"]).then((value) {
-        _localizationSink.add(value.vsLocalization);
+      VSText.load(result["displayLang"], language).then((value) {
+        _vsTextSink.add(value);
       });
     } on PlatformException catch (error) {
       print('Failed to set the Virtusize props: $error');

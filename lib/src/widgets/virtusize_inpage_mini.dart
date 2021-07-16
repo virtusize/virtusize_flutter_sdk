@@ -4,9 +4,10 @@ import 'package:flutter/material.dart';
 
 import '../models/recommendation.dart';
 import '../models/product_data_check.dart';
-import '../models/virtusize_localization.dart';
 import '../resources/colors.dart';
+import '../resources/font.dart';
 import '../resources/images.dart';
+import '../resources/text.dart';
 import '../../virtusize_plugin.dart';
 import 'cta_button.dart';
 import 'animated_dots.dart';
@@ -27,11 +28,11 @@ class VirtusizeInPageMini extends StatefulWidget {
 }
 
 class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
-  StreamSubscription<VirtusizeLocalization> _localizationSubscription;
+  StreamSubscription<VSText> _vsTextSubscription;
   StreamSubscription<ProductDataCheck> _pdcSubscription;
   StreamSubscription<Recommendation> _recSubscription;
 
-  VirtusizeLocalization _virtusizeLocalization;
+  VSText _vsText;
   bool _isValidProduct = false;
   bool _isLoading;
   bool _hasError;
@@ -41,9 +42,10 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
   void initState() {
     super.initState();
 
-    _localizationSubscription = VirtusizePlugin.instance.localizationStream.listen((vsLocalization) {
-      _virtusizeLocalization = vsLocalization;
-      _recText = _virtusizeLocalization.vsLoadingText;
+    _vsTextSubscription =
+        VirtusizePlugin.instance.vsTextStream.listen((vsLocalization) {
+      _vsText = vsLocalization;
+      _recText = _vsText.localization.vsLoadingText;
     });
 
     _pdcSubscription = VirtusizePlugin.instance.pdcStream.listen((pdc) {
@@ -69,7 +71,7 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
 
   @override
   void dispose() {
-    _localizationSubscription.cancel();
+    _vsTextSubscription.cancel();
     _pdcSubscription.cancel();
     _recSubscription.cancel();
     super.dispose();
@@ -128,9 +130,9 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
       Container(
         margin: EdgeInsets.only(top: 6, bottom: 6, left: 5),
         child: Text(_recText,
-            style: TextStyle(
+            style: _vsText.vsFont.getTextStyle(
+                fontSize: VSFontSize.small,
                 fontWeight: FontWeight.bold,
-                fontSize: 12,
                 color: _isLoading ? VSColors.vsGray900 : Colors.white)),
       ),
       Container(width: 1.0),
@@ -143,13 +145,15 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
       Flexible(
           child: Container(
         margin: EdgeInsets.only(top: 6, bottom: 6, left: 8),
-        child:
-            Text(_recText, style: TextStyle(fontSize: 12, color: Colors.white)),
+        child: Text(_recText,
+            style: _vsText.vsFont
+                .getTextStyle(fontSize: VSFontSize.small, color: Colors.white)),
       )),
       Container(
           margin: EdgeInsets.only(top: 5, bottom: 5, left: 4, right: 8),
           child: CTAButton(
-              text: _virtusizeLocalization.vsButtonText,
+              text: _vsText.localization.vsButtonText,
+              textStyle: _vsText.vsFont.getTextStyle(fontSize: VSFontSize.xsmall, fontWeight: FontWeight.bold),
               textColor: themeColor,
               onPressed: _openVirtusizeWebview))
     ]);
@@ -168,8 +172,9 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
           )),
       Container(
         margin: EdgeInsets.only(top: 6, bottom: 6, left: 5),
-        child: Text(_virtusizeLocalization.vsShortErrorText,
-            style: TextStyle(fontSize: 12, color: VSColors.vsGray700)),
+        child: Text(_vsText.localization.vsShortErrorText,
+            style: _vsText.vsFont.getTextStyle(
+                fontSize: VSFontSize.small, color: VSColors.vsGray700)),
       )
     ]);
   }

@@ -4,8 +4,9 @@ import 'package:flutter/material.dart';
 
 import '../main.dart';
 import '../models/product_data_check.dart';
-import '../models/virtusize_localization.dart';
+import '../resources/font.dart';
 import '../resources/images.dart';
+import '../resources/text.dart';
 import '../../virtusize_plugin.dart';
 import '../resources/colors.dart';
 
@@ -22,18 +23,18 @@ class VirtusizeButton extends StatefulWidget {
 }
 
 class _VirtusizeButtonState extends State<VirtusizeButton> {
-  StreamSubscription<VirtusizeLocalization> _localizationSubscription;
+  StreamSubscription<VSText> _vsTextSubscription;
   StreamSubscription<ProductDataCheck> _pdcSubscription;
 
-  VirtusizeLocalization _virtusizeLocalization;
+  VSText _vsText;
   bool _isValidProduct = false;
 
   @override
   void initState() {
     super.initState();
 
-    _localizationSubscription = VirtusizePlugin.instance.localizationStream.listen((vsLocalization) {
-      _virtusizeLocalization = vsLocalization;
+    _vsTextSubscription = VirtusizePlugin.instance.vsTextStream.listen((vsText) {
+      _vsText = vsText;
     });
 
     _pdcSubscription = VirtusizePlugin.instance.pdcStream.listen((value) {
@@ -45,7 +46,7 @@ class _VirtusizeButtonState extends State<VirtusizeButton> {
 
   @override
   void dispose() {
-    _localizationSubscription.cancel();
+    _vsTextSubscription.cancel();
     _pdcSubscription.cancel();
     super.dispose();
   }
@@ -87,7 +88,7 @@ class _VirtusizeButtonState extends State<VirtusizeButton> {
           Container(width: 4),
           child != null
               ? child
-              : Text(_virtusizeLocalization.vsButtonText, style: TextStyle(fontSize: 12))
+              : Text(_vsText.localization.vsButtonText, style: _vsText.vsFont.getTextStyle(fontSize: VSFontSize.small))
         ],
       ),
       style: ElevatedButton.styleFrom(

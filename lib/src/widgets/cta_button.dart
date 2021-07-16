@@ -5,12 +5,14 @@ import '../resources/images.dart';
 
 class CTAButton extends StatelessWidget {
   final String text;
+  final TextStyle textStyle;
   final Color backgroundColor;
   final Color textColor;
   final Function onPressed;
 
   const CTAButton(
       {this.text,
+      this.textStyle,
       this.backgroundColor = Colors.white,
       this.textColor = VSColors.vsGray900,
       this.onPressed});
@@ -19,7 +21,7 @@ class CTAButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ElevatedButton(
       child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
-        Text(text, style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
+        Text(text, style: textStyle),
         Container(width: 1.0),
         Container(
           width: 5,
