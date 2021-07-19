@@ -34,7 +34,8 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
   StreamSubscription<Recommendation> _recSubscription;
 
   VSText _vsText = IVirtusizePlugin.instance.vsText;
-  bool _isValidProduct = false;
+  bool _isValidProduct;
+  String _externalProductID;
   bool _isLoading;
   bool _hasError;
   String _recText;
@@ -50,28 +51,35 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
     });
 
     _pdcSubscription = IVirtusizePlugin.instance.pdcStream.listen((pdc) {
-      setState(() {
-        _isLoading = true;
-        _hasError = false;
-        _isValidProduct = pdc.isValidProduct;
-      });
+      if(_isValidProduct == null) {
+        IVirtusizePlugin.instance.addProduct(externalProductId: pdc.externalProductId);
+        _externalProductID = pdc.externalProductId;
+        setState(() {
+          _isLoading = true;
+          _hasError = false;
+          _isValidProduct = pdc.isValidProduct;
+        });
+      }
     });
 
     _recSubscription =
         IVirtusizePlugin.instance.recStream.listen((recommendation) {
-      setState(() {
-        try {
-          _recText = recommendation.text.replaceAll("<br>", "");
-        } catch (e) {
-          _hasError = true;
-        }
-        _isLoading = false;
-      });
+          if(_externalProductID == recommendation.externalProductID) {
+            setState(() {
+              try {
+                _recText = recommendation.text.replaceAll("<br>", "");
+              } catch (e) {
+                _hasError = true;
+              }
+              _isLoading = false;
+            });
+          }
     });
   }
 
   @override
   void dispose() {
+    IVirtusizePlugin.instance.removeProduct(externalProductId: _externalProductID);
     _vsTextSubscription.cancel();
     _pdcSubscription.cancel();
     _recSubscription.cancel();
@@ -80,7 +88,7 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
 
   @override
   Widget build(BuildContext context) {
-    if (_isValidProduct) {
+    if (_isValidProduct == true) {
       return GestureDetector(
         child: _createVSInPageMini(),
         onTap: !_hasError ? _openVirtusizeWebview : () => {},

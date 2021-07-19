@@ -27,7 +27,8 @@ class _VirtusizeButtonState extends State<VirtusizeButton> {
   StreamSubscription<ProductDataCheck> _pdcSubscription;
 
   VSText _vsText = IVirtusizePlugin.instance.vsText;
-  bool _isValidProduct = false;
+  String _externalProductID;
+  bool _isValidProduct;
 
   @override
   void initState() {
@@ -37,15 +38,20 @@ class _VirtusizeButtonState extends State<VirtusizeButton> {
       _vsText = vsText;
     });
 
-    _pdcSubscription = IVirtusizePlugin.instance.pdcStream.listen((value) {
-      setState(() {
-        _isValidProduct = value.isValidProduct;
-      });
+    _pdcSubscription = IVirtusizePlugin.instance.pdcStream.listen((productDataCheck) {
+      if(_isValidProduct == null) {
+        IVirtusizePlugin.instance.addProduct(externalProductId: productDataCheck.externalProductId);
+        _externalProductID = productDataCheck.externalProductId;
+        setState(() {
+          _isValidProduct = productDataCheck.isValidProduct;
+        });
+      }
     });
   }
 
   @override
   void dispose() {
+    IVirtusizePlugin.instance.removeProduct(externalProductId: _externalProductID);
     _vsTextSubscription.cancel();
     _pdcSubscription.cancel();
     super.dispose();
@@ -53,7 +59,7 @@ class _VirtusizeButtonState extends State<VirtusizeButton> {
 
   @override
   Widget build(BuildContext context) {
-    if (_isValidProduct) {
+    if (_isValidProduct == true) {
       switch (widget.style) {
         case VirtusizeStyle.None:
           return widget.child;

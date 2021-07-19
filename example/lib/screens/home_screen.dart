@@ -88,7 +88,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         onPressed: () {
                           Navigator.push(context,
                               MaterialPageRoute(builder: (_) {
-                            return ProductScreen();
+                            return ProductScreen(externalID: "vs_pants");
                           }));
                         },
                         child: Text("Go to next product page")))

@@ -54,58 +54,75 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
   void initState() {
     super.initState();
 
-    _vsTextSubscription = IVirtusizePlugin.instance.vsTextStream.listen((vsText) {
+    _vsTextSubscription =
+        IVirtusizePlugin.instance.vsTextStream.listen((vsText) {
       _vsText = vsText;
     });
 
     _pdcSubscription = IVirtusizePlugin.instance.pdcStream.listen((pdc) {
-      setState(() {
-        _isLoading = true;
-        _hasError = false;
-        _productDataCheck = pdc;
-      });
+      if (_productDataCheck == null) {
+        IVirtusizePlugin.instance.addProduct(externalProductId: pdc.externalProductId);
+        setState(() {
+          _isLoading = true;
+          _hasError = false;
+          _productDataCheck = pdc;
+        });
+      }
     });
 
     _productSubscription =
         IVirtusizePlugin.instance.productStream.listen((product) {
-      String imageUrl = product.imageUrl ?? "";
-      Image networkImage = Image.network(imageUrl);
-      final ImageStream stream =
-          networkImage.image.resolve(ImageConfiguration.empty);
-      stream.addListener(
-          ImageStreamListener((ImageInfo image, bool synchronousCall) {
-        setState(() {
-          if (product.imageType == ProductImageType.store) {
-            product.networkProductImage = networkImage;
-            _storeProduct = product;
-          } else if (product.imageType == ProductImageType.user) {
-            product.networkProductImage = networkImage;
-            _userProduct = product;
-          }
-        });
-      }, onError: (dynamic exception, StackTrace stackTrace) {
-        setState(() {
-          if (product.imageType == ProductImageType.store) {
-            _storeProduct = product;
-          } else if (product.imageType == ProductImageType.user) {
-            _userProduct = product;
-          }
-        });
-      }));
+      if (isSameProduct(_storeProduct, product) ||
+          isSameProduct(_userProduct, product)) {
+        String imageUrl = product.imageUrl ?? "";
+        Image networkImage = Image.network(imageUrl);
+        final ImageStream stream =
+            networkImage.image.resolve(ImageConfiguration.empty);
+        stream.addListener(
+            ImageStreamListener((ImageInfo image, bool synchronousCall) {
+          setState(() {
+            if (product.imageType == ProductImageType.store) {
+              product.networkProductImage = networkImage;
+              _storeProduct = product;
+            } else if (product.imageType == ProductImageType.user) {
+              product.networkProductImage = networkImage;
+              _userProduct = product;
+            }
+          });
+        }, onError: (dynamic exception, StackTrace stackTrace) {
+          setState(() {
+            if (product.imageType == ProductImageType.store) {
+              _storeProduct = product;
+            } else if (product.imageType == ProductImageType.user) {
+              _userProduct = product;
+            }
+          });
+        }));
+      }
     });
 
     _recSubscription =
         IVirtusizePlugin.instance.recStream.listen((recommendation) {
-      setState(() {
-        _showUserProductImage = recommendation.showUserProductImage;
-        try {
-          _splitRecTexts(recommendation.text);
-        } catch (e) {
-          _hasError = true;
-        }
-        _isLoading = false;
-      });
+      if (_productDataCheck.externalProductId ==
+          recommendation.externalProductID) {
+        setState(() {
+          _showUserProductImage = recommendation.showUserProductImage;
+          try {
+            _splitRecTexts(recommendation.text);
+          } catch (e) {
+            _hasError = true;
+          }
+          _isLoading = false;
+        });
+      }
     });
+  }
+
+  bool isSameProduct(Product productA, Product productB) {
+    return productA == null ||
+        (productA != null &&
+            productA.imageType == productB.imageType &&
+            productA.productID == productB.productID);
   }
 
   void _splitRecTexts(String recText) {
@@ -121,6 +138,8 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
 
   @override
   void dispose() {
+    IVirtusizePlugin.instance
+        .removeProduct(externalProductId: _productDataCheck.externalProductId);
     _vsTextSubscription.cancel();
     _pdcSubscription.cancel();
     _productSubscription.cancel();
@@ -168,7 +187,8 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
                       GestureDetector(
                           child: Text(
                             _vsText.localization.vsPrivacyPolicy,
-                            style: _vsText.vsFont.getTextStyle(fontSize: VSFontSize.xsmall),
+                            style: _vsText.vsFont
+                                .getTextStyle(fontSize: VSFontSize.xsmall),
                           ),
                           onTap: _openPrivacyPolicyLink)
                     ])
@@ -243,7 +263,9 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
                                 : _buildRecommendationText())),
                     CTAButton(
                         text: _vsText.localization.vsButtonText,
-                        textStyle: _vsText.vsFont.getTextStyle(fontSize: VSFontSize.xsmall, fontWeight: FontWeight.bold),
+                        textStyle: _vsText.vsFont.getTextStyle(
+                            fontSize: VSFontSize.xsmall,
+                            fontWeight: FontWeight.bold),
                         backgroundColor: color,
                         textColor: Colors.white,
                         onPressed: _openVirtusizeWebview)
@@ -267,7 +289,8 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
   Widget _buildLoadingText() {
     return Wrap(children: [
       Text(_vsText.localization.vsLoadingText,
-          style: _vsText.vsFont.getTextStyle(fontSize: VSFontSize.large, fontWeight: FontWeight.bold)),
+          style: _vsText.vsFont.getTextStyle(
+              fontSize: VSFontSize.large, fontWeight: FontWeight.bold)),
       AnimatedDots()
     ]);
   }
@@ -277,10 +300,12 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _topRecText != null
-            ? Text(_topRecText, style: _vsText.vsFont.getTextStyle(fontSize: VSFontSize.small))
+            ? Text(_topRecText,
+                style: _vsText.vsFont.getTextStyle(fontSize: VSFontSize.small))
             : Container(),
         Text(_bottomRecText,
-            style: _vsText.vsFont.getTextStyle(fontSize: VSFontSize.large, fontWeight: FontWeight.bold))
+            style: _vsText.vsFont.getTextStyle(
+                fontSize: VSFontSize.large, fontWeight: FontWeight.bold))
       ],
     );
   }
@@ -293,7 +318,8 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
         Container(height: 10),
         Text(_vsText.localization.vsLongErrorText,
             textAlign: TextAlign.center,
-            style: _vsText.vsFont.getTextStyle(fontSize: VSFontSize.small, color: VSColors.vsGray700))
+            style: _vsText.vsFont.getTextStyle(
+                fontSize: VSFontSize.small, color: VSColors.vsGray700))
       ],
     );
   }

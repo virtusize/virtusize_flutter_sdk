@@ -32,7 +32,6 @@ class VirtusizePlugin {
         IVirtusizePlugin.instance._recSink
             .add(Recommendation(json.encode(call.arguments)));
       } else if (call.method == "onProduct") {
-        print(call.arguments);
         IVirtusizePlugin.instance._productSink
             .add(Product(json.encode(call.arguments)));
       } else if (call.method == "onVSEvent") {
@@ -89,7 +88,8 @@ class VirtusizePlugin {
       return;
     }
     try {
-      await IVirtusizePlugin.instance._channel.invokeMethod('setUserID', userId);
+      await IVirtusizePlugin.instance._channel
+          .invokeMethod('setUserID', userId);
     } on PlatformException catch (error) {
       print('Failed to set the external user ID: $error');
     }
@@ -97,11 +97,12 @@ class VirtusizePlugin {
 
   Future<void> setProduct(
       {@required String externalId, String imageUrl}) async {
+    externalId = externalId ?? "";
     _product = ClientProduct(externalId: externalId, imageUrl: imageUrl);
     ProductDataCheck productDataCheck = await _currentProductDataCheck;
     IVirtusizePlugin.instance._pdcSink.add(productDataCheck);
     if (productDataCheck.isValidProduct) {
-      _getRecommendationText();
+      _getRecommendationText(productId: productDataCheck.productId);
     }
   }
 
@@ -126,11 +127,11 @@ class VirtusizePlugin {
     return null;
   }
 
-  Future<void> _getRecommendationText() async {
+  Future<void> _getRecommendationText({@required int productId}) async {
     try {
       IVirtusizePlugin.instance._recSink.add(Recommendation(json.encode(
           await IVirtusizePlugin.instance._channel
-              .invokeMethod('getRecommendationText'))));
+              .invokeMethod('getRecommendationText', productId))));
     } on PlatformException catch (error) {
       print('Failed to get RecommendationText: $error');
       IVirtusizePlugin.instance._recSink.add(Recommendation(null));
@@ -169,24 +170,32 @@ class IVirtusizePlugin {
   static final IVirtusizePlugin instance = IVirtusizePlugin._();
 
   MethodChannel _channel =
-  const MethodChannel('com.virtusize/virtusize_flutter_plugin');
+      const MethodChannel('com.virtusize/virtusize_flutter_plugin');
 
   VSText vsText;
 
   StreamController _vsTextController;
+
   StreamSink<VSText> get _vsTextSink => _vsTextController.sink;
+
   Stream<VSText> get vsTextStream => _vsTextController.stream;
 
   StreamController _pdcController;
+
   StreamSink<ProductDataCheck> get _pdcSink => _pdcController.sink;
+
   Stream<ProductDataCheck> get pdcStream => _pdcController.stream;
 
   StreamController _productController;
+
   StreamSink<Product> get _productSink => _productController.sink;
+
   Stream<Product> get productStream => _productController.stream;
 
   StreamController _recController;
+
   StreamSink<Recommendation> get _recSink => _recController.sink;
+
   Stream<Recommendation> get recStream => _recController.stream;
 
   IVirtusizePlugin._();
@@ -197,6 +206,28 @@ class IVirtusizePlugin {
     } on PlatformException catch (error) {
       print('Failed to get the privacy policy link: $error');
       return null;
+    }
+  }
+
+  Future<void> addProduct({@required String externalProductId}) async {
+    if (externalProductId == null) {
+      return;
+    }
+    try {
+      await _channel.invokeMethod('addProduct', externalProductId);
+    } on PlatformException catch (error) {
+      print('Failed to remove the product $externalProductId: $error');
+    }
+  }
+
+  Future<void> removeProduct({@required String externalProductId}) async {
+    if (externalProductId == null) {
+      return;
+    }
+    try {
+      await _channel.invokeMethod('removeProduct');
+    } on PlatformException catch (error) {
+      print('Failed to remove the product $externalProductId: $error');
     }
   }
 }

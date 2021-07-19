@@ -23,5 +23,7 @@ class Product extends VirtusizeModel {
 
   int get productType => decodedData["productType"];
 
+  int get productID => decodedData["productID"];
+
   String get productStyle => decodedData["productStyle"];
 }
