@@ -8,13 +8,15 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 	
 	private let repository = VirtusizeFlutterRepository.shared
 	private var currentWorkItem: DispatchWorkItem?
-	private var product: VirtusizeProduct?
-	private var productCheckData: [String: Any]?
-	private var storeProduct: VirtusizeServerProduct? = nil
+	private var storeProductSet: Set<VirtusizeProduct> = []
+	private var externalProductIDStack: [String] = []
+	private var serverStoreProductSet: Set<VirtusizeServerProduct> = []
+    private var currentStoreProduct: VirtusizeServerProduct? = nil
 	private var productTypes: [VirtusizeProductType]? = nil
 	private var i18nLocalization: VirtusizeI18nLocalization? = nil
 	private var userSessionResponse: String? = ""
 	private var userProducts: [VirtusizeServerProduct]? = nil
+	private var userBodyProfile: VirtusizeUserBodyProfile? = nil
 	private var bodyProfileRecommendedSize: BodyProfileRecommendedSize? = nil
 	private var selectedUserProductId: Int? = nil
 
@@ -114,11 +116,14 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 								imageURL: imageURL
 							)
 					)
-					self.product = product
-					self.productCheckData = self.product?.dictionary["data"] as? [String: Any]
+					if let product = product {
+						self.storeProductSet.insert(product)
+					}
 					result(pdcJsonString)
 				}
 			case "openVirtusizeWebView":
+				let lastExternalProductID = externalProductIDStack.last
+				let product = storeProductSet.first { $0.externalId == lastExternalProductID }
 				if let viewController = VirtusizeWebViewController(
 					product: product,
 					userSessionResponse: userSessionResponse,
@@ -128,10 +133,11 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 					flutterRootViewController?.present(viewController, animated: true)
 				}
 			case "getRecommendationText":
-				guard let storeProductId = self.productCheckData?["productDataId"] as? Int else {
-					result(FlutterError.unknown)
+				guard let storeProductId = call.arguments as? Int else {
+					result(FlutterError.argumentNotSet("storeProductId"))
 					return
 				}
+
 				let initialDataWorkItem = DispatchWorkItem { [weak self] in
 					self?.fetchInitialData(self?.currentWorkItem, result, storeProductId: storeProductId)
 				}
@@ -172,6 +178,15 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 				},onError: { error in
 					result(FlutterError.sendOrder(error.localizedDescription))
 				})
+			case "addProduct":
+				guard let externalProductId = call.arguments as? String else {
+					result(FlutterError.invalidExternalProductID)
+					return
+				}
+				
+				externalProductIDStack.append(externalProductId)
+			case "removeProduct":
+				externalProductIDStack.removeLast()
 			default:
 				result(FlutterMethodNotImplemented)
 		}
@@ -180,20 +195,23 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 	private func fetchInitialData(_ workItem: DispatchWorkItem?, _ result: @escaping FlutterResult, storeProductId: Int) {
 		selectedUserProductId = nil
 		
-		storeProduct = repository.getStoreProduct(productId: storeProductId)
-		if storeProduct == nil {
+		currentStoreProduct = repository.getStoreProduct(productId: storeProductId)
+		if currentStoreProduct == nil {
 			result(FlutterError.nullAPIResult("storeProduct"))
 			workItem?.cancel()
 			return
 		}
+		
+		self.serverStoreProductSet.insert(currentStoreProduct!)
 
 		flutterChannel?.invokeMethod(
 			"onProduct",
 			arguments: [
 				"imageType": "store",
-				"imageUrl" : storeProduct?.cloudinaryImageUrlString,
-				"productType": storeProduct?.productType,
-				"productStyle": storeProduct?.productStyle
+				"imageUrl" : currentStoreProduct?.cloudinaryImageUrlString,
+				"productID": currentStoreProduct?.id,
+				"productType": currentStoreProduct?.productType,
+				"productStyle": currentStoreProduct?.productStyle
 			]
 		)
 
@@ -236,7 +254,8 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 		_ result: FlutterResult? = nil,
 		selectedRecommendedType: SizeRecommendationType? = nil,
 		shouldUpdateUserProducts: Bool = true,
-		shouldUpdateUserBodyProfile: Bool = true
+		shouldUpdateUserBodyProfile: Bool = true,
+		shouldUpdateBodyProfileRecommendedSize: Bool = false
 	) {
 		if shouldUpdateUserProducts {
 			userProducts = repository.getUserProducts()
@@ -257,16 +276,20 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 			}
 		}
 
+		let errorCode: Int?
 		if shouldUpdateUserBodyProfile {
-			let (userBodyProfile, errorCode) = repository.getUserBodyProfile()
+			(userBodyProfile, errorCode) = repository.getUserBodyProfile()
 			if let errorCode = errorCode, errorCode != 404 {
 				workItem?.cancel()
 				return
 			}
+		}
+		
+		if shouldUpdateUserBodyProfile || shouldUpdateBodyProfileRecommendedSize {
 			bodyProfileRecommendedSize = (userBodyProfile != nil) ?
 				repository.getBodyProfileRecommendedSize(
 					productTypes: productTypes!,
-					storeProduct: storeProduct!,
+					storeProduct: currentStoreProduct!,
 					userBodyProfile: userBodyProfile!
 				)
 				: nil
@@ -278,7 +301,7 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 		let userProductRecommendedSize = repository.getUserProductRecommendedSize(
 			selectedRecType: selectedRecommendedType,
 			userProducts: filteredUserProducts,
-			storeProduct: storeProduct!,
+			storeProduct: currentStoreProduct!,
 			productTypes: productTypes!
 		)
 		
@@ -287,6 +310,7 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 			arguments:  [
 				"imageType": "user",
 				"imageUrl" : userProductRecommendedSize?.bestUserProduct?.cloudinaryImageUrlString,
+				"productID": userProductRecommendedSize?.bestUserProduct?.id,
 				"productType": userProductRecommendedSize?.bestUserProduct?.productType,
 				"productStyle": userProductRecommendedSize?.bestUserProduct?.productStyle
 			]
@@ -294,13 +318,14 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 		
 		let recText = repository.getRecommendationText(
 			selectedRecType: selectedRecommendedType,
-			storeProduct: storeProduct!,
+			storeProduct: currentStoreProduct!,
 			userProductRecommendedSize: userProductRecommendedSize,
 			bodyProfileRecommendedSize: bodyProfileRecommendedSize,
 			i18nLocalization: i18nLocalization!
 		)
 		
 		let arguments: [String : Any] = [
+			"externalProductID": externalProductIDStack.last,
 			"text": recText,
 			"showUserProductImage": userProductRecommendedSize?.bestUserProduct != nil
 		]
@@ -335,21 +360,29 @@ extension SwiftVirtusizeFlutterPlugin: VirtusizeMessageHandler {
 		let eventsWorkItem = DispatchWorkItem { [weak self] in
 			if let eventData = event.data as? [String: Any],
 			   let eventName = eventData["name"] ?? eventData["eventName"] {
+				print(eventData)
 				self?.flutterChannel?.invokeMethod("onVSEvent", arguments: eventName)
 			}
 		}
 		
 		var userDataWorkItem: DispatchWorkItem = DispatchWorkItem { [weak self] in }
 		var recommendationWorkItem: DispatchWorkItem? = nil
-		
 		switch VirtusizeEventName.init(rawValue: event.name) {
 			case .userOpenedWidget:
 				selectedUserProductId = nil
+				
+				let currentStoreProductId = storeProductSet.first { $0.externalId == externalProductIDStack.last }?.id
+				let shouldUpdateStoreProduct = currentStoreProductId != currentStoreProduct?.id
+				if shouldUpdateStoreProduct {
+					currentStoreProduct = serverStoreProductSet.filter({ $0.id == currentStoreProductId }).first
+				}
+				
 				recommendationWorkItem = DispatchWorkItem { [weak self] in
 					self?.getRecommendation(
 						self?.currentWorkItem,
 						shouldUpdateUserProducts: false,
-						shouldUpdateUserBodyProfile: false
+						shouldUpdateUserBodyProfile: false,
+						shouldUpdateBodyProfileRecommendedSize: shouldUpdateStoreProduct
 					)
 				}
 			case .userAuthData:

@@ -13,6 +13,8 @@ extension FlutterError {
 	
 	internal static let invalidUserID = FlutterError(code: "INVALID_USER_ID", message: "The user ID is set to null or empty", details: nil)
 	
+	internal static let invalidExternalProductID = FlutterError(code: "INVALID_EXTERNAL_PRODUCT_ID", message: "The external product ID is invalid", details: nil)
+	
 	internal static func sendOrder(_ errorMessage: String) -> FlutterError {
 		return FlutterError(code: "SEND_ORDER", message: errorMessage, details: nil)
 	}
