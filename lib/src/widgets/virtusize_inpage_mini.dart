@@ -33,7 +33,7 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
   StreamSubscription<ProductDataCheck> _pdcSubscription;
   StreamSubscription<Recommendation> _recSubscription;
 
-  VSText _vsText;
+  VSText _vsText = IVirtusizePlugin.instance.vsText;
   bool _isValidProduct = false;
   bool _isLoading;
   bool _hasError;

@@ -76,6 +76,7 @@ class VirtusizePlugin {
       });
       VSText.load(result["displayLang"], language).then((value) {
         IVirtusizePlugin.instance._vsTextSink.add(value);
+        IVirtusizePlugin.instance.vsText = value;
       });
     } on PlatformException catch (error) {
       print('Failed to set the Virtusize props: $error');
@@ -169,6 +170,8 @@ class IVirtusizePlugin {
 
   MethodChannel _channel =
   const MethodChannel('com.virtusize/virtusize_flutter_plugin');
+
+  VSText vsText;
 
   StreamController _vsTextController;
   StreamSink<VSText> get _vsTextSink => _vsTextController.sink;

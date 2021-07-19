@@ -40,7 +40,7 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
   StreamSubscription<Recommendation> _recSubscription;
   StreamSubscription<Product> _productSubscription;
 
-  VSText _vsText;
+  VSText _vsText = IVirtusizePlugin.instance.vsText;
   ProductDataCheck _productDataCheck;
   bool _hasError;
   bool _isLoading;

@@ -26,7 +26,7 @@ class _VirtusizeButtonState extends State<VirtusizeButton> {
   StreamSubscription<VSText> _vsTextSubscription;
   StreamSubscription<ProductDataCheck> _pdcSubscription;
 
-  VSText _vsText;
+  VSText _vsText = IVirtusizePlugin.instance.vsText;
   bool _isValidProduct = false;
 
   @override
