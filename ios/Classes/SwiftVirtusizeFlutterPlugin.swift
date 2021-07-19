@@ -178,6 +178,8 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 	}
 	
 	private func fetchInitialData(_ workItem: DispatchWorkItem?, _ result: @escaping FlutterResult, storeProductId: Int) {
+		selectedUserProductId = nil
+		
 		storeProduct = repository.getStoreProduct(productId: storeProductId)
 		if storeProduct == nil {
 			result(FlutterError.nullAPIResult("storeProduct"))
@@ -273,21 +275,21 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 		let filteredUserProducts = (selectedUserProductId != nil) ?
 		userProducts?.filter { $0.id == selectedUserProductId } : userProducts
 		
-		flutterChannel?.invokeMethod(
-			"onProduct",
-			arguments:  [
-				"imageType": "user",
-				"imageUrl" : filteredUserProducts?.first?.cloudinaryImageUrlString,
-				"productType": filteredUserProducts?.first?.productType,
-				"productStyle": filteredUserProducts?.first?.productStyle
-			]
-		)
-		
 		let userProductRecommendedSize = repository.getUserProductRecommendedSize(
 			selectedRecType: selectedRecommendedType,
 			userProducts: filteredUserProducts,
 			storeProduct: storeProduct!,
 			productTypes: productTypes!
+		)
+		
+		flutterChannel?.invokeMethod(
+			"onProduct",
+			arguments:  [
+				"imageType": "user",
+				"imageUrl" : userProductRecommendedSize?.bestUserProduct?.cloudinaryImageUrlString,
+				"productType": userProductRecommendedSize?.bestUserProduct?.productType,
+				"productStyle": userProductRecommendedSize?.bestUserProduct?.productStyle
+			]
 		)
 		
 		let recText = repository.getRecommendationText(
