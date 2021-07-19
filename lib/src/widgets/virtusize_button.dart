@@ -33,11 +33,11 @@ class _VirtusizeButtonState extends State<VirtusizeButton> {
   void initState() {
     super.initState();
 
-    _vsTextSubscription = VirtusizePlugin.instance.vsTextStream.listen((vsText) {
+    _vsTextSubscription = IVirtusizePlugin.instance.vsTextStream.listen((vsText) {
       _vsText = vsText;
     });
 
-    _pdcSubscription = VirtusizePlugin.instance.pdcStream.listen((value) {
+    _pdcSubscription = IVirtusizePlugin.instance.pdcStream.listen((value) {
       setState(() {
         _isValidProduct = value.isValidProduct;
       });

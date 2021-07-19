@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../main.dart';
 import '../models/recommendation.dart';
 import '../models/product_data_check.dart';
 import '../res/colors.dart';
@@ -43,12 +44,12 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
     super.initState();
 
     _vsTextSubscription =
-        VirtusizePlugin.instance.vsTextStream.listen((vsLocalization) {
+        IVirtusizePlugin.instance.vsTextStream.listen((vsLocalization) {
       _vsText = vsLocalization;
       _recText = _vsText.localization.vsLoadingText;
     });
 
-    _pdcSubscription = VirtusizePlugin.instance.pdcStream.listen((pdc) {
+    _pdcSubscription = IVirtusizePlugin.instance.pdcStream.listen((pdc) {
       setState(() {
         _isLoading = true;
         _hasError = false;
@@ -57,7 +58,7 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
     });
 
     _recSubscription =
-        VirtusizePlugin.instance.recStream.listen((recommendation) {
+        IVirtusizePlugin.instance.recStream.listen((recommendation) {
       setState(() {
         try {
           _recText = recommendation.text.replaceAll("<br>", "");

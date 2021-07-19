@@ -12,56 +12,35 @@ import 'models/virtusize_product.dart';
 import 'res/text.dart';
 import 'utils/virtusize_message_listener.dart';
 
-
 class VirtusizePlugin {
   static final VirtusizePlugin instance = VirtusizePlugin._();
-
-  static const MethodChannel _channel =
-  const MethodChannel('com.virtusize/virtusize_flutter_plugin');
 
   ClientProduct _product;
   VirtusizeMessageListener _virtusizeMessageListener;
 
-  StreamController _vsTextController;
-  StreamSink<VSText> get _vsTextSink =>
-      _vsTextController.sink;
-  Stream<VSText> get vsTextStream =>
-      _vsTextController.stream;
-
-  StreamController _pdcController;
-  StreamSink<ProductDataCheck> get _pdcSink =>
-      _pdcController.sink;
-  Stream<ProductDataCheck> get pdcStream =>
-      _pdcController.stream;
-
-  StreamController _recController;
-  StreamSink<Product> get _productSink =>
-      _productController.sink;
-  Stream<Product> get productStream =>
-      _productController.stream;
-
-  StreamController _productController;
-  StreamSink<Recommendation> get _recSink =>
-      _recController.sink;
-  Stream<Recommendation> get recStream =>
-      _recController.stream;
-
   VirtusizePlugin._() {
-    _vsTextController = StreamController<VSText>.broadcast();
-    _pdcController = StreamController<ProductDataCheck>.broadcast();
-    _productController = StreamController<Product>.broadcast();
-    _recController = StreamController<Recommendation>.broadcast();
-    _channel.setMethodCallHandler((call) {
-      if(call.method == "onRecChange") {
-        _recSink.add(Recommendation(json.encode(call.arguments)));
-      } else if(call.method == "onProduct") {
-        _productSink.add(Product(json.encode(call.arguments)));
-      } else if(call.method == "onVSEvent") {
-        if(_virtusizeMessageListener != null) {
+    IVirtusizePlugin.instance._vsTextController =
+        StreamController<VSText>.broadcast();
+    IVirtusizePlugin.instance._pdcController =
+        StreamController<ProductDataCheck>.broadcast();
+    IVirtusizePlugin.instance._productController =
+        StreamController<Product>.broadcast();
+    IVirtusizePlugin.instance._recController =
+        StreamController<Recommendation>.broadcast();
+    IVirtusizePlugin.instance._channel.setMethodCallHandler((call) {
+      if (call.method == "onRecChange") {
+        IVirtusizePlugin.instance._recSink
+            .add(Recommendation(json.encode(call.arguments)));
+      } else if (call.method == "onProduct") {
+        print(call.arguments);
+        IVirtusizePlugin.instance._productSink
+            .add(Product(json.encode(call.arguments)));
+      } else if (call.method == "onVSEvent") {
+        if (_virtusizeMessageListener != null) {
           _virtusizeMessageListener.vsEvent.call(call.arguments);
         }
-      } else if(call.method == "onVSError") {
-        if(_virtusizeMessageListener != null) {
+      } else if (call.method == "onVSError") {
+        if (_virtusizeMessageListener != null) {
           _virtusizeMessageListener.vsError.call(call.arguments);
         }
       }
@@ -69,19 +48,20 @@ class VirtusizePlugin {
     });
   }
 
-  Future<void> setVirtusizeProps({@required String apiKey,
+  Future<void> setVirtusizeProps(
+      {@required String apiKey,
       String externalUserId,
       Env env = Env.global,
       Language language,
       bool showSGI = false,
       List<Language> allowedLanguages = Language.values,
-      List<InfoCategory> detailsPanelCards = InfoCategory.values
-  }) async {
-    if(apiKey == null) {
+      List<InfoCategory> detailsPanelCards = InfoCategory.values}) async {
+    if (apiKey == null) {
       throw FlutterError("The API key is required");
     }
     try {
-      Map<dynamic, dynamic> result = await _channel.invokeMethod('setVirtusizeProps', {
+      Map<dynamic, dynamic> result = await IVirtusizePlugin.instance._channel
+          .invokeMethod('setVirtusizeProps', {
         'apiKey': apiKey,
         'externalUserId': externalUserId,
         'env': env.value,
@@ -95,7 +75,7 @@ class VirtusizePlugin {
         }).toList()
       });
       VSText.load(result["displayLang"], language).then((value) {
-        _vsTextSink.add(value);
+        IVirtusizePlugin.instance._vsTextSink.add(value);
       });
     } on PlatformException catch (error) {
       print('Failed to set the Virtusize props: $error');
@@ -103,69 +83,65 @@ class VirtusizePlugin {
   }
 
   Future<void> setUserID(String userId) async {
-    if(userId == null || userId.isEmpty) {
+    if (userId == null || userId.isEmpty) {
       print('Failed to set the external user ID: userId is null or empty');
       return;
     }
     try {
-      await _channel.invokeMethod('setUserID', userId);
+      await IVirtusizePlugin.instance._channel.invokeMethod('setUserID', userId);
     } on PlatformException catch (error) {
       print('Failed to set the external user ID: $error');
     }
   }
 
-  Future<void> setProduct({@required String externalId, String imageUrl}) async {
+  Future<void> setProduct(
+      {@required String externalId, String imageUrl}) async {
     _product = ClientProduct(externalId: externalId, imageUrl: imageUrl);
     ProductDataCheck productDataCheck = await _currentProductDataCheck;
-    _pdcSink.add(productDataCheck);
-    if(productDataCheck.isValidProduct) {
+    IVirtusizePlugin.instance._pdcSink.add(productDataCheck);
+    if (productDataCheck.isValidProduct) {
       _getRecommendationText();
     }
   }
 
   Future<ProductDataCheck> get _currentProductDataCheck async {
     try {
-      ProductDataCheck productDataCheck = await _channel.invokeMethod('getProductDataCheck', {
+      ProductDataCheck productDataCheck = await IVirtusizePlugin
+          .instance._channel
+          .invokeMethod('getProductDataCheck', {
         'externalId': _product.externalId,
         'imageUrl': _product.imageUrl
       }).then((value) => ProductDataCheck(value, _product.externalId));
-      if(_virtusizeMessageListener != null) {
+      if (_virtusizeMessageListener != null) {
         _virtusizeMessageListener.productDataCheckData.call(productDataCheck);
       }
       return productDataCheck;
     } on PlatformException catch (error) {
       print('Failed to set VirtusizeProduct: $error');
-      if(_virtusizeMessageListener != null) {
+      if (_virtusizeMessageListener != null) {
         _virtusizeMessageListener.productDataCheckError.call(error);
       }
     }
     return null;
   }
 
-  Future<void> openVirtusizeWebView() async {
-    try {
-      await _channel.invokeMethod('openVirtusizeWebView');
-    } on PlatformException catch (error) {
-      print('Failed to open the VirtusizeWebView: $error');
-    }
-  }
-
   Future<void> _getRecommendationText() async {
     try {
-      _recSink.add(Recommendation(
-          json.encode(await _channel.invokeMethod('getRecommendationText'))));
+      IVirtusizePlugin.instance._recSink.add(Recommendation(json.encode(
+          await IVirtusizePlugin.instance._channel
+              .invokeMethod('getRecommendationText'))));
     } on PlatformException catch (error) {
       print('Failed to get RecommendationText: $error');
-      _recSink.add(Recommendation(null));
+      IVirtusizePlugin.instance._recSink.add(Recommendation(null));
     }
   }
 
-  Future<String> getPrivacyPolicyLink() async {
+  Future<void> openVirtusizeWebView() async {
     try {
-      return await _channel.invokeMethod('getPrivacyPolicyLink');
+      await IVirtusizePlugin.instance._channel
+          .invokeMethod('openVirtusizeWebView');
     } on PlatformException catch (error) {
-      print('Failed to get the privacy policy link: $error');
-      return null;
+      print('Failed to open the VirtusizeWebView: $error');
     }
   }
 
@@ -173,13 +149,51 @@ class VirtusizePlugin {
     _virtusizeMessageListener = listener;
   }
 
-  Future<void> sendOrder({@required VirtusizeOrder order, Function(Map<String, dynamic> orderData) onSuccess, Function(Exception e) onError}) async {
+  Future<void> sendOrder(
+      {@required VirtusizeOrder order,
+      Function(Map<String, dynamic> orderData) onSuccess,
+      Function(Exception e) onError}) async {
     try {
-      await _channel.invokeMethod('sendOrder', order.toJson());
+      await IVirtusizePlugin.instance._channel
+          .invokeMethod('sendOrder', order.toJson());
       onSuccess(order.toJson());
     } on PlatformException catch (error) {
       print('Failed to send the order: $error');
       onError(error);
+    }
+  }
+}
+
+class IVirtusizePlugin {
+  static final IVirtusizePlugin instance = IVirtusizePlugin._();
+
+  MethodChannel _channel =
+  const MethodChannel('com.virtusize/virtusize_flutter_plugin');
+
+  StreamController _vsTextController;
+  StreamSink<VSText> get _vsTextSink => _vsTextController.sink;
+  Stream<VSText> get vsTextStream => _vsTextController.stream;
+
+  StreamController _pdcController;
+  StreamSink<ProductDataCheck> get _pdcSink => _pdcController.sink;
+  Stream<ProductDataCheck> get pdcStream => _pdcController.stream;
+
+  StreamController _productController;
+  StreamSink<Product> get _productSink => _productController.sink;
+  Stream<Product> get productStream => _productController.stream;
+
+  StreamController _recController;
+  StreamSink<Recommendation> get _recSink => _recController.sink;
+  Stream<Recommendation> get recStream => _recController.stream;
+
+  IVirtusizePlugin._();
+
+  Future<String> getPrivacyPolicyLink() async {
+    try {
+      return await _channel.invokeMethod('getPrivacyPolicyLink');
+    } on PlatformException catch (error) {
+      print('Failed to get the privacy policy link: $error');
+      return null;
     }
   }
 }

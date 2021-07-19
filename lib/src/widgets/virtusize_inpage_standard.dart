@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:virtusize_flutter_plugin/src/main.dart';
 
 import '../models/recommendation.dart';
 import '../models/product.dart';
@@ -53,11 +54,11 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
   void initState() {
     super.initState();
 
-    _vsTextSubscription = VirtusizePlugin.instance.vsTextStream.listen((vsText) {
+    _vsTextSubscription = IVirtusizePlugin.instance.vsTextStream.listen((vsText) {
       _vsText = vsText;
     });
 
-    _pdcSubscription = VirtusizePlugin.instance.pdcStream.listen((pdc) {
+    _pdcSubscription = IVirtusizePlugin.instance.pdcStream.listen((pdc) {
       setState(() {
         _isLoading = true;
         _hasError = false;
@@ -66,7 +67,7 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
     });
 
     _productSubscription =
-        VirtusizePlugin.instance.productStream.listen((product) {
+        IVirtusizePlugin.instance.productStream.listen((product) {
       String imageUrl = product.imageUrl ?? "";
       Image networkImage = Image.network(imageUrl);
       final ImageStream stream =
@@ -94,7 +95,7 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
     });
 
     _recSubscription =
-        VirtusizePlugin.instance.recStream.listen((recommendation) {
+        IVirtusizePlugin.instance.recStream.listen((recommendation) {
       setState(() {
         _showUserProductImage = recommendation.showUserProductImage;
         try {
@@ -140,7 +141,7 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
   }
 
   Future<void> _openPrivacyPolicyLink() async {
-    String _url = await VirtusizePlugin.instance.getPrivacyPolicyLink();
+    String _url = await IVirtusizePlugin.instance.getPrivacyPolicyLink();
     await canLaunch(_url)
         ? await launch(_url, forceSafariVC: false)
         : throw 'Could not launch $_url';
