@@ -30,6 +30,7 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     private var virtusize: Virtusize? = null
     private var virtusizeProduct: VirtusizeProduct? = null
     private var productDataCheck: ProductCheck? = null
+    private var externalProductIDStack = mutableListOf<String>()
     private var storeProduct: Product? = null
     private var productTypes: List<ProductType>? = null
     private var i18nLocalization: I18nLocalization? = null
@@ -37,7 +38,6 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     private var bodyProfileRecommendedSize: BodyProfileRecommendedSize? = null
     private var selectedUserProductId: Int? = null
     private var helper: VirtusizeFlutterHelper? = null
-
 
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         channel = MethodChannel(
@@ -240,7 +240,7 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 }
                 helper?.openVirtusizeView(
                     virtusize,
-                    virtusizeProduct!!,
+                    virtusizeProduct,
                     productDataCheck!!,
                     messageHandler
                 )
@@ -269,6 +269,18 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                         result.error(error.errorCode, error.errorMessage, null)
                     })
                 }
+            }
+            "addProduct" -> {
+                val externalId = call.arguments as? String
+                if (externalId == null) {
+                    val error = VirtusizeFlutterErrors.argumentNotSet("externalId")
+                    result.error(error.errorCode, error.errorMessage, null)
+                    return
+                }
+                externalProductIDStack.add(externalId)
+            }
+            "removeProduct" -> {
+                externalProductIDStack.removeLast()
             }
             else -> {
                 result.notImplemented()
