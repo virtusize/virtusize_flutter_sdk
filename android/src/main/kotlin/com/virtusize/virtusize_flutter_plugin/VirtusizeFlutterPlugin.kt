@@ -38,6 +38,7 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     private var userProducts: List<Product>? = null
     private var userBodyProfile: UserBodyProfile? = null
     private var bodyProfileRecommendedSize: BodyProfileRecommendedSize? = null
+    private var storeProductForBodyProfileRecSize: Product? = null
     private var selectedUserProductId: Int? = null
     private var helper: VirtusizeFlutterHelper? = null
 
@@ -74,9 +75,14 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                     VirtusizeEvents.UserOpenedWidget.getEventName() -> {
                         scope.launch {
                             selectedUserProductId = null
+
+                            val shouldUpdateBodyProfileRecommendedSize =
+                                storeProductForBodyProfileRecSize?.externalId != storeProduct?.externalId
+
                             getRecommendation(
                                 shouldUpdateUserProducts = false,
-                                shouldUpdateUserBodyProfile = false
+                                shouldUpdateUserBodyProfile = false,
+                                shouldUpdateBodyProfileRecommendedSize = shouldUpdateBodyProfileRecommendedSize
                             )
                         }
                     }
@@ -358,7 +364,8 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         storeProductId: Int? = null,
         selectedRecommendedType: SizeRecommendationType? = null,
         shouldUpdateUserProducts: Boolean = true,
-        shouldUpdateUserBodyProfile: Boolean = true
+        shouldUpdateUserBodyProfile: Boolean = true,
+        shouldUpdateBodyProfileRecommendedSize: Boolean = false
     ) {
         var storeProduct = storeProduct
         storeProductId?.let { productId ->
@@ -388,6 +395,9 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
         if (shouldUpdateUserBodyProfile) {
             userBodyProfile = repository.getUserBodyProfile()
+        }
+
+        if (shouldUpdateUserBodyProfile || shouldUpdateBodyProfileRecommendedSize) {
             bodyProfileRecommendedSize =
                 if (userBodyProfile == null) {
                     null
@@ -398,6 +408,7 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                         userBodyProfile!!
                     )
                 }
+            storeProductForBodyProfileRecSize = storeProduct
         }
 
         val filteredUserProducts = if (selectedUserProductId != null) userProducts?.filter { it.id == selectedUserProductId } else userProducts
@@ -442,6 +453,7 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     private suspend fun clearUserData() {
         repository.deleteUser()
 
+        selectedUserProductId = null
         userProducts = null
         bodyProfileRecommendedSize = null
     }
