@@ -51,29 +51,31 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
     });
 
     _pdcSubscription = IVirtusizePlugin.instance.pdcStream.listen((pdc) {
-      if(_isValidProduct == null) {
-        IVirtusizePlugin.instance.addProduct(externalProductId: pdc.externalProductId);
-        _externalProductID = pdc.externalProductId;
-        setState(() {
-          _isLoading = true;
-          _hasError = false;
-          _isValidProduct = pdc.isValidProduct;
-        });
+      if(_isValidProduct != null) {
+        return;
       }
+      IVirtusizePlugin.instance.addProduct(externalProductId: pdc.externalProductId);
+      _externalProductID = pdc.externalProductId;
+      setState(() {
+        _isLoading = true;
+        _hasError = false;
+        _isValidProduct = pdc.isValidProduct;
+      });
     });
 
     _recSubscription =
         IVirtusizePlugin.instance.recStream.listen((recommendation) {
-          if(_externalProductID == recommendation.externalProductID) {
-            setState(() {
-              try {
-                _recText = recommendation.text.replaceAll("<br>", "");
-              } catch (e) {
-                _hasError = true;
-              }
-              _isLoading = false;
-            });
+          if(_externalProductID != recommendation.externalProductID) {
+            return;
           }
+          setState(() {
+            try {
+              _recText = recommendation.text.replaceAll("<br>", "");
+            } catch (e) {
+              _hasError = true;
+            }
+            _isLoading = false;
+          });
     });
   }
 

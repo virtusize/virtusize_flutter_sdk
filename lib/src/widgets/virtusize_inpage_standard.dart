@@ -60,69 +60,72 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
     });
 
     _pdcSubscription = IVirtusizePlugin.instance.pdcStream.listen((pdc) {
-      if (_productDataCheck == null) {
-        IVirtusizePlugin.instance.addProduct(externalProductId: pdc.externalProductId);
-        setState(() {
-          _isLoading = true;
-          _hasError = false;
-          _productDataCheck = pdc;
-        });
+      if (_productDataCheck != null) {
+        return;
       }
+      IVirtusizePlugin.instance
+          .addProduct(externalProductId: pdc.externalProductId);
+      setState(() {
+        _isLoading = true;
+        _hasError = false;
+        _productDataCheck = pdc;
+      });
     });
 
     _productSubscription =
         IVirtusizePlugin.instance.productStream.listen((product) {
-      if (isSameProduct(_storeProduct, product) ||
-          isSameProduct(_userProduct, product)) {
-        String imageUrl = product.imageUrl ?? "";
-        Image networkImage = Image.network(imageUrl);
-        final ImageStream stream =
-            networkImage.image.resolve(ImageConfiguration.empty);
-        stream.addListener(
-            ImageStreamListener((ImageInfo image, bool synchronousCall) {
-          setState(() {
-            if (product.imageType == ProductImageType.store) {
-              product.networkProductImage = networkImage;
-              _storeProduct = product;
-            } else if (product.imageType == ProductImageType.user) {
-              product.networkProductImage = networkImage;
-              _userProduct = product;
-            }
-          });
-        }, onError: (dynamic exception, StackTrace stackTrace) {
-          setState(() {
-            if (product.imageType == ProductImageType.store) {
-              _storeProduct = product;
-            } else if (product.imageType == ProductImageType.user) {
-              _userProduct = product;
-            }
-          });
-        }));
+      if (_productDataCheck.productId != product.storeProductID &&
+          !isTheSameProduct(_storeProduct, product) &&
+          !isTheSameProduct(_userProduct, product)) {
+        return;
       }
+      String imageUrl = product.imageUrl ?? "";
+      Image networkImage = Image.network(imageUrl);
+      final ImageStream stream =
+          networkImage.image.resolve(ImageConfiguration.empty);
+      stream.addListener(
+          ImageStreamListener((ImageInfo image, bool synchronousCall) {
+        setState(() {
+          if (product.imageType == ProductImageType.store) {
+            product.networkProductImage = networkImage;
+            _storeProduct = product;
+          } else if (product.imageType == ProductImageType.user) {
+            product.networkProductImage = networkImage;
+            _userProduct = product;
+          }
+        });
+      }, onError: (dynamic exception, StackTrace stackTrace) {
+        setState(() {
+          if (product.imageType == ProductImageType.store) {
+            _storeProduct = product;
+          } else if (product.imageType == ProductImageType.user) {
+            _userProduct = product;
+          }
+        });
+      }));
     });
 
     _recSubscription =
         IVirtusizePlugin.instance.recStream.listen((recommendation) {
-      if (_productDataCheck.externalProductId ==
+      if (_productDataCheck.externalProductId !=
           recommendation.externalProductID) {
-        setState(() {
-          _showUserProductImage = recommendation.showUserProductImage;
-          try {
-            _splitRecTexts(recommendation.text);
-          } catch (e) {
-            _hasError = true;
-          }
-          _isLoading = false;
-        });
+        return;
       }
+      setState(() {
+        _showUserProductImage = recommendation.showUserProductImage;
+        try {
+          _splitRecTexts(recommendation.text);
+        } catch (e) {
+          _hasError = true;
+        }
+        _isLoading = false;
+      });
     });
   }
 
-  bool isSameProduct(VirtusizeProduct productA, VirtusizeProduct productB) {
+  bool isTheSameProduct(VirtusizeProduct productA, VirtusizeProduct productB) {
     return productA == null ||
-        (productA != null &&
-            productA.imageType == productB.imageType &&
-            productA.productID == productB.productID);
+        (productA != null && productA.imageType == productB.imageType);
   }
 
   void _splitRecTexts(String recText) {

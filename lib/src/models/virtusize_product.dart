@@ -19,11 +19,11 @@ class VirtusizeProduct extends VirtusizeModel {
     return null;
   }
 
+  int get storeProductID => decodedData["storeProductID"];
+
   String get imageUrl  => decodedData["imageUrl"];
 
   int get productType => decodedData["productType"];
-
-  int get productID => decodedData["productID"];
 
   String get productStyle => decodedData["productStyle"];
 }

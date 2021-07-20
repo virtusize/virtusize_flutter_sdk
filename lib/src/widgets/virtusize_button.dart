@@ -39,13 +39,14 @@ class _VirtusizeButtonState extends State<VirtusizeButton> {
     });
 
     _pdcSubscription = IVirtusizePlugin.instance.pdcStream.listen((productDataCheck) {
-      if(_isValidProduct == null) {
-        IVirtusizePlugin.instance.addProduct(externalProductId: productDataCheck.externalProductId);
-        _externalProductID = productDataCheck.externalProductId;
-        setState(() {
-          _isValidProduct = productDataCheck.isValidProduct;
-        });
+      if(_isValidProduct != null) {
+        return;
       }
+      IVirtusizePlugin.instance.addProduct(externalProductId: productDataCheck.externalProductId);
+      _externalProductID = productDataCheck.externalProductId;
+      setState(() {
+        _isValidProduct = productDataCheck.isValidProduct;
+      });
     });
   }
 
