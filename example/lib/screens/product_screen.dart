@@ -40,21 +40,21 @@ class _ProductScreenState extends State<ProductScreen> {
           title: const Text('Virtusize Plugin Example App'),
         ),
         body: Center(
-            child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
+            child:
+                Column(mainAxisAlignment: MainAxisAlignment.center, children: [
           VirtusizeInPageStandard.vsStyle(style: VirtusizeStyle.Black),
-                  Container(height: 16),
-                  VirtusizeInPageStandard.vsStyle(style: VirtusizeStyle.Teal),
-                  Container(height: 16),
-                  ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(context,
-                            MaterialPageRoute(builder: (_) {
-                              return ProductScreen();
-                            }));
-                      },
-                      child: Text("Go to next product page"))
+          Container(height: 16),
+          VirtusizeInPageMini.vsStyle(style: VirtusizeStyle.Teal),
+          Container(height: 16),
+          VirtusizeButton.vsStyle(),
+          Container(height: 16),
+          ElevatedButton(
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (_) {
+                  return ProductScreen();
+                }));
+              },
+              child: Text("Go to next product page"))
         ])));
   }
 }
