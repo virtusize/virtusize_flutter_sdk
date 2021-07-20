@@ -140,7 +140,7 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
           )),
       Container(
         margin: EdgeInsets.only(top: 6, bottom: 6, left: 5),
-        child: Text(_recText,
+        child: Text(_vsText.localization.vsLoadingText,
             style: _vsText.vsFont.getTextStyle(
                 fontSize: VSFontSize.small,
                 fontWeight: FontWeight.bold,
