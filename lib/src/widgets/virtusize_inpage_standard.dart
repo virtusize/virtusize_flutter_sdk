@@ -5,7 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:virtusize_flutter_plugin/src/main.dart';
 
 import '../models/recommendation.dart';
-import '../models/product.dart';
+import '../models/virtusize_product.dart';
 import '../models/product_data_check.dart';
 import '../res/colors.dart';
 import '../res/font.dart';
@@ -38,15 +38,15 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
   StreamSubscription<VSText> _vsTextSubscription;
   StreamSubscription<ProductDataCheck> _pdcSubscription;
   StreamSubscription<Recommendation> _recSubscription;
-  StreamSubscription<Product> _productSubscription;
+  StreamSubscription<VirtusizeProduct> _productSubscription;
 
   VSText _vsText = IVirtusizePlugin.instance.vsText;
   ProductDataCheck _productDataCheck;
   bool _hasError;
   bool _isLoading;
   bool _showUserProductImage = false;
-  Product _storeProduct;
-  Product _userProduct;
+  VirtusizeProduct _storeProduct;
+  VirtusizeProduct _userProduct;
   String _topRecText;
   String _bottomRecText;
 
@@ -118,7 +118,7 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
     });
   }
 
-  bool isSameProduct(Product productA, Product productB) {
+  bool isSameProduct(VirtusizeProduct productA, VirtusizeProduct productB) {
     return productA == null ||
         (productA != null &&
             productA.imageType == productB.imageType &&

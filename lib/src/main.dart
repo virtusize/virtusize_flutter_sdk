@@ -4,18 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'models/recommendation.dart';
-import 'models/product.dart';
+import 'models/virtusize_product.dart';
 import 'models/product_data_check.dart';
 import 'models/virtusize_enums.dart';
 import 'models/virtusize_order.dart';
-import 'models/virtusize_product.dart';
 import 'res/text.dart';
 import 'utils/virtusize_message_listener.dart';
 
 class VirtusizePlugin {
   static final VirtusizePlugin instance = VirtusizePlugin._();
 
-  ClientProduct _product;
   VirtusizeMessageListener _virtusizeMessageListener;
 
   VirtusizePlugin._() {
@@ -24,7 +22,7 @@ class VirtusizePlugin {
     IVirtusizePlugin.instance._pdcController =
         StreamController<ProductDataCheck>.broadcast();
     IVirtusizePlugin.instance._productController =
-        StreamController<Product>.broadcast();
+        StreamController<VirtusizeProduct>.broadcast();
     IVirtusizePlugin.instance._recController =
         StreamController<Recommendation>.broadcast();
     IVirtusizePlugin.instance._channel.setMethodCallHandler((call) {
@@ -33,7 +31,7 @@ class VirtusizePlugin {
             .add(Recommendation(json.encode(call.arguments)));
       } else if (call.method == "onProduct") {
         IVirtusizePlugin.instance._productSink
-            .add(Product(json.encode(call.arguments)));
+            .add(VirtusizeProduct(json.encode(call.arguments)));
       } else if (call.method == "onVSEvent") {
         if (_virtusizeMessageListener != null) {
           _virtusizeMessageListener.vsEvent.call(call.arguments);
@@ -97,23 +95,21 @@ class VirtusizePlugin {
 
   Future<void> setProduct(
       {@required String externalId, String imageUrl}) async {
-    externalId = externalId ?? "";
-    _product = ClientProduct(externalId: externalId, imageUrl: imageUrl);
-    ProductDataCheck productDataCheck = await _currentProductDataCheck;
+    ProductDataCheck productDataCheck = await getProductDataCheck(externalId, imageUrl);
     IVirtusizePlugin.instance._pdcSink.add(productDataCheck);
     if (productDataCheck.isValidProduct) {
       _getRecommendationText(productId: productDataCheck.productId);
     }
   }
 
-  Future<ProductDataCheck> get _currentProductDataCheck async {
+  Future<ProductDataCheck> getProductDataCheck(String externalId, String imageUrl) async {
     try {
       ProductDataCheck productDataCheck = await IVirtusizePlugin
           .instance._channel
           .invokeMethod('getProductDataCheck', {
-        'externalId': _product.externalId,
-        'imageUrl': _product.imageUrl
-      }).then((value) => ProductDataCheck(value, _product.externalId));
+        'externalId': externalId,
+        'imageUrl': imageUrl
+      }).then((value) => ProductDataCheck(value, externalId));
       if (_virtusizeMessageListener != null) {
         _virtusizeMessageListener.productDataCheckData.call(productDataCheck);
       }
@@ -188,9 +184,9 @@ class IVirtusizePlugin {
 
   StreamController _productController;
 
-  StreamSink<Product> get _productSink => _productController.sink;
+  StreamSink<VirtusizeProduct> get _productSink => _productController.sink;
 
-  Stream<Product> get productStream => _productController.stream;
+  Stream<VirtusizeProduct> get productStream => _productController.stream;
 
   StreamController _recController;
 
