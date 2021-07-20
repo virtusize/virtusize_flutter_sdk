@@ -147,7 +147,7 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 				}
 				
 				let recommendationItem = DispatchWorkItem { [weak self] in
-					self?.getRecommendation(self?.currentWorkItem, result)
+					self?.getRecommendation(self?.currentWorkItem, result, storeProductId: storeProductId)
 				}
 
 				currentWorkItem = initialDataWorkItem
@@ -207,9 +207,9 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 		flutterChannel?.invokeMethod(
 			"onProduct",
 			arguments: [
+				"storeProductID": currentStoreProduct?.id,
 				"imageType": "store",
 				"imageUrl" : currentStoreProduct?.cloudinaryImageUrlString,
-				"productID": currentStoreProduct?.id,
 				"productType": currentStoreProduct?.productType,
 				"productStyle": currentStoreProduct?.productStyle
 			]
@@ -252,11 +252,19 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 	private func getRecommendation(
 		_ workItem: DispatchWorkItem?,
 		_ result: FlutterResult? = nil,
+		storeProductId: Int? = nil,
 		selectedRecommendedType: SizeRecommendationType? = nil,
 		shouldUpdateUserProducts: Bool = true,
 		shouldUpdateUserBodyProfile: Bool = true,
 		shouldUpdateBodyProfileRecommendedSize: Bool = false
 	) {
+		var storeProduct = currentStoreProduct
+		if let storeProductId = storeProductId, let product = serverStoreProductSet.filter { storeProduct in
+			storeProduct.id == storeProductId
+		}.first {
+			storeProduct = product
+		}
+		
 		if shouldUpdateUserProducts {
 			userProducts = repository.getUserProducts()
 			if userProducts == nil {
@@ -289,7 +297,7 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 			bodyProfileRecommendedSize = (userBodyProfile != nil) ?
 				repository.getBodyProfileRecommendedSize(
 					productTypes: productTypes!,
-					storeProduct: currentStoreProduct!,
+					storeProduct: storeProduct!,
 					userBodyProfile: userBodyProfile!
 				)
 				: nil
@@ -301,16 +309,16 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 		let userProductRecommendedSize = repository.getUserProductRecommendedSize(
 			selectedRecType: selectedRecommendedType,
 			userProducts: filteredUserProducts,
-			storeProduct: currentStoreProduct!,
+			storeProduct: storeProduct!,
 			productTypes: productTypes!
 		)
 		
 		flutterChannel?.invokeMethod(
 			"onProduct",
 			arguments:  [
+				"storeProductID": storeProduct!.id,
 				"imageType": "user",
 				"imageUrl" : userProductRecommendedSize?.bestUserProduct?.cloudinaryImageUrlString,
-				"productID": userProductRecommendedSize?.bestUserProduct?.id,
 				"productType": userProductRecommendedSize?.bestUserProduct?.productType,
 				"productStyle": userProductRecommendedSize?.bestUserProduct?.productStyle
 			]
@@ -318,14 +326,14 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 		
 		let recText = repository.getRecommendationText(
 			selectedRecType: selectedRecommendedType,
-			storeProduct: currentStoreProduct!,
+			storeProduct: storeProduct!,
 			userProductRecommendedSize: userProductRecommendedSize,
 			bodyProfileRecommendedSize: bodyProfileRecommendedSize,
 			i18nLocalization: i18nLocalization!
 		)
 		
 		let arguments: [String : Any] = [
-			"externalProductID": externalProductIDStack.last,
+			"externalProductID": storeProduct?.externalId,
 			"text": recText,
 			"showUserProductImage": userProductRecommendedSize?.bestUserProduct != nil
 		]
