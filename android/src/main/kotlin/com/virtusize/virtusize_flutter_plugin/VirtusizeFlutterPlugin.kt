@@ -29,13 +29,14 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     private var virtusize: Virtusize? = null
     private var virtusizeProduct: VirtusizeProduct? = null
     private val virtusizeProductSet = mutableSetOf<VirtusizeProduct>()
-    private var productDataCheck: ProductCheck? = null
     private val externalProductIDStack = mutableListOf<String>()
-    private var storeProduct: Product? = null
+    private val storeProduct: Product?
+        get() = storeProductSet.firstOrNull { product -> product.externalId == externalProductIDStack.last() }
     private val storeProductSet = mutableSetOf<Product>()
     private var productTypes: List<ProductType>? = null
     private var i18nLocalization: I18nLocalization? = null
     private var userProducts: List<Product>? = null
+    private var userBodyProfile: UserBodyProfile? = null
     private var bodyProfileRecommendedSize: BodyProfileRecommendedSize? = null
     private var selectedUserProductId: Int? = null
     private var helper: VirtusizeFlutterHelper? = null
@@ -231,7 +232,7 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                     imageUrl = call.argument<String>("imageUrl")
                 )
                 CoroutineScope(Dispatchers.Main).launch {
-                    productDataCheck = repository.productDataCheck(virtusizeProduct!!)
+                    val productDataCheck = repository.productDataCheck(virtusizeProduct!!)
                     productDataCheck?.let { productDataCheck ->
                         virtusizeProduct!!.productCheckData = productDataCheck
                         virtusizeProductSet.add(virtusizeProduct!!)
@@ -241,14 +242,13 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             }
             "openVirtusizeWebView" -> {
                 val virtusizeProduct =
-                    virtusizeProductSet.lastOrNull { product -> product.externalId == externalProductIDStack.last() }
-                if (virtusizeProduct == null || productDataCheck == null) {
+                    virtusizeProductSet.firstOrNull { product -> product.externalId == externalProductIDStack.last() }
+                if (virtusizeProduct?.productCheckData == null) {
                     throw IllegalArgumentException("Please call the VirtusizePlugin.instance.setProduct function")
                 }
                 helper?.openVirtusizeView(
                     virtusize,
                     virtusizeProduct,
-                    productDataCheck!!,
                     messageHandler
                 )
             }
@@ -260,9 +260,9 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                     return
                 }
                 scope.launch {
-                    fetchInitialData(result, storeProductId=storeProductId)
+                    fetchInitialData(result, storeProductId = storeProductId)
                     updateUserSession(result)
-                    getRecommendation(result, storeProductId=storeProductId)
+                    getRecommendation(result, storeProductId = storeProductId)
                 }
             }
             "getPrivacyPolicyLink" -> {
@@ -299,8 +299,7 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     private suspend fun fetchInitialData(result: Result, storeProductId: Int) {
         selectedUserProductId = null
 
-        storeProduct =
-            repository.getStoreProduct(storeProductId)
+        val storeProduct = repository.getStoreProduct(storeProductId)
         if (storeProduct == null) {
             val error = VirtusizeFlutterErrors.nullAPIResult("storeProduct")
             result.error(error.errorCode, error.errorMessage, null)
@@ -312,11 +311,11 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         channel.invokeMethod(
             "onProduct",
             mutableMapOf(
-                "storeProductID" to storeProduct!!.id,
+                "storeProductID" to storeProduct.id,
                 "imageType" to "store",
-                "imageUrl" to storeProduct!!.getProductImageURL(),
-                "productType" to storeProduct!!.productType,
-                "productStyle" to storeProduct!!.storeProductMeta?.additionalInfo?.style
+                "imageUrl" to storeProduct.getProductImageURL(),
+                "productType" to storeProduct.productType,
+                "productStyle" to storeProduct.storeProductMeta?.additionalInfo?.style
             )
         )
 
@@ -362,8 +361,8 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         shouldUpdateUserBodyProfile: Boolean = true
     ) {
         var storeProduct = storeProduct
-        storeProductId?.let { storeProductId ->
-            storeProductSet.firstOrNull { product -> product.id == storeProductId }?.let { product ->
+        storeProductId?.let { productId ->
+            storeProductSet.firstOrNull { product -> product.id == productId }?.let { product ->
                 storeProduct = product
             }
         }
@@ -388,7 +387,7 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         }
 
         if (shouldUpdateUserBodyProfile) {
-            val userBodyProfile = repository.getUserBodyProfile()
+            userBodyProfile = repository.getUserBodyProfile()
             bodyProfileRecommendedSize =
                 if (userBodyProfile == null) {
                     null
@@ -396,7 +395,7 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                     repository.getBodyProfileRecommendedSize(
                         productTypes!!,
                         storeProduct!!,
-                        userBodyProfile
+                        userBodyProfile!!
                     )
                 }
         }
