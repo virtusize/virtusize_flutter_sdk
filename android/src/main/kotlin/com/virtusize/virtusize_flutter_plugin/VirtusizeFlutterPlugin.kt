@@ -289,6 +289,8 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     }
 
     private suspend fun fetchInitialData(result: Result) {
+        selectedUserProductId = null
+
         storeProduct =
             repository.getStoreProduct(productDataCheck?.data?.productDataId!!)
         if (storeProduct == null) {
@@ -382,21 +384,22 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
         val filteredUserProducts = if (selectedUserProductId != null) userProducts?.filter { it.id == selectedUserProductId } else userProducts
 
-        channel.invokeMethod(
-            "onProduct",
-            mutableMapOf(
-                "imageType" to "user",
-                "imageUrl" to filteredUserProducts?.firstOrNull()?.getProductImageURL(),
-                "productType" to filteredUserProducts?.firstOrNull()?.productType,
-                "productStyle" to filteredUserProducts?.firstOrNull()?.storeProductMeta?.additionalInfo?.style
-            )
-        )
-
         val userProductRecommendedSize = helper?.getUserProductRecommendedSize(
             selectedRecommendedType,
             filteredUserProducts,
             storeProduct!!,
             productTypes!!
+        )
+
+        channel.invokeMethod(
+            "onProduct",
+            mutableMapOf(
+                "storeProductID" to storeProduct!!.id,
+                "imageType" to "user",
+                "imageUrl" to userProductRecommendedSize?.bestUserProduct?.getProductImageURL(),
+                "productType" to userProductRecommendedSize?.bestUserProduct?.productType,
+                "productStyle" to userProductRecommendedSize?.bestUserProduct?.storeProductMeta?.additionalInfo?.style
+            )
         )
 
         val recText = helper?.getRecommendationText(
