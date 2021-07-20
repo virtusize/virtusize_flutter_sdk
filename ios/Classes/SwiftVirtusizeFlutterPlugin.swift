@@ -11,12 +11,17 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 	private var storeProductSet: Set<VirtusizeProduct> = []
 	private var externalProductIDStack: [String] = []
 	private var serverStoreProductSet: Set<VirtusizeServerProduct> = []
-    private var currentStoreProduct: VirtusizeServerProduct? = nil
+	private var storeProduct: VirtusizeServerProduct? {
+		get {
+			serverStoreProductSet.filter({ $0.externalId == externalProductIDStack.last }).first
+		}
+	}
 	private var productTypes: [VirtusizeProductType]? = nil
 	private var i18nLocalization: VirtusizeI18nLocalization? = nil
 	private var userSessionResponse: String? = ""
 	private var userProducts: [VirtusizeServerProduct]? = nil
 	private var userBodyProfile: VirtusizeUserBodyProfile? = nil
+	private var storeProductForBodyProfileRecSize: VirtusizeServerProduct? = nil
 	private var bodyProfileRecommendedSize: BodyProfileRecommendedSize? = nil
 	private var selectedUserProductId: Int? = nil
 
@@ -122,8 +127,7 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 					result(pdcJsonString)
 				}
 			case "openVirtusizeWebView":
-				let lastExternalProductID = externalProductIDStack.last
-				let product = storeProductSet.first { $0.externalId == lastExternalProductID }
+				let product = storeProductSet.first { $0.externalId == externalProductIDStack.last }
 				if let viewController = VirtusizeWebViewController(
 					product: product,
 					userSessionResponse: userSessionResponse,
@@ -180,7 +184,7 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 				})
 			case "addProduct":
 				guard let externalProductId = call.arguments as? String else {
-					result(FlutterError.invalidExternalProductID)
+					result(FlutterError.argumentNotSet("externalProductId"))
 					return
 				}
 				
@@ -195,23 +199,23 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 	private func fetchInitialData(_ workItem: DispatchWorkItem?, _ result: @escaping FlutterResult, storeProductId: Int) {
 		selectedUserProductId = nil
 		
-		currentStoreProduct = repository.getStoreProduct(productId: storeProductId)
-		if currentStoreProduct == nil {
+		let storeProduct = repository.getStoreProduct(productId: storeProductId)
+		if storeProduct == nil {
 			result(FlutterError.nullAPIResult("storeProduct"))
 			workItem?.cancel()
 			return
 		}
 		
-		self.serverStoreProductSet.insert(currentStoreProduct!)
+		self.serverStoreProductSet.insert(storeProduct!)
 
 		flutterChannel?.invokeMethod(
 			"onProduct",
 			arguments: [
-				"storeProductID": currentStoreProduct?.id,
+				"storeProductID": storeProduct!.id,
 				"imageType": "store",
-				"imageUrl" : currentStoreProduct?.cloudinaryImageUrlString,
-				"productType": currentStoreProduct?.productType,
-				"productStyle": currentStoreProduct?.productStyle
+				"imageUrl": storeProduct!.cloudinaryImageUrlString,
+				"productType": storeProduct!.productType,
+				"productStyle": storeProduct!.productStyle
 			]
 		)
 
@@ -258,13 +262,14 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 		shouldUpdateUserBodyProfile: Bool = true,
 		shouldUpdateBodyProfileRecommendedSize: Bool = false
 	) {
-		var storeProduct = currentStoreProduct
-		if let storeProductId = storeProductId, let product = serverStoreProductSet.filter { storeProduct in
-			storeProduct.id == storeProductId
-		}.first {
+		var storeProduct = storeProduct
+		if let productId = storeProductId,
+		   let product = serverStoreProductSet.filter({ product in
+			product.id == productId
+		   }).first {
 			storeProduct = product
 		}
-		
+
 		if shouldUpdateUserProducts {
 			userProducts = repository.getUserProducts()
 			if userProducts == nil {
@@ -301,8 +306,9 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 					userBodyProfile: userBodyProfile!
 				)
 				: nil
+			storeProductForBodyProfileRecSize = storeProduct
 		}
-		
+
 		let filteredUserProducts = (selectedUserProductId != nil) ?
 		userProducts?.filter { $0.id == selectedUserProductId } : userProducts
 		
@@ -312,7 +318,7 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 			storeProduct: storeProduct!,
 			productTypes: productTypes!
 		)
-		
+
 		flutterChannel?.invokeMethod(
 			"onProduct",
 			arguments:  [
@@ -333,7 +339,7 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 		)
 		
 		let arguments: [String : Any] = [
-			"externalProductID": storeProduct?.externalId,
+			"externalProductID": storeProduct!.externalId,
 			"text": recText,
 			"showUserProductImage": userProductRecommendedSize?.bestUserProduct != nil
 		]
@@ -351,6 +357,7 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 	private func clearUserData() {
 		repository.deleteUser()
 		
+		selectedUserProductId = nil
 		userProducts = nil
 		bodyProfileRecommendedSize = nil
 	}
@@ -368,29 +375,24 @@ extension SwiftVirtusizeFlutterPlugin: VirtusizeMessageHandler {
 		let eventsWorkItem = DispatchWorkItem { [weak self] in
 			if let eventData = event.data as? [String: Any],
 			   let eventName = eventData["name"] ?? eventData["eventName"] {
-				print(eventData)
 				self?.flutterChannel?.invokeMethod("onVSEvent", arguments: eventName)
 			}
 		}
 		
-		var userDataWorkItem: DispatchWorkItem = DispatchWorkItem { [weak self] in }
+		var userDataWorkItem: DispatchWorkItem = DispatchWorkItem { }
 		var recommendationWorkItem: DispatchWorkItem? = nil
 		switch VirtusizeEventName.init(rawValue: event.name) {
 			case .userOpenedWidget:
 				selectedUserProductId = nil
 				
-				let currentStoreProductId = storeProductSet.first { $0.externalId == externalProductIDStack.last }?.id
-				let shouldUpdateStoreProduct = currentStoreProductId != currentStoreProduct?.id
-				if shouldUpdateStoreProduct {
-					currentStoreProduct = serverStoreProductSet.filter({ $0.id == currentStoreProductId }).first
-				}
-				
+				let shouldUpdateBodyProfileRecommendedSize = storeProductForBodyProfileRecSize?.externalId != storeProduct?.externalId
+
 				recommendationWorkItem = DispatchWorkItem { [weak self] in
 					self?.getRecommendation(
 						self?.currentWorkItem,
 						shouldUpdateUserProducts: false,
 						shouldUpdateUserBodyProfile: false,
-						shouldUpdateBodyProfileRecommendedSize: shouldUpdateStoreProduct
+						shouldUpdateBodyProfileRecommendedSize: shouldUpdateBodyProfileRecommendedSize
 					)
 				}
 			case .userAuthData:
