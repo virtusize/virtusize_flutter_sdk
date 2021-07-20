@@ -74,9 +74,9 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
 
     _productSubscription =
         IVirtusizePlugin.instance.productStream.listen((product) {
-      if (_productDataCheck.productId != product.storeProductID &&
+      if (_productDataCheck.productId != product.storeProductID || (
           !isTheSameProduct(_storeProduct, product) &&
-          !isTheSameProduct(_userProduct, product)) {
+          !isTheSameProduct(_userProduct, product))) {
         return;
       }
       String imageUrl = product.imageUrl ?? "";
