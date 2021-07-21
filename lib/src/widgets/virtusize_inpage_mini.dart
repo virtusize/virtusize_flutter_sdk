@@ -34,8 +34,7 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
   StreamSubscription<Recommendation> _recSubscription;
 
   VSText _vsText = IVirtusizePlugin.instance.vsText;
-  bool _isValidProduct;
-  String _externalProductID;
+  ProductDataCheck _productDataCheck;
   bool _isLoading;
   bool _hasError;
   String _recText;
@@ -51,7 +50,7 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
     });
 
     _pdcSubscription = IVirtusizePlugin.instance.pdcStream.listen((pdc) {
-      if (_isValidProduct != null) {
+      if (_productDataCheck != null) {
         return;
       }
       IVirtusizePlugin.instance
@@ -59,13 +58,14 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
       setState(() {
         _isLoading = true;
         _hasError = false;
-        _isValidProduct = pdc.isValidProduct;
+        _productDataCheck = pdc;
       });
     });
 
     _recSubscription =
         IVirtusizePlugin.instance.recStream.listen((recommendation) {
-      if (_externalProductID != recommendation.externalProductID) {
+      if (_productDataCheck.externalProductId !=
+          recommendation.externalProductID) {
         return;
       }
       setState(() {
@@ -90,7 +90,7 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
 
   @override
   Widget build(BuildContext context) {
-    if (_isValidProduct == true) {
+    if (_productDataCheck != null && _productDataCheck.isValidProduct) {
       return GestureDetector(
         child: _createVSInPageMini(),
         onTap: !_hasError ? _openVirtusizeWebview : () => {},
