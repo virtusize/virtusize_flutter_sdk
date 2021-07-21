@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:virtusize_flutter_plugin/virtusize_plugin.dart';
 import '../screens/product_screen.dart';
@@ -34,7 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text('Virtusize Plugin Example App'),
+          title: const Text('Virtusize Example App'),
         ),
         body: Padding(
             padding: EdgeInsets.only(top: 16),
@@ -87,7 +88,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: ElevatedButton(
                         onPressed: () {
                           Navigator.push(context,
-                              MaterialPageRoute(builder: (_) {
+                              CupertinoPageRoute(builder: (_) {
                             return ProductScreen(externalID: "vs_pants");
                           }));
                         },
