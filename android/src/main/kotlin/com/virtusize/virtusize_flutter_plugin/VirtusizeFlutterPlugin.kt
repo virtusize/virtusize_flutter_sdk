@@ -35,12 +35,12 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     // A stack implemented by a list to record the visited order of the external product IDs that are tied with the Virtusize widgets created on a client's app
     private val externalProductIDStack = mutableListOf<String>()
 
+    // A set to cache the store product information of all the visited products
+    private val storeProductSet = mutableSetOf<Product>()
+
     // The most recent visited store product on a client's app
     private val storeProduct: Product?
         get() = storeProductSet.firstOrNull { product -> product.externalId == externalProductIDStack.last() }
-
-    // A set to cache the store product information of all the visited products
-    private val storeProductSet = mutableSetOf<Product>()
 
     private var selectedUserProductId: Int? = null
     private var productTypes: List<ProductType>? = null
