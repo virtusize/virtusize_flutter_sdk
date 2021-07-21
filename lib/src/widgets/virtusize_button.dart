@@ -26,26 +26,34 @@ class _VirtusizeButtonState extends State<VirtusizeButton> {
   StreamSubscription<VSText> _vsTextSubscription;
   StreamSubscription<ProductDataCheck> _pdcSubscription;
 
-  VSText _vsText;
-  bool _isValidProduct = false;
+  VSText _vsText = IVirtusizePlugin.instance.vsText;
+  bool _isValidProduct;
 
   @override
   void initState() {
     super.initState();
 
-    _vsTextSubscription = VirtusizePlugin.instance.vsTextStream.listen((vsText) {
+    _vsTextSubscription =
+        IVirtusizePlugin.instance.vsTextStream.listen((vsText) {
       _vsText = vsText;
     });
 
-    _pdcSubscription = VirtusizePlugin.instance.pdcStream.listen((value) {
+    _pdcSubscription =
+        IVirtusizePlugin.instance.pdcStream.listen((productDataCheck) {
+      if (_isValidProduct != null) {
+        return;
+      }
+      IVirtusizePlugin.instance
+          .addProduct(externalProductId: productDataCheck.externalProductId);
       setState(() {
-        _isValidProduct = value.isValidProduct;
+        _isValidProduct = productDataCheck.isValidProduct;
       });
     });
   }
 
   @override
   void dispose() {
+    IVirtusizePlugin.instance.removeProduct();
     _vsTextSubscription.cancel();
     _pdcSubscription.cancel();
     super.dispose();
@@ -53,7 +61,7 @@ class _VirtusizeButtonState extends State<VirtusizeButton> {
 
   @override
   Widget build(BuildContext context) {
-    if (_isValidProduct) {
+    if (_isValidProduct == true) {
       switch (widget.style) {
         case VirtusizeStyle.None:
           return widget.child;
@@ -88,7 +96,9 @@ class _VirtusizeButtonState extends State<VirtusizeButton> {
           Container(width: 4),
           child != null
               ? child
-              : Text(_vsText.localization.vsButtonText, style: _vsText.vsFont.getTextStyle(fontSize: VSFontSize.small))
+              : Text(_vsText.localization.vsButtonText,
+                  style:
+                      _vsText.vsFont.getTextStyle(fontSize: VSFontSize.small))
         ],
       ),
       style: ElevatedButton.styleFrom(

@@ -7,10 +7,8 @@ class ProductDataCheck extends VirtusizeModel {
   ProductDataCheck(data, this.externalProductId) : super(data);
 
   Map<String, dynamic> get data => decodedData["data"] ?? {};
-
   bool get isValidProduct => data["validProduct"] ?? false;
-
-  String get productId  => data["productId"];
+  int get productId  => data["productDataId"];
 
   @override
   String toString() {

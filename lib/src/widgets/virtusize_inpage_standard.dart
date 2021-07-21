@@ -3,8 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../main.dart';
 import '../models/recommendation.dart';
-import '../models/product.dart';
+import '../models/virtusize_product.dart';
 import '../models/product_data_check.dart';
 import '../res/colors.dart';
 import '../res/font.dart';
@@ -37,15 +38,15 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
   StreamSubscription<VSText> _vsTextSubscription;
   StreamSubscription<ProductDataCheck> _pdcSubscription;
   StreamSubscription<Recommendation> _recSubscription;
-  StreamSubscription<Product> _productSubscription;
+  StreamSubscription<VirtusizeProduct> _productSubscription;
 
-  VSText _vsText;
+  VSText _vsText = IVirtusizePlugin.instance.vsText;
   ProductDataCheck _productDataCheck;
   bool _hasError;
   bool _isLoading;
   bool _showUserProductImage = false;
-  Product _storeProduct;
-  Product _userProduct;
+  VirtusizeProduct _storeProduct;
+  VirtusizeProduct _userProduct;
   String _topRecText;
   String _bottomRecText;
 
@@ -53,11 +54,17 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
   void initState() {
     super.initState();
 
-    _vsTextSubscription = VirtusizePlugin.instance.vsTextStream.listen((vsText) {
+    _vsTextSubscription =
+        IVirtusizePlugin.instance.vsTextStream.listen((vsText) {
       _vsText = vsText;
     });
 
-    _pdcSubscription = VirtusizePlugin.instance.pdcStream.listen((pdc) {
+    _pdcSubscription = IVirtusizePlugin.instance.pdcStream.listen((pdc) {
+      if (_productDataCheck != null) {
+        return;
+      }
+      IVirtusizePlugin.instance
+          .addProduct(externalProductId: pdc.externalProductId);
       setState(() {
         _isLoading = true;
         _hasError = false;
@@ -66,7 +73,12 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
     });
 
     _productSubscription =
-        VirtusizePlugin.instance.productStream.listen((product) {
+        IVirtusizePlugin.instance.productStream.listen((product) {
+      if (_productDataCheck.productId != product.storeProductID ||
+          (!isTheSameProduct(_storeProduct, product) &&
+              !isTheSameProduct(_userProduct, product))) {
+        return;
+      }
       String imageUrl = product.imageUrl ?? "";
       Image networkImage = Image.network(imageUrl);
       final ImageStream stream =
@@ -94,7 +106,11 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
     });
 
     _recSubscription =
-        VirtusizePlugin.instance.recStream.listen((recommendation) {
+        IVirtusizePlugin.instance.recStream.listen((recommendation) {
+      if (_productDataCheck.externalProductId !=
+          recommendation.externalProductID) {
+        return;
+      }
       setState(() {
         _showUserProductImage = recommendation.showUserProductImage;
         try {
@@ -105,6 +121,11 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
         _isLoading = false;
       });
     });
+  }
+
+  bool isTheSameProduct(VirtusizeProduct productA, VirtusizeProduct productB) {
+    return productA == null ||
+        (productA != null && productA.imageType == productB.imageType);
   }
 
   void _splitRecTexts(String recText) {
@@ -120,6 +141,7 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
 
   @override
   void dispose() {
+    IVirtusizePlugin.instance.removeProduct();
     _vsTextSubscription.cancel();
     _pdcSubscription.cancel();
     _productSubscription.cancel();
@@ -140,7 +162,7 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
   }
 
   Future<void> _openPrivacyPolicyLink() async {
-    String _url = await VirtusizePlugin.instance.getPrivacyPolicyLink();
+    String _url = await IVirtusizePlugin.instance.getPrivacyPolicyLink();
     await canLaunch(_url)
         ? await launch(_url, forceSafariVC: false)
         : throw 'Could not launch $_url';
@@ -167,7 +189,8 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
                       GestureDetector(
                           child: Text(
                             _vsText.localization.vsPrivacyPolicy,
-                            style: _vsText.vsFont.getTextStyle(fontSize: VSFontSize.xsmall),
+                            style: _vsText.vsFont
+                                .getTextStyle(fontSize: VSFontSize.xsmall),
                           ),
                           onTap: _openPrivacyPolicyLink)
                     ])
@@ -242,7 +265,9 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
                                 : _buildRecommendationText())),
                     CTAButton(
                         text: _vsText.localization.vsButtonText,
-                        textStyle: _vsText.vsFont.getTextStyle(fontSize: VSFontSize.xsmall, fontWeight: FontWeight.bold),
+                        textStyle: _vsText.vsFont.getTextStyle(
+                            fontSize: VSFontSize.xsmall,
+                            fontWeight: FontWeight.bold),
                         backgroundColor: color,
                         textColor: Colors.white,
                         onPressed: _openVirtusizeWebview)
@@ -266,7 +291,8 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
   Widget _buildLoadingText() {
     return Wrap(children: [
       Text(_vsText.localization.vsLoadingText,
-          style: _vsText.vsFont.getTextStyle(fontSize: VSFontSize.large, fontWeight: FontWeight.bold)),
+          style: _vsText.vsFont.getTextStyle(
+              fontSize: VSFontSize.large, fontWeight: FontWeight.bold)),
       AnimatedDots()
     ]);
   }
@@ -276,10 +302,12 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _topRecText != null
-            ? Text(_topRecText, style: _vsText.vsFont.getTextStyle(fontSize: VSFontSize.small))
+            ? Text(_topRecText,
+                style: _vsText.vsFont.getTextStyle(fontSize: VSFontSize.small))
             : Container(),
         Text(_bottomRecText,
-            style: _vsText.vsFont.getTextStyle(fontSize: VSFontSize.large, fontWeight: FontWeight.bold))
+            style: _vsText.vsFont.getTextStyle(
+                fontSize: VSFontSize.large, fontWeight: FontWeight.bold))
       ],
     );
   }
@@ -292,7 +320,8 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
         Container(height: 10),
         Text(_vsText.localization.vsLongErrorText,
             textAlign: TextAlign.center,
-            style: _vsText.vsFont.getTextStyle(fontSize: VSFontSize.small, color: VSColors.vsGray700))
+            style: _vsText.vsFont.getTextStyle(
+                fontSize: VSFontSize.small, color: VSColors.vsGray700))
       ],
     );
   }

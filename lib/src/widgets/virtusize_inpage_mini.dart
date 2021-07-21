@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../main.dart';
 import '../models/recommendation.dart';
 import '../models/product_data_check.dart';
 import '../res/colors.dart';
@@ -32,8 +33,8 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
   StreamSubscription<ProductDataCheck> _pdcSubscription;
   StreamSubscription<Recommendation> _recSubscription;
 
-  VSText _vsText;
-  bool _isValidProduct = false;
+  VSText _vsText = IVirtusizePlugin.instance.vsText;
+  ProductDataCheck _productDataCheck;
   bool _isLoading;
   bool _hasError;
   String _recText;
@@ -43,21 +44,30 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
     super.initState();
 
     _vsTextSubscription =
-        VirtusizePlugin.instance.vsTextStream.listen((vsLocalization) {
+        IVirtusizePlugin.instance.vsTextStream.listen((vsLocalization) {
       _vsText = vsLocalization;
       _recText = _vsText.localization.vsLoadingText;
     });
 
-    _pdcSubscription = VirtusizePlugin.instance.pdcStream.listen((pdc) {
+    _pdcSubscription = IVirtusizePlugin.instance.pdcStream.listen((pdc) {
+      if (_productDataCheck != null) {
+        return;
+      }
+      IVirtusizePlugin.instance
+          .addProduct(externalProductId: pdc.externalProductId);
       setState(() {
         _isLoading = true;
         _hasError = false;
-        _isValidProduct = pdc.isValidProduct;
+        _productDataCheck = pdc;
       });
     });
 
     _recSubscription =
-        VirtusizePlugin.instance.recStream.listen((recommendation) {
+        IVirtusizePlugin.instance.recStream.listen((recommendation) {
+      if (_productDataCheck.externalProductId !=
+          recommendation.externalProductID) {
+        return;
+      }
       setState(() {
         try {
           _recText = recommendation.text.replaceAll("<br>", "");
@@ -71,6 +81,7 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
 
   @override
   void dispose() {
+    IVirtusizePlugin.instance.removeProduct();
     _vsTextSubscription.cancel();
     _pdcSubscription.cancel();
     _recSubscription.cancel();
@@ -79,7 +90,7 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
 
   @override
   Widget build(BuildContext context) {
-    if (_isValidProduct) {
+    if (_productDataCheck != null && _productDataCheck.isValidProduct) {
       return GestureDetector(
         child: _createVSInPageMini(),
         onTap: !_hasError ? _openVirtusizeWebview : () => {},
@@ -129,7 +140,7 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
           )),
       Container(
         margin: EdgeInsets.only(top: 6, bottom: 6, left: 5),
-        child: Text(_recText,
+        child: Text(_vsText.localization.vsLoadingText,
             style: _vsText.vsFont.getTextStyle(
                 fontSize: VSFontSize.small,
                 fontWeight: FontWeight.bold,
@@ -153,7 +164,8 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
           margin: EdgeInsets.only(top: 5, bottom: 5, left: 4, right: 8),
           child: CTAButton(
               text: _vsText.localization.vsButtonText,
-              textStyle: _vsText.vsFont.getTextStyle(fontSize: VSFontSize.xsmall, fontWeight: FontWeight.bold),
+              textStyle: _vsText.vsFont.getTextStyle(
+                  fontSize: VSFontSize.xsmall, fontWeight: FontWeight.bold),
               textColor: themeColor,
               onPressed: _openVirtusizeWebview))
     ]);
