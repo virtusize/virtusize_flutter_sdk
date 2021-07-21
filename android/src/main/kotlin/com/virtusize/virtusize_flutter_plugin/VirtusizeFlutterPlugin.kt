@@ -70,8 +70,9 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 var eventName: String? = null
                 if (event.name.isNotEmpty()) {
                     eventName = event.name
-                } else if (event.data != null){
-                    eventName = event.data!!.optString("name") ?: event.data!!.optString("eventName")
+                } else if (event.data != null) {
+                    eventName =
+                        event.data!!.optString("name") ?: event.data!!.optString("eventName")
                 }
                 eventName?.let {
                     scope.launch {
@@ -81,16 +82,17 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
                 when (event.name) {
                     VirtusizeEvents.UserOpenedWidget.getEventName() -> {
+                        // Unset the selected user product ID
+                        selectedUserProductId = null
+
+                        // If the store product that is associated with the current body profile recommended size is different from the most recent one,
+                        // we should update the data for the body profile recommended size
+                        val shouldUpdateBodyProfileRecommendedSize =
+                            bodyProfileRecommendedSize?.product?.externalId != storeProduct?.externalId
+
                         scope.launch {
-                            // Unset the selected user product ID
-                            selectedUserProductId = null
-
-                            // If the store product that is associated with the current body profile recommended size is different from the most recent one,
-                            // we should update the data for the body profile recommended size
-                            val shouldUpdateBodyProfileRecommendedSize =
-                                bodyProfileRecommendedSize?.product?.externalId != storeProduct?.externalId
-
                             getRecommendation(
+                                this,
                                 shouldUpdateUserProducts = false,
                                 shouldUpdateUserBodyProfile = false,
                                 shouldUpdateBodyProfileRecommendedSize = shouldUpdateBodyProfileRecommendedSize
@@ -103,34 +105,37 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                         }
                     }
                     VirtusizeEvents.UserSelectedProduct.getEventName() -> {
+                        event.data?.optInt("userProductId")?.let { userProductId ->
+                            selectedUserProductId = userProductId
+                        }
                         scope.launch {
-                            event.data?.optInt("userProductId")?.let { userProductId ->
-                                selectedUserProductId = userProductId
-                            }
                             getRecommendation(
+                                this,
                                 selectedRecommendedType = SizeRecommendationType.compareProduct,
                                 shouldUpdateUserProducts = false
                             )
                         }
                     }
                     VirtusizeEvents.UserAddedProduct.getEventName() -> {
+                        event.data?.optInt("userProductId")?.let { userProductId ->
+                            selectedUserProductId = userProductId
+                        }
                         scope.launch {
-                            event.data?.optInt("userProductId")?.let { userProductId ->
-                                selectedUserProductId = userProductId
-                            }
                             getRecommendation(
+                                this,
                                 selectedRecommendedType = SizeRecommendationType.compareProduct,
                                 shouldUpdateUserBodyProfile = false
                             )
                         }
                     }
                     VirtusizeEvents.UserChangedRecommendationType.getEventName() -> {
+                        var recommendationType: SizeRecommendationType? = null
+                        event.data?.optString("recommendationType")?.let {
+                            recommendationType = valueOf<SizeRecommendationType>(it)
+                        }
                         scope.launch {
-                            var recommendationType: SizeRecommendationType? = null
-                            event.data?.optString("recommendationType")?.let {
-                                recommendationType = valueOf<SizeRecommendationType>(it)
-                            }
                             getRecommendation(
+                                this,
                                 selectedRecommendedType = recommendationType,
                                 shouldUpdateUserProducts = false,
                                 shouldUpdateUserBodyProfile = false
@@ -140,8 +145,10 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                     VirtusizeEvents.UserUpdatedBodyMeasurements.getEventName() -> {
                         scope.launch {
                             event.data?.optString("sizeRecName")?.let { sizeRecName ->
-                                bodyProfileRecommendedSize = BodyProfileRecommendedSize(storeProduct!!, sizeRecName)
+                                bodyProfileRecommendedSize =
+                                    BodyProfileRecommendedSize(storeProduct!!, sizeRecName)
                                 getRecommendation(
+                                    this,
                                     selectedRecommendedType = SizeRecommendationType.body,
                                     shouldUpdateUserProducts = false,
                                     shouldUpdateUserBodyProfile = false
@@ -151,15 +158,16 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                     }
                     VirtusizeEvents.UserLoggedIn.getEventName() -> {
                         scope.launch {
-                            updateUserSession()
-                            getRecommendation()
+                            updateUserSession(this)
+                            getRecommendation(this)
                         }
                     }
                     VirtusizeEvents.UserLoggedOut.getEventName(), VirtusizeEvents.UserDeletedData.getEventName() -> {
                         scope.launch {
                             clearUserData()
-                            updateUserSession()
+                            updateUserSession(this)
                             getRecommendation(
+                                this,
                                 shouldUpdateUserProducts = false,
                                 shouldUpdateUserBodyProfile = false
                             )
@@ -174,7 +182,7 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
         when (call.method) {
             "setVirtusizeProps" -> {
-                if(call.arguments == null) {
+                if (call.arguments == null) {
                     val error = VirtusizeFlutterErrors.noArguments
                     result.error(error.errorCode, error.errorMessage, null)
                     return
@@ -229,7 +237,7 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 )
             }
             "setUserID" -> {
-                if(call.arguments == null) {
+                if (call.arguments == null) {
                     val error = VirtusizeFlutterErrors.noArguments
                     result.error(error.errorCode, error.errorMessage, null)
                     return
@@ -248,7 +256,7 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                     externalId = externalId,
                     imageUrl = call.argument<String>("imageUrl")
                 )
-                CoroutineScope(Dispatchers.Main).launch {
+                scope.launch {
                     val productDataCheck = repository.productDataCheck(virtusizeProduct)
                     productDataCheck?.let { productDataCheck ->
                         virtusizeProduct.productCheckData = productDataCheck
@@ -271,15 +279,15 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             }
             "getRecommendationText" -> {
                 val storeProductId = call.arguments as? Int
-                if(storeProductId == null) {
+                if (storeProductId == null) {
                     val error = VirtusizeFlutterErrors.argumentNotSet("storeProductId")
                     result.error(error.errorCode, error.errorMessage, null)
                     return
                 }
                 scope.launch {
-                    fetchInitialData(result, storeProductId = storeProductId)
-                    updateUserSession(result)
-                    getRecommendation(result, storeProductId = storeProductId)
+                    fetchInitialData(this, result, storeProductId = storeProductId)
+                    updateUserSession(this, result)
+                    getRecommendation(this, result, storeProductId = storeProductId)
                 }
             }
             "getPrivacyPolicyLink" -> {
@@ -287,12 +295,16 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             }
             "sendOrder" -> {
                 scope.launch {
-                    repository.sendOrder(virtusize, call.arguments as Map<String, Any?>, onSuccess = {
-                        result.success(null)
-                    }, onError = {
-                        val error = VirtusizeFlutterErrors.sendOrder(it.message)
-                        result.error(error.errorCode, error.errorMessage, null)
-                    })
+                    repository.sendOrder(
+                        virtusize,
+                        call.arguments as Map<String, Any?>,
+                        onSuccess = {
+                            result.success(null)
+                        },
+                        onError = {
+                            val error = VirtusizeFlutterErrors.sendOrder(it.message)
+                            result.error(error.errorCode, error.errorMessage, null)
+                        })
                 }
             }
             "addProduct" -> {
@@ -313,7 +325,11 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         }
     }
 
-    private suspend fun fetchInitialData(result: Result, storeProductId: Int) {
+    private suspend fun fetchInitialData(
+        scope: CoroutineScope,
+        result: Result,
+        storeProductId: Int
+    ) {
         selectedUserProductId = null
 
         val storeProduct = repository.getStoreProduct(storeProductId)
@@ -351,7 +367,7 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         }
     }
 
-    private suspend fun updateUserSession(result: Result? = null) {
+    private suspend fun updateUserSession(scope: CoroutineScope, result: Result? = null) {
         val userSessionResponse = repository.getUserSessionResponse()
         if (userSessionResponse == null) {
             if (result != null) {
@@ -371,6 +387,7 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     }
 
     private suspend fun getRecommendation(
+        scope: CoroutineScope,
         result: Result? = null,
         storeProductId: Int? = null,
         selectedRecommendedType: SizeRecommendationType? = null,
@@ -423,7 +440,8 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 }
         }
 
-        val filteredUserProducts = if (selectedUserProductId != null) userProducts?.filter { it.id == selectedUserProductId } else userProducts
+        val filteredUserProducts =
+            if (selectedUserProductId != null) userProducts?.filter { it.id == selectedUserProductId } else userProducts
 
         val userProductRecommendedSize = helper.getUserProductRecommendedSize(
             selectedRecommendedType,
@@ -472,6 +490,7 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
     override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
         channel.setMethodCallHandler(null)
+        scope.cancel()
     }
 
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {
