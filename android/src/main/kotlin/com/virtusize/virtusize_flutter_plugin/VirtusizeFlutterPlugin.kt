@@ -18,29 +18,36 @@ import kotlinx.coroutines.*
 import java.lang.IllegalArgumentException
 
 class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
-    /// The MethodChannel that will create the communication between Flutter and native Android
+    // The MethodChannel that will create the communication between Flutter and native Android
     private lateinit var channel: MethodChannel
 
     private lateinit var context: Context
     private lateinit var repository: VirtusizeFlutterRepository
+    private lateinit var helper: VirtusizeFlutterHelper
     private lateinit var messageHandler: VirtusizeMessageHandler
     private lateinit var scope: CoroutineScope
 
     private var virtusize: Virtusize? = null
-    private var virtusizeProduct: VirtusizeProduct? = null
+
+    // A set to cache the product data check data of all the visited products
     private val virtusizeProductSet = mutableSetOf<VirtusizeProduct>()
+
+    // A stack implemented by a list to record the visited order of the external product IDs that are tied with the Virtusize widgets created on a client's app
     private val externalProductIDStack = mutableListOf<String>()
+
+    // The most recent visited store product on a client's app
     private val storeProduct: Product?
         get() = storeProductSet.firstOrNull { product -> product.externalId == externalProductIDStack.last() }
+
+    // A set to cache the store product information of all the visited products
     private val storeProductSet = mutableSetOf<Product>()
+
+    private var selectedUserProductId: Int? = null
     private var productTypes: List<ProductType>? = null
     private var i18nLocalization: I18nLocalization? = null
     private var userProducts: List<Product>? = null
     private var userBodyProfile: UserBodyProfile? = null
     private var bodyProfileRecommendedSize: BodyProfileRecommendedSize? = null
-    private var storeProductForBodyProfileRecSize: Product? = null
-    private var selectedUserProductId: Int? = null
-    private var helper: VirtusizeFlutterHelper? = null
 
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         channel = MethodChannel(
@@ -51,6 +58,7 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
         context = flutterPluginBinding.applicationContext
         scope = CoroutineScope(Dispatchers.Main)
+
         messageHandler = object : VirtusizeMessageHandler {
             override fun onError(error: VirtusizeError) {
                 scope.launch {
@@ -74,10 +82,13 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 when (event.name) {
                     VirtusizeEvents.UserOpenedWidget.getEventName() -> {
                         scope.launch {
+                            // Unset the selected user product ID
                             selectedUserProductId = null
 
+                            // If the store product that is associated with the current body profile recommended size is different from the most recent one,
+                            // we should update the data for the body profile recommended size
                             val shouldUpdateBodyProfileRecommendedSize =
-                                storeProductForBodyProfileRecSize?.externalId != storeProduct?.externalId
+                                bodyProfileRecommendedSize?.product?.externalId != storeProduct?.externalId
 
                             getRecommendation(
                                 shouldUpdateUserProducts = false,
@@ -129,7 +140,7 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                     VirtusizeEvents.UserUpdatedBodyMeasurements.getEventName() -> {
                         scope.launch {
                             event.data?.optString("sizeRecName")?.let { sizeRecName ->
-                                bodyProfileRecommendedSize = BodyProfileRecommendedSize(sizeRecName)
+                                bodyProfileRecommendedSize = BodyProfileRecommendedSize(storeProduct!!, sizeRecName)
                                 getRecommendation(
                                     selectedRecommendedType = SizeRecommendationType.body,
                                     shouldUpdateUserProducts = false,
@@ -233,15 +244,15 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                     result.error(error.errorCode, error.errorMessage, null)
                     return
                 }
-                virtusizeProduct = VirtusizeProduct(
+                val virtusizeProduct = VirtusizeProduct(
                     externalId = externalId,
                     imageUrl = call.argument<String>("imageUrl")
                 )
                 CoroutineScope(Dispatchers.Main).launch {
-                    val productDataCheck = repository.productDataCheck(virtusizeProduct!!)
+                    val productDataCheck = repository.productDataCheck(virtusizeProduct)
                     productDataCheck?.let { productDataCheck ->
-                        virtusizeProduct!!.productCheckData = productDataCheck
-                        virtusizeProductSet.add(virtusizeProduct!!)
+                        virtusizeProduct.productCheckData = productDataCheck
+                        virtusizeProductSet.add(virtusizeProduct)
                     }
                     result.success(productDataCheck?.jsonString)
                 }
@@ -252,7 +263,7 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 if (virtusizeProduct?.productCheckData == null) {
                     throw IllegalArgumentException("Please call the VirtusizePlugin.instance.setProduct function")
                 }
-                helper?.openVirtusizeView(
+                helper.openVirtusizeView(
                     virtusize,
                     virtusizeProduct,
                     messageHandler
@@ -272,7 +283,7 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 }
             }
             "getPrivacyPolicyLink" -> {
-                result.success(helper?.getPrivacyPolicyLink(virtusize?.displayLanguage))
+                result.success(helper.getPrivacyPolicyLink(virtusize?.displayLanguage))
             }
             "sendOrder" -> {
                 scope.launch {
@@ -367,6 +378,8 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         shouldUpdateUserBodyProfile: Boolean = true,
         shouldUpdateBodyProfileRecommendedSize: Boolean = false
     ) {
+        // The default store product to use for the recommendation is the most recent one
+        // But if the store product ID is not null, we update the store product value
         var storeProduct = storeProduct
         storeProductId?.let { productId ->
             storeProductSet.firstOrNull { product -> product.id == productId }?.let { product ->
@@ -408,12 +421,11 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                         userBodyProfile!!
                     )
                 }
-            storeProductForBodyProfileRecSize = storeProduct
         }
 
         val filteredUserProducts = if (selectedUserProductId != null) userProducts?.filter { it.id == selectedUserProductId } else userProducts
 
-        val userProductRecommendedSize = helper?.getUserProductRecommendedSize(
+        val userProductRecommendedSize = helper.getUserProductRecommendedSize(
             selectedRecommendedType,
             filteredUserProducts,
             storeProduct!!,
@@ -431,7 +443,7 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             )
         )
 
-        val recText = helper?.getRecommendationText(
+        val recText = helper.getRecommendationText(
             selectedRecommendedType,
             storeProduct!!,
             userProductRecommendedSize,
@@ -466,15 +478,9 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         helper = VirtusizeFlutterHelper(binding.activity)
     }
 
-    override fun onDetachedFromActivityForConfigChanges() {
+    override fun onDetachedFromActivityForConfigChanges() {}
 
-    }
+    override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {}
 
-    override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
-
-    }
-
-    override fun onDetachedFromActivity() {
-        helper = null
-    }
+    override fun onDetachedFromActivity() {}
 }
