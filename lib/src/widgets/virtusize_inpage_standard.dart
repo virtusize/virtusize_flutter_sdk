@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:virtusize_flutter_plugin/src/main.dart';
 
+import '../main.dart';
 import '../models/recommendation.dart';
 import '../models/virtusize_product.dart';
 import '../models/product_data_check.dart';
@@ -74,9 +74,9 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
 
     _productSubscription =
         IVirtusizePlugin.instance.productStream.listen((product) {
-      if (_productDataCheck.productId != product.storeProductID || (
-          !isTheSameProduct(_storeProduct, product) &&
-          !isTheSameProduct(_userProduct, product))) {
+      if (_productDataCheck.productId != product.storeProductID ||
+          (!isTheSameProduct(_storeProduct, product) &&
+              !isTheSameProduct(_userProduct, product))) {
         return;
       }
       String imageUrl = product.imageUrl ?? "";
@@ -141,8 +141,7 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
 
   @override
   void dispose() {
-    IVirtusizePlugin.instance
-        .removeProduct(externalProductId: _productDataCheck.externalProductId);
+    IVirtusizePlugin.instance.removeProduct();
     _vsTextSubscription.cancel();
     _pdcSubscription.cancel();
     _productSubscription.cancel();

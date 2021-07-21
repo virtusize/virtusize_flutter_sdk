@@ -51,11 +51,11 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
     });
 
     _pdcSubscription = IVirtusizePlugin.instance.pdcStream.listen((pdc) {
-      if(_isValidProduct != null) {
+      if (_isValidProduct != null) {
         return;
       }
-      IVirtusizePlugin.instance.addProduct(externalProductId: pdc.externalProductId);
-      _externalProductID = pdc.externalProductId;
+      IVirtusizePlugin.instance
+          .addProduct(externalProductId: pdc.externalProductId);
       setState(() {
         _isLoading = true;
         _hasError = false;
@@ -65,23 +65,23 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
 
     _recSubscription =
         IVirtusizePlugin.instance.recStream.listen((recommendation) {
-          if(_externalProductID != recommendation.externalProductID) {
-            return;
-          }
-          setState(() {
-            try {
-              _recText = recommendation.text.replaceAll("<br>", "");
-            } catch (e) {
-              _hasError = true;
-            }
-            _isLoading = false;
-          });
+      if (_externalProductID != recommendation.externalProductID) {
+        return;
+      }
+      setState(() {
+        try {
+          _recText = recommendation.text.replaceAll("<br>", "");
+        } catch (e) {
+          _hasError = true;
+        }
+        _isLoading = false;
+      });
     });
   }
 
   @override
   void dispose() {
-    IVirtusizePlugin.instance.removeProduct(externalProductId: _externalProductID);
+    IVirtusizePlugin.instance.removeProduct();
     _vsTextSubscription.cancel();
     _pdcSubscription.cancel();
     _recSubscription.cancel();
@@ -164,7 +164,8 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
           margin: EdgeInsets.only(top: 5, bottom: 5, left: 4, right: 8),
           child: CTAButton(
               text: _vsText.localization.vsButtonText,
-              textStyle: _vsText.vsFont.getTextStyle(fontSize: VSFontSize.xsmall, fontWeight: FontWeight.bold),
+              textStyle: _vsText.vsFont.getTextStyle(
+                  fontSize: VSFontSize.xsmall, fontWeight: FontWeight.bold),
               textColor: themeColor,
               onPressed: _openVirtusizeWebview))
     ]);

@@ -212,18 +212,15 @@ class IVirtusizePlugin {
     try {
       await _channel.invokeMethod('addProduct', externalProductId);
     } on PlatformException catch (error) {
-      print('Failed to remove the product $externalProductId: $error');
+      print('Failed to add the product $externalProductId: $error');
     }
   }
 
-  Future<void> removeProduct({@required String externalProductId}) async {
-    if (externalProductId == null) {
-      return;
-    }
+  Future<void> removeProduct() async {
     try {
       await _channel.invokeMethod('removeProduct');
     } on PlatformException catch (error) {
-      print('Failed to remove the product $externalProductId: $error');
+      print('Failed to remove a product $error');
     }
   }
 }

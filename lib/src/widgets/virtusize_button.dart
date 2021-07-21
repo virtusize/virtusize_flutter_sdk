@@ -27,23 +27,24 @@ class _VirtusizeButtonState extends State<VirtusizeButton> {
   StreamSubscription<ProductDataCheck> _pdcSubscription;
 
   VSText _vsText = IVirtusizePlugin.instance.vsText;
-  String _externalProductID;
   bool _isValidProduct;
 
   @override
   void initState() {
     super.initState();
 
-    _vsTextSubscription = IVirtusizePlugin.instance.vsTextStream.listen((vsText) {
+    _vsTextSubscription =
+        IVirtusizePlugin.instance.vsTextStream.listen((vsText) {
       _vsText = vsText;
     });
 
-    _pdcSubscription = IVirtusizePlugin.instance.pdcStream.listen((productDataCheck) {
-      if(_isValidProduct != null) {
+    _pdcSubscription =
+        IVirtusizePlugin.instance.pdcStream.listen((productDataCheck) {
+      if (_isValidProduct != null) {
         return;
       }
-      IVirtusizePlugin.instance.addProduct(externalProductId: productDataCheck.externalProductId);
-      _externalProductID = productDataCheck.externalProductId;
+      IVirtusizePlugin.instance
+          .addProduct(externalProductId: productDataCheck.externalProductId);
       setState(() {
         _isValidProduct = productDataCheck.isValidProduct;
       });
@@ -52,7 +53,7 @@ class _VirtusizeButtonState extends State<VirtusizeButton> {
 
   @override
   void dispose() {
-    IVirtusizePlugin.instance.removeProduct(externalProductId: _externalProductID);
+    IVirtusizePlugin.instance.removeProduct();
     _vsTextSubscription.cancel();
     _pdcSubscription.cancel();
     super.dispose();
@@ -95,7 +96,9 @@ class _VirtusizeButtonState extends State<VirtusizeButton> {
           Container(width: 4),
           child != null
               ? child
-              : Text(_vsText.localization.vsButtonText, style: _vsText.vsFont.getTextStyle(fontSize: VSFontSize.small))
+              : Text(_vsText.localization.vsButtonText,
+                  style:
+                      _vsText.vsFont.getTextStyle(fontSize: VSFontSize.small))
         ],
       ),
       style: ElevatedButton.styleFrom(
