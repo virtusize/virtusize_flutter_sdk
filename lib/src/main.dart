@@ -1,6 +1,9 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'models/recommendation.dart';
+import 'models/product.dart';
 import 'models/product_data_check.dart';
 import 'models/virtusize_enums.dart';
 import 'models/virtusize_product.dart';
@@ -10,27 +13,34 @@ class VirtusizePlugin {
 
   ClientProduct product;
   StreamController _pdcController;
-  StreamController _recTextController;
+  StreamController _recController;
+  StreamController _productController;
 
   StreamSink<ProductDataCheck> get _pdcSink =>
       _pdcController.sink;
-
   Stream<ProductDataCheck> get pdcStream =>
       _pdcController.stream;
 
-  StreamSink<String> get _recTextSink =>
-      _recTextController.sink;
+  StreamSink<Product> get _productSink =>
+      _productController.sink;
+  Stream<Product> get productStream =>
+      _productController.stream;
 
-  Stream<String> get recTextStream =>
-      _recTextController.stream;
+  StreamSink<Recommendation> get _recSink =>
+      _recController.sink;
+  Stream<Recommendation> get recStream =>
+      _recController.stream;
 
   VirtusizePlugin._() {
     _pdcController = StreamController<ProductDataCheck>.broadcast();
-    _recTextController = StreamController<String>.broadcast();
+    _productController = StreamController<Product>.broadcast();
+    _recController = StreamController<Recommendation>.broadcast();
     _channel.setMethodCallHandler((call) {
       print(call);
-      if(call.method == "onRecTextChange") {
-        _recTextSink.add(call.arguments);
+      if(call.method == "onRecChange") {
+        _recSink.add(Recommendation(json.encode(call.arguments)));
+      } else if(call.method == "onProduct") {
+        _productSink.add(Product(json.encode(call.arguments)));
       }
       return null;
     });
@@ -98,21 +108,22 @@ class VirtusizePlugin {
     }
   }
 
-  Future<void> setVirtusizeView(String viewType, int id) async {
+  Future<void> getRecommendationText() async {
     try {
-      await _channel.invokeMethod(
-          'setVirtusizeView', {'viewType': viewType.toString(), 'viewId': id});
+      _recSink.add(Recommendation(
+          json.encode(await _channel.invokeMethod('getRecommendationText'))));
     } on PlatformException catch (error) {
-      print('Failed to set VirtusizeView: $error');
+      print('Failed to get RecommendationText: $error');
+      _recSink.add(Recommendation(null));
     }
   }
 
-  Future<void> getRecommendationText() async {
+  Future<String> getPrivacyPolicyLink() async {
     try {
-      _recTextSink.add(await _channel.invokeMethod('getRecommendationText'));
+      return await _channel.invokeMethod('getPrivacyPolicyLink');
     } on PlatformException catch (error) {
-      print('Failed to get RecommendationText: $error');
-      _recTextSink.add(null);
+      print('Failed to get the privacy policy link: $error');
+      return null;
     }
   }
 }

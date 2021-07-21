@@ -1,14 +1,10 @@
 import 'virtusize_model.dart';
 
 class ProductDataCheck extends VirtusizeModel {
-  final dynamic _data;
-  Map<String, dynamic> _decodedData;
 
-  ProductDataCheck(this._data) {
-    _decodedData = decodeJson(_data);
-  }
+  ProductDataCheck(data) : super(data);
 
-  Map<String, dynamic> get data => _decodedData["data"] ?? {};
+  Map<String, dynamic> get data => decodedData["data"] ?? {};
 
   bool get isValidProduct => data["validProduct"] ?? false;
 

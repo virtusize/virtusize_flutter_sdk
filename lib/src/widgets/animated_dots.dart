@@ -18,7 +18,6 @@ class _AnimatedDotsState extends State<AnimatedDots> with TickerProviderStateMix
   void initState() {
     super.initState();
 
-
     _controller = AnimationController(
       vsync: this,
       duration: Duration(milliseconds: 500 * widget.dotNumbers),
@@ -59,12 +58,13 @@ class _AnimatedDotsState extends State<AnimatedDots> with TickerProviderStateMix
           opacity: entry.key as Animation<double>,
           child: Text(entry.value,
               style: TextStyle(
-                  fontWeight: FontWeight.bold, color: VSColor.vsGray900)),
+                  fontWeight: FontWeight.bold, color: VSColors.vsGray900)),
         )).toList()
     );
   }
 
-  dispose() {
+  @override
+  void dispose() {
     _controller.dispose();
     super.dispose();
   }

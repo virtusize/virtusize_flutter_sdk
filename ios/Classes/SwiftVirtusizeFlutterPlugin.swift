@@ -10,11 +10,11 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 	private var currentWorkItem: DispatchWorkItem?
 	private var product: VirtusizeProduct?
 	private var productCheckData: [String: Any]?
-	private var storeProduct: VirtusizeStoreProduct? = nil
+	private var storeProduct: VirtusizeServerProduct? = nil
 	private var productTypes: [VirtusizeProductType]? = nil
 	private var i18nLocalization: VirtusizeI18nLocalization? = nil
 	private var userSessionResponse: String? = ""
-	private var userProducts: [VirtusizeStoreProduct]? = nil
+	private var userProducts: [VirtusizeServerProduct]? = nil
 	private var bodyProfileRecommendedSize: BodyProfileRecommendedSize? = nil
 	private var selectedUserProductId: Int? = nil
 
@@ -86,7 +86,7 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 					return
 				}
 				guard let productId = arguments["externalId"] as? String   else {
-					result(FlutterMethodNotImplemented)
+					result(FlutterError.argumentNotSet("externalId"))
 					return
 				}
 				
@@ -118,7 +118,7 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 				}
 			case "getRecommendationText":
 				guard let storeProductId = self.productCheckData?["productDataId"] as? Int else {
-					result(FlutterError.unKnownError)
+					result(FlutterError.unknown)
 					return
 				}
 				let initialDataWorkItem = DispatchWorkItem { [weak self] in
@@ -149,6 +149,8 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 						recommendationItem.perform()
 					}
 				}
+			case "getPrivacyPolicyLink":
+				result(repository.getPrivacyPolicyLink())
 			default:
 				result(FlutterMethodNotImplemented)
 		}
@@ -161,7 +163,17 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 			workItem?.cancel()
 			return
 		}
-		
+
+		flutterChannel?.invokeMethod(
+			"onProduct",
+			arguments: [
+				"imageType": "store",
+				"imageUrl" : storeProduct?.cloudinaryImageUrlString,
+				"productType": storeProduct?.productType,
+				"productStyle": storeProduct?.productStyle
+			]
+		)
+
 		productTypes = repository.getProductTypes()
 		if productTypes == nil {
 			result(FlutterError.nullAPIResult("productTypes"))
@@ -183,7 +195,13 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 			if let result = result {
 				result(FlutterError.nullAPIResult("userSessionResponse"))
 			} else {
-				flutterChannel?.invokeMethod("onRecTextChange", arguments: nil)
+				flutterChannel?.invokeMethod(
+					"onRecChange",
+					arguments: [
+						"text": nil,
+						"showUserProductImage": false
+					]
+				)
 			}
 			workItem?.cancel()
 			return
@@ -203,7 +221,13 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 				if let result = result {
 					result(FlutterError.nullAPIResult("userProducts"))
 				} else {
-					flutterChannel?.invokeMethod("onRecTextChange", arguments: nil)
+					flutterChannel?.invokeMethod(
+						"onRecChange",
+						arguments: [
+							"text": nil,
+							"showUserProductImage": false
+						]
+					)
 				}
 				workItem?.cancel()
 				return
@@ -225,21 +249,46 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 				: nil
 		}
 		
-
+		let filteredUserProducts = (selectedUserProductId != nil) ?
+		userProducts?.filter { $0.id == selectedUserProductId } : userProducts
+		
+		flutterChannel?.invokeMethod(
+			"onProduct",
+			arguments:  [
+				"imageType": "user",
+				"imageUrl" : filteredUserProducts?.first?.cloudinaryImageUrlString,
+				"productType": filteredUserProducts?.first?.productType,
+				"productStyle": filteredUserProducts?.first?.productStyle
+			]
+		)
+		
+		let userProductRecommendedSize = repository.getUserProductRecommendedSize(
+			selectedRecType: selectedRecommendedType,
+			userProducts: filteredUserProducts,
+			storeProduct: storeProduct!,
+			productTypes: productTypes!
+		)
+		
 		let recText = repository.getRecommendationText(
 			selectedRecType: selectedRecommendedType,
-			userProducts: (selectedUserProductId != nil) ?
-				userProducts?.filter { $0.id == selectedUserProductId } : userProducts,
 			storeProduct: storeProduct!,
-			productTypes: productTypes!,
+			userProductRecommendedSize: userProductRecommendedSize,
 			bodyProfileRecommendedSize: bodyProfileRecommendedSize,
 			i18nLocalization: i18nLocalization!
 		)
 		
+		let arguments: [String : Any] = [
+			"text": recText,
+			"showUserProductImage": userProductRecommendedSize?.bestUserProduct != nil
+		]
+
 		if let result = result {
-			result(recText)
+			result(arguments)
 		} else {
-			flutterChannel?.invokeMethod("onRecTextChange", arguments: recText)
+			flutterChannel?.invokeMethod(
+				"onRecChange",
+				arguments: arguments
+			)
 		}
 	}
 	
@@ -264,7 +313,7 @@ extension SwiftVirtusizeFlutterPlugin: VirtusizeMessageHandler {
 			self?.flutterChannel?.invokeMethod("onVSEvent", arguments: event.data)
 		}
 		
-		var userDataWorkItem: DispatchWorkItem = DispatchWorkItem {}
+		var userDataWorkItem: DispatchWorkItem = DispatchWorkItem { [weak self] in }
 		var recommendationWorkItem: DispatchWorkItem? = nil
 		
 		switch VirtusizeEventName.init(rawValue: event.name) {

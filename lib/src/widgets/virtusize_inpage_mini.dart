@@ -2,10 +2,13 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../models/recommendation.dart';
+import '../models/product_data_check.dart';
 import '../ui/colors.dart';
 import '../ui/images.dart';
 import '../../virtusize_plugin.dart';
-import 'fading_dots.dart';
+import 'cta_button.dart';
+import 'animated_dots.dart';
 
 class VirtusizeInPageMini extends StatefulWidget {
   VirtusizeStyle style = VirtusizeStyle.None;
@@ -13,7 +16,7 @@ class VirtusizeInPageMini extends StatefulWidget {
   final double horizontalMargin;
 
   VirtusizeInPageMini(
-      {this.backgroundColor = VSColor.vsGray900, this.horizontalMargin = 16});
+      {this.backgroundColor = VSColors.vsGray900, this.horizontalMargin = 16});
 
   VirtusizeInPageMini.vsStyle(
       {this.style = VirtusizeStyle.Black, this.horizontalMargin = 16});
@@ -23,43 +26,42 @@ class VirtusizeInPageMini extends StatefulWidget {
 }
 
 class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
-  StreamSubscription<ProductDataCheck> pdcSubscription;
-  StreamSubscription<String> recTextSubscription;
+  StreamSubscription<ProductDataCheck> _pdcSubscription;
+  StreamSubscription<Recommendation> _recSubscription;
   bool _isValidProduct = false;
-  bool _isLoading = true;
-  bool _hasError = false;
-  String _recText = "読み込み中";
+  bool _isLoading;
+  bool _hasError;
+  String _recText = "サイズを分析中";
 
   @override
   void initState() {
     super.initState();
 
-    pdcSubscription = VirtusizePlugin.instance.pdcStream.listen((pdc) {
+    _pdcSubscription = VirtusizePlugin.instance.pdcStream.listen((pdc) {
       setState(() {
+        _isLoading = true;
+        _hasError = false;
         _isValidProduct = pdc.isValidProduct;
       });
     });
 
-    recTextSubscription =
-        VirtusizePlugin.instance.recTextStream.listen((recText) {
+    _recSubscription =
+        VirtusizePlugin.instance.recStream.listen((recommendation) {
       setState(() {
-        _isLoading = false;
         try {
-          _recText = recText
-              .replaceAll("%{boldStart}", "")
-              .replaceAll("%{boldEnd}", "");
-          _hasError = false;
+          _recText = recommendation.text.replaceAll("<br>", "");
         } catch (e) {
           _hasError = true;
         }
+        _isLoading = false;
       });
     });
   }
 
   @override
   void dispose() {
-    pdcSubscription.cancel();
-    recTextSubscription.cancel();
+    _pdcSubscription.cancel();
+    _recSubscription.cancel();
     super.dispose();
   }
 
@@ -82,15 +84,15 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
     Color color;
     switch (widget.style) {
       case VirtusizeStyle.Black:
-        color = VSColor.vsGray900;
+        color = VSColors.vsGray900;
         break;
       case VirtusizeStyle.None:
         color = widget.backgroundColor;
         break;
       case VirtusizeStyle.Teal:
-        color = VSColor.vsTeal;
+        color = VSColors.vsTeal;
         break;
-      }
+    }
     return Container(
         margin: EdgeInsets.symmetric(horizontal: widget.horizontalMargin),
         color: _isLoading || _hasError ? Colors.white : color,
@@ -98,23 +100,28 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
         child: _hasError
             ? _createVSInPageMiniOnError()
             : _isLoading
-            ? _createVSInPageMiniOnLoading()
-            : _createVSInPageMiniOnFinishedLoading(themeColor: color));
-
+                ? _createVSInPageMiniOnLoading()
+                : _createVSInPageMiniOnFinishedLoading(themeColor: color));
   }
 
   Widget _createVSInPageMiniOnLoading() {
     return Row(children: [
       Container(
           margin: EdgeInsets.only(left: 6),
-          child: ImageIcon(VSImages.vsIcon.image, size: 16)),
+          child: Container(
+            width: 16,
+            child: Image(
+                image: VSImages.vsIcon.image,
+                fit: BoxFit.cover,
+                color: VSColors.vsGray900),
+          )),
       Container(
         margin: EdgeInsets.only(top: 6, bottom: 6, left: 5),
         child: Text(_recText,
             style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 12,
-                color: _isLoading ? VSColor.vsGray900 : Colors.white)),
+                color: _isLoading ? VSColors.vsGray900 : Colors.white)),
       ),
       Container(width: 1.0),
       AnimatedDots()
@@ -131,44 +138,26 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
       )),
       Container(
           margin: EdgeInsets.only(top: 5, bottom: 5, left: 4, right: 8),
-          child: _createVSSizeCheckButton(themeColor: themeColor))
+          child: CTAButton(
+              textColor: themeColor, onPressed: _openVirtusizeWebview))
     ]);
-  }
-
-  Widget _createVSSizeCheckButton({Color themeColor}) {
-    return ElevatedButton(
-      child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
-        Text('サイズチェック',
-            style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
-        Container(width: 1.0),
-        ImageIcon(VSImages.rightArrow.image, size: 9, color: themeColor)
-      ]),
-      style: ElevatedButton.styleFrom(
-          elevation: 0,
-          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          minimumSize: Size.zero,
-          padding: EdgeInsets.symmetric(vertical: 4, horizontal: 6),
-          //change background color of button
-          primary: Colors.white,
-          //change text color of button
-          onPrimary: themeColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(100),
-          )),
-      onPressed: _openVirtusizeWebview,
-    );
   }
 
   Widget _createVSInPageMiniOnError() {
     return Row(children: [
       Container(
           margin: EdgeInsets.only(left: 6),
-          child: ImageIcon(VSImages.errorHanger.image,
-              size: 20, color: VSColor.vsGray700)),
+          child: Container(
+            width: 20,
+            child: Image(
+                image: VSImages.errorHanger.image,
+                fit: BoxFit.cover,
+                color: VSColors.vsGray700),
+          )),
       Container(
         margin: EdgeInsets.only(top: 6, bottom: 6, left: 5),
         child: Text("現在バーチャサイズは使えません。",
-            style: TextStyle(fontSize: 12, color: VSColor.vsGray700)),
+            style: TextStyle(fontSize: 12, color: VSColors.vsGray700)),
       )
     ]);
   }

@@ -17,7 +17,6 @@ import io.flutter.plugin.common.MethodChannel.Result
 import kotlinx.coroutines.*
 import java.lang.IllegalArgumentException
 
-
 class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     /// The MethodChannel that will create the communication between Flutter and native Android
     private lateinit var channel: MethodChannel
@@ -148,28 +147,24 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             }
         }
         repository = VirtusizeFlutterRepository(context, messageHandler)
-
-        // Register the VirtusizeButton
-        flutterPluginBinding.platformViewRegistry.registerViewFactory(
-            "com.virtusize/virtusize_button",
-            FLVirtusizeButtonFactory()
-        )
-
-        flutterPluginBinding.platformViewRegistry.registerViewFactory(
-            "com.virtusize/virtusize_inpage_standard",
-            FLVirtusizeInPageStandardFactory(flutterPluginBinding.binaryMessenger)
-        )
     }
 
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
         when (call.method) {
             "setVirtusizeProps" -> {
+                if(call.arguments == null) {
+                    val error = VirtusizeFlutterErrors.noArguments
+                    result.error(error.errorCode, error.errorCode, null)
+                    return
+                }
+
                 var virtusizeBuilder = VirtusizeBuilder().init(context)
 
                 call.argument<String>("apiKey")?.let { apiKey ->
                     virtusizeBuilder = virtusizeBuilder.setApiKey(apiKey)
                 } ?: run {
-                    result.error("-1", "apiKey is null", null)
+                    val error = VirtusizeFlutterErrors.argumentNotSet("apiKey")
+                    result.error(error.errorCode, error.errorMessage, null)
                     return
                 }
 
@@ -208,7 +203,11 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             }
             "getProductDataCheck" -> {
                 val externalId = call.argument<String>("externalId")
-                    ?: throw IllegalArgumentException("Please set the product's external ID")
+                if (externalId == null) {
+                    val error = VirtusizeFlutterErrors.argumentNotSet("externalId")
+                    result.error(error.errorCode, error.errorMessage, null)
+                    return
+                }
                 virtusizeProduct = VirtusizeProduct(
                     externalId = externalId,
                     imageUrl = call.argument<String>("imageUrl")
@@ -220,7 +219,7 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             }
             "openVirtusizeWebView" -> {
                 if (virtusizeProduct == null || productDataCheck == null) {
-                    throw IllegalArgumentException("Please invoke getProductDataCheck")
+                    throw IllegalArgumentException("Please call the VirtusizePlugin.instance.setProduct function")
                 }
                 helper?.openVirtusizeView(
                     virtusize,
@@ -229,33 +228,20 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                     messageHandler
                 )
             }
-            "setVirtusizeView" -> {
-                val type = call.argument<String>("viewType")
-                call.argument<Int>("viewId")?.let {
-                    if (type == "VirtusizeButton") {
-                        virtusize?.setupVirtusizeView(FLVirtusizeButton.virtusizeButtons.get(it))
-                    } else if (type == "VirtusizeInPageStandard") {
-                        virtusize?.setupVirtusizeView(
-                            FLVirtusizeInPageStandard.virtusizeInPageStandards.get(
-                                it
-                            )
-                        )
-                    }
-                    result.success(true)
-                } ?: run {
-                    result.error("-1", "viewId is null", null)
-                }
-            }
             "getRecommendationText" -> {
                 scope.launch {
                     if (productDataCheck?.data?.productDataId == null) {
-                        result.error("-1", "this code shouldn't get executed", null)
+                        val error = VirtusizeFlutterErrors.unKnown
+                        result.error(error.errorCode, error.errorMessage, null)
                         return@launch
                     }
                     fetchInitialData(result)
                     updateUserSession(result)
                     getRecommendation(result)
                 }
+            }
+            "getPrivacyPolicyLink" -> {
+                result.success(helper?.getPrivacyPolicyLink(virtusize?.displayLanguage))
             }
             else -> {
                 result.notImplemented()
@@ -267,19 +253,32 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         storeProduct =
             repository.getStoreProduct(productDataCheck?.data?.productDataId!!)
         if (storeProduct == null) {
-            result.error("-1", "storeProduct is null", null)
+            val error = VirtusizeFlutterErrors.nullAPIResult("storeProduct")
+            result.error(error.errorCode, error.errorMessage, null)
             scope.cancel()
         }
 
+        channel.invokeMethod(
+            "onProduct",
+            mutableMapOf(
+                "imageType" to "store",
+                "imageUrl" to storeProduct!!.getProductImageURL(),
+                "productType" to storeProduct!!.productType,
+                "productStyle" to storeProduct!!.storeProductMeta?.additionalInfo?.style
+            )
+        )
+
         productTypes = repository.getProductTypes()
         if (productTypes == null) {
-            result.error("-1", "productTypes is null", null)
+            val error = VirtusizeFlutterErrors.nullAPIResult("productTypes")
+            result.error(error.errorCode, error.errorMessage, null)
             scope.cancel()
         }
 
         i18nLocalization = repository.getI18nLocalization(virtusize?.displayLanguage)
         if (i18nLocalization == null) {
-            result.error("-1", "i18nLocalization is null", null)
+            val error = VirtusizeFlutterErrors.nullAPIResult("i18nLocalization")
+            result.error(error.errorCode, error.errorMessage, null)
             scope.cancel()
         }
     }
@@ -288,9 +287,16 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         val userSessionResponse = repository.getUserSessionResponse()
         if (userSessionResponse == null) {
             if (result != null) {
-                result.error("-1", "userSessionResponse is null", null)
+                val error = VirtusizeFlutterErrors.nullAPIResult("userSessionResponse")
+                result.error(error.errorCode, error.errorMessage, null)
             } else {
-                channel.invokeMethod("onRecTextChange", null)
+                channel.invokeMethod(
+                    "onRecChange",
+                    mutableMapOf(
+                        "text" to null,
+                        "showUserProductImage" to false
+                    )
+                )
             }
             scope.cancel()
         }
@@ -306,9 +312,16 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             userProducts = repository.getUserProducts()
             if (userProducts == null) {
                 if (result != null) {
-                    result.error("-1", "userProducts is null", null)
+                    val error = VirtusizeFlutterErrors.nullAPIResult("userProducts")
+                    result.error(error.errorCode, error.errorMessage, null)
                 } else {
-                    channel.invokeMethod("onRecTextChange", mutableMapOf("error" to "userProducts is null"))
+                    channel.invokeMethod(
+                        "onRecChange",
+                        mutableMapOf(
+                            "text" to null,
+                            "showUserProductImage" to false
+                        )
+                    )
                 }
                 scope.cancel()
             }
@@ -328,16 +341,40 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 }
         }
 
+        val filteredUserProducts = if (selectedUserProductId != null) userProducts?.filter { it.id == selectedUserProductId } else userProducts
+
+        channel.invokeMethod(
+            "onProduct",
+            mutableMapOf(
+                "imageType" to "user",
+                "imageUrl" to filteredUserProducts?.firstOrNull()?.getProductImageURL(),
+                "productType" to filteredUserProducts?.firstOrNull()?.productType,
+                "productStyle" to filteredUserProducts?.firstOrNull()?.storeProductMeta?.additionalInfo?.style
+            )
+        )
+
+        val userProductRecommendedSize = helper?.getUserProductRecommendedSize(
+            selectedRecommendedType,
+            filteredUserProducts,
+            storeProduct!!,
+            productTypes!!
+        )
+
         val recText = helper?.getRecommendationText(
             selectedRecommendedType,
-            if (selectedUserProductId != null) userProducts?.filter { it.id == selectedUserProductId } else userProducts,
             storeProduct!!,
-            productTypes!!,
+            userProductRecommendedSize,
             bodyProfileRecommendedSize,
             i18nLocalization!!
         )
-        result?.success(recText) ?: run {
-            channel.invokeMethod("onRecTextChange", recText)
+
+        val resultMap = mutableMapOf(
+            "text" to recText,
+            "showUserProductImage" to (userProductRecommendedSize?.bestUserProduct != null)
+        )
+
+        result?.success(resultMap) ?: run {
+            channel.invokeMethod("onRecChange", resultMap)
         }
     }
 
