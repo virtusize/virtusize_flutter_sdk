@@ -117,8 +117,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
     VirtusizePlugin.instance.sendOrder(
         order: order,
-        onSuccess: (order) {
-          print("Successfully sent the order $order");
+        onSuccess: (sentOrder) {
+          print("Successfully sent the order $sentOrder");
         },
         onError: (error) {
           print(error);

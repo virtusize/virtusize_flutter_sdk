@@ -231,7 +231,7 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
                 result.success(
                     mutableMapOf(
-                        "virtusizeProp" to call.arguments.toString(),
+                        "virtusizeProps" to call.arguments.toString(),
                         "displayLang" to virtusize?.displayLanguage?.value
                     )
                 )
@@ -243,7 +243,6 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                     return
                 }
                 virtusize?.setUserId(call.arguments.toString())
-                result.success(null)
             }
             "getProductDataCheck" -> {
                 val externalId = call.argument<String>("externalId")
@@ -299,7 +298,7 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                         virtusize,
                         call.arguments as Map<String, Any?>,
                         onSuccess = {
-                            result.success(null)
+                            result.success(call.arguments)
                         },
                         onError = {
                             val error = VirtusizeFlutterErrors.sendOrder(it.message)

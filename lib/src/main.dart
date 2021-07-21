@@ -149,12 +149,12 @@ class VirtusizePlugin {
 
   Future<void> sendOrder(
       {@required VirtusizeOrder order,
-      Function(Map<String, dynamic> orderData) onSuccess,
+      Function(Map<dynamic, dynamic> sentOrder) onSuccess,
       Function(Exception e) onError}) async {
     try {
-      await IVirtusizePlugin.instance._channel
+      Map<dynamic, dynamic> sentOrder = await IVirtusizePlugin.instance._channel
           .invokeMethod('sendOrder', order.toJson());
-      onSuccess(order.toJson());
+      onSuccess(sentOrder);
     } on PlatformException catch (error) {
       print('Failed to send the order: $error');
       onError(error);

@@ -97,7 +97,7 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 				
 				Virtusize.params = virtusizeBuilder.build()
 				result([
-					"virtusizeProp": arguments,
+					"virtusizeProps": arguments,
 					"displayLang": Virtusize.displayLanguage?.rawValue
 				])
 			case "setUserID":
