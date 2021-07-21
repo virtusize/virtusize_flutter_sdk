@@ -3,19 +3,29 @@ import UIKit
 import Virtusize
 
 public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
-	
+
+	/// The FlutterMethodChannel that will create the communication between Flutter and native iOS
 	private var flutterChannel: FlutterMethodChannel?
-	
+
 	private let repository = VirtusizeFlutterRepository.shared
 	private var currentWorkItem: DispatchWorkItem?
+
+	/// A set to cache the product data check data of all the visited products
 	private var storeProductSet: Set<VirtusizeProduct> = []
+
+	/// A stack implemented by a list to record the visited order of the external product IDs that are tied with the Virtusize widgets created on a client's app
 	private var externalProductIDStack: [String] = []
+
+	/// A set to cache the store product information of all the visited products
 	private var serverStoreProductSet: Set<VirtusizeServerProduct> = []
+
+	/// The most recent visited store product on a client's app
 	private var storeProduct: VirtusizeServerProduct? {
 		get {
 			serverStoreProductSet.filter({ $0.externalId == externalProductIDStack.last }).first
 		}
 	}
+
 	private var productTypes: [VirtusizeProductType]? = nil
 	private var i18nLocalization: VirtusizeI18nLocalization? = nil
 	private var userSessionResponse: String? = ""
@@ -261,6 +271,8 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 		shouldUpdateUserBodyProfile: Bool = true,
 		shouldUpdateBodyProfileRecommendedSize: Bool = false
 	) {
+		// The default store product to use for the recommendation is the most recent one
+		// But if the store product ID is not null, we update the store product value
 		var storeProduct = storeProduct
 		if let productId = storeProductId,
 		   let product = serverStoreProductSet.filter({ product in
@@ -382,8 +394,11 @@ extension SwiftVirtusizeFlutterPlugin: VirtusizeMessageHandler {
 		var recommendationWorkItem: DispatchWorkItem? = nil
 		switch VirtusizeEventName.init(rawValue: event.name) {
 			case .userOpenedWidget:
+				// Unset the selected user product ID
 				selectedUserProductId = nil
 				
+				// If the store product that is associated with the current body profile recommended size is different from the most recent one,
+				// we should update the data for the body profile recommended size
 				let shouldUpdateBodyProfileRecommendedSize = bodyProfileRecommendedSize?.product?.externalId != storeProduct?.externalId
 
 				recommendationWorkItem = DispatchWorkItem { [weak self] in
