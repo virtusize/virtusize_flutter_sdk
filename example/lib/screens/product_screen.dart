@@ -1,24 +1,42 @@
+import 'dart:math';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:virtusize_flutter_plugin/virtusize_plugin.dart';
 
 class ProductScreen extends StatefulWidget {
-  String externalID;
+  final String externalID;
 
-  ProductScreen({this.externalID = 'vs_dress'});
+  ProductScreen({this.externalID});
 
   @override
   State<StatefulWidget> createState() => _ProductScreenState();
 }
 
 class _ProductScreenState extends State<ProductScreen> {
+  static const List<String> _externalIDList = [
+    "vs_dress",
+    "vs_top",
+    "vs_shirt",
+    "vs_coat",
+    "vs_jacket",
+    "vs_sweater",
+    "vs_skirt",
+    "vs_pants"
+  ];
+
+
+  String _externalID;
+
   @override
   void initState() {
     super.initState();
 
+    _externalID = widget.externalID ?? _externalIDList[Random().nextInt(_externalIDList.length)];
+
     VirtusizePlugin.instance.setProduct(
         // Set the product's external ID
-        externalId: widget.externalID,
+        externalId: _externalID,
         // Set the product image URL
         imageUrl: 'http://www.image.com/goods/12345.jpg');
 
@@ -38,7 +56,7 @@ class _ProductScreenState extends State<ProductScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text('Virtusize Example App'),
+          title: Text('Virtusize Product $_externalID'),
         ),
         body: Center(
             child:

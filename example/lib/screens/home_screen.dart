@@ -89,7 +89,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         onPressed: () {
                           Navigator.push(context,
                               CupertinoPageRoute(builder: (_) {
-                            return ProductScreen(externalID: "vs_pants");
+                            return ProductScreen();
                           }));
                         },
                         child: Text("Go to next product page")))
