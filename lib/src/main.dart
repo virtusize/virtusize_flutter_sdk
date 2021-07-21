@@ -2,13 +2,15 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'utils/virtusize_message_listener.dart';
+
 import 'models/recommendation.dart';
 import 'models/product.dart';
 import 'models/product_data_check.dart';
 import 'models/virtusize_enums.dart';
 import 'models/virtusize_order.dart';
 import 'models/virtusize_product.dart';
+import 'res/text.dart';
+import 'utils/virtusize_message_listener.dart';
 
 
 class VirtusizePlugin {
@@ -17,11 +19,17 @@ class VirtusizePlugin {
   static const MethodChannel _channel =
   const MethodChannel('com.virtusize/virtusize_flutter_plugin');
 
-  ClientProduct product;
+  ClientProduct _product;
+  StreamController _vsTextController;
   StreamController _pdcController;
   StreamController _recController;
   StreamController _productController;
   VirtusizeMessageListener _virtusizeMessageListener;
+
+  StreamSink<VSText> get _vsTextSink =>
+      _vsTextController.sink;
+  Stream<VSText> get vsTextStream =>
+      _vsTextController.stream;
 
   StreamSink<ProductDataCheck> get _pdcSink =>
       _pdcController.sink;
@@ -39,6 +47,7 @@ class VirtusizePlugin {
       _recController.stream;
 
   VirtusizePlugin._() {
+    _vsTextController = StreamController<VSText>.broadcast();
     _pdcController = StreamController<ProductDataCheck>.broadcast();
     _productController = StreamController<Product>.broadcast();
     _recController = StreamController<Recommendation>.broadcast();
@@ -63,7 +72,7 @@ class VirtusizePlugin {
   Future<void> setVirtusizeProps({@required String apiKey,
       String externalUserId,
       Env env = Env.global,
-      Language language = Language.jp,
+      Language language,
       bool showSGI = false,
       List<Language> allowedLanguages = Language.values,
       List<InfoCategory> detailsPanelCards = InfoCategory.values
@@ -72,11 +81,11 @@ class VirtusizePlugin {
       throw FlutterError("The API key is required");
     }
     try {
-      await _channel.invokeMethod('setVirtusizeProps', {
+      Map<dynamic, dynamic> result = await _channel.invokeMethod('setVirtusizeProps', {
         'apiKey': apiKey,
         'externalUserId': externalUserId,
         'env': env.value,
-        'language': language.value,
+        'language': language != null ? language.value : null,
         'showSGI': showSGI,
         'allowedLanguages': allowedLanguages.map((language) {
           return language.value;
@@ -84,6 +93,9 @@ class VirtusizePlugin {
         'detailsPanelCards': detailsPanelCards.map((infoCategory) {
           return infoCategory.value;
         }).toList()
+      });
+      VSText.load(result["displayLang"], language).then((value) {
+        _vsTextSink.add(value);
       });
     } on PlatformException catch (error) {
       print('Failed to set the Virtusize props: $error');
@@ -103,7 +115,7 @@ class VirtusizePlugin {
   }
 
   Future<void> setProduct({@required String externalId, String imageUrl}) async {
-    product = ClientProduct(externalId: externalId, imageUrl: imageUrl);
+    _product = ClientProduct(externalId: externalId, imageUrl: imageUrl);
     ProductDataCheck productDataCheck = await _currentProductDataCheck;
     _pdcSink.add(productDataCheck);
     if(productDataCheck.isValidProduct) {
@@ -114,9 +126,9 @@ class VirtusizePlugin {
   Future<ProductDataCheck> get _currentProductDataCheck async {
     try {
       ProductDataCheck productDataCheck = await _channel.invokeMethod('getProductDataCheck', {
-        'externalId': product.externalId,
-        'imageUrl': product.imageUrl
-      }).then((value) => ProductDataCheck(value, product.externalId));
+        'externalId': _product.externalId,
+        'imageUrl': _product.imageUrl
+      }).then((value) => ProductDataCheck(value, _product.externalId));
       if(_virtusizeMessageListener != null) {
         _virtusizeMessageListener.productDataCheckData.call(productDataCheck);
       }

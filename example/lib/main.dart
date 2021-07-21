@@ -74,7 +74,7 @@ class _MyAppState extends State<MyApp> {
                   Center(
                       child: VirtusizeButton(
                     child: ElevatedButton.icon(
-                        label: Text('サイズチェック', style: TextStyle(fontSize: 12)),
+                        label: Text('Custom Button', style: TextStyle(fontSize: 12)),
                         icon: Icon(Icons.account_circle_rounded),
                         style: ElevatedButton.styleFrom(
                             primary: Color(0xFF191919),
