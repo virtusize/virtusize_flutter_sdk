@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import '../ui/colors.dart';
-import '../ui/images.dart';
+import '../resources/colors.dart';
+import '../resources/images.dart';
 
 class CTAButton extends StatelessWidget {
   final Color backgroundColor;

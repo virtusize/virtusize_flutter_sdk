@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 
 import '../models/recommendation.dart';
 import '../models/product_data_check.dart';
-import '../ui/colors.dart';
-import '../ui/images.dart';
+import '../resources/colors.dart';
+import '../resources/images.dart';
 import '../../virtusize_plugin.dart';
 import 'cta_button.dart';
 import 'animated_dots.dart';

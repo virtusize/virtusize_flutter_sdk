@@ -2,19 +2,26 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'utils/virtusize_message_listener.dart';
 import 'models/recommendation.dart';
 import 'models/product.dart';
 import 'models/product_data_check.dart';
 import 'models/virtusize_enums.dart';
+import 'models/virtusize_order.dart';
 import 'models/virtusize_product.dart';
+
 
 class VirtusizePlugin {
   static final VirtusizePlugin instance = VirtusizePlugin._();
+
+  static const MethodChannel _channel =
+  const MethodChannel('com.virtusize/virtusize_flutter_plugin');
 
   ClientProduct product;
   StreamController _pdcController;
   StreamController _recController;
   StreamController _productController;
+  VirtusizeMessageListener _virtusizeMessageListener;
 
   StreamSink<ProductDataCheck> get _pdcSink =>
       _pdcController.sink;
@@ -36,18 +43,22 @@ class VirtusizePlugin {
     _productController = StreamController<Product>.broadcast();
     _recController = StreamController<Recommendation>.broadcast();
     _channel.setMethodCallHandler((call) {
-      print(call);
       if(call.method == "onRecChange") {
         _recSink.add(Recommendation(json.encode(call.arguments)));
       } else if(call.method == "onProduct") {
         _productSink.add(Product(json.encode(call.arguments)));
+      } else if(call.method == "onVSEvent") {
+        if(_virtusizeMessageListener != null) {
+          _virtusizeMessageListener.vsEvent.call(call.arguments);
+        }
+      } else if(call.method == "onVSError") {
+        if(_virtusizeMessageListener != null) {
+          _virtusizeMessageListener.vsError.call(call.arguments);
+        }
       }
       return null;
     });
   }
-
-  static const MethodChannel _channel =
-      const MethodChannel('com.virtusize/virtusize_flutter_plugin');
 
   Future<void> setVirtusizeProps({@required String apiKey,
       String externalUserId,
@@ -79,23 +90,42 @@ class VirtusizePlugin {
     }
   }
 
+  Future<void> setUserID(String userId) async {
+    if(userId == null || userId.isEmpty) {
+      print('Failed to set the external user ID: userId is null or empty');
+      return;
+    }
+    try {
+      await _channel.invokeMethod('setUserID', userId);
+    } on PlatformException catch (error) {
+      print('Failed to set the external user ID: $error');
+    }
+  }
+
   Future<void> setProduct({@required String externalId, String imageUrl}) async {
     product = ClientProduct(externalId: externalId, imageUrl: imageUrl);
-    ProductDataCheck productDataCheck = await currentProductDataCheck;
+    ProductDataCheck productDataCheck = await _currentProductDataCheck;
     _pdcSink.add(productDataCheck);
     if(productDataCheck.isValidProduct) {
       getRecommendationText();
     }
   }
 
-  Future<ProductDataCheck> get currentProductDataCheck async {
+  Future<ProductDataCheck> get _currentProductDataCheck async {
     try {
-      return await _channel.invokeMethod('getProductDataCheck', {
+      ProductDataCheck productDataCheck = await _channel.invokeMethod('getProductDataCheck', {
         'externalId': product.externalId,
         'imageUrl': product.imageUrl
-      }).then((value) => ProductDataCheck(value));
+      }).then((value) => ProductDataCheck(value, product.externalId));
+      if(_virtusizeMessageListener != null) {
+        _virtusizeMessageListener.productDataCheckData.call(productDataCheck);
+      }
+      return productDataCheck;
     } on PlatformException catch (error) {
       print('Failed to set VirtusizeProduct: $error');
+      if(_virtusizeMessageListener != null) {
+        _virtusizeMessageListener.productDataCheckError.call(error);
+      }
     }
     return null;
   }
@@ -124,6 +154,20 @@ class VirtusizePlugin {
     } on PlatformException catch (error) {
       print('Failed to get the privacy policy link: $error');
       return null;
+    }
+  }
+
+  void setVirtusizeMessageListener(VirtusizeMessageListener listener) {
+    _virtusizeMessageListener = listener;
+  }
+
+  Future<void> sendOrder({@required VirtusizeOrder order, Function(Map<String, dynamic> orderData) onSuccess, Function(Exception e) onError}) async {
+    try {
+      await _channel.invokeMethod('sendOrder', order.toJson());
+      onSuccess(order.toJson());
+    } on PlatformException catch (error) {
+      print('Failed to send the order: $error');
+      onError(error);
     }
   }
 }
