@@ -21,7 +21,6 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 	private var userSessionResponse: String? = ""
 	private var userProducts: [VirtusizeServerProduct]? = nil
 	private var userBodyProfile: VirtusizeUserBodyProfile? = nil
-	private var storeProductForBodyProfileRecSize: VirtusizeServerProduct? = nil
 	private var bodyProfileRecommendedSize: BodyProfileRecommendedSize? = nil
 	private var selectedUserProductId: Int? = nil
 
@@ -306,11 +305,11 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 					userBodyProfile: userBodyProfile!
 				)
 				: nil
-			storeProductForBodyProfileRecSize = storeProduct
+			bodyProfileRecommendedSize?.product = storeProduct
 		}
 
 		let filteredUserProducts = (selectedUserProductId != nil) ?
-		userProducts?.filter { $0.id == selectedUserProductId } : userProducts
+			userProducts?.filter { $0.id == selectedUserProductId } : userProducts
 		
 		let userProductRecommendedSize = repository.getUserProductRecommendedSize(
 			selectedRecType: selectedRecommendedType,
@@ -385,7 +384,7 @@ extension SwiftVirtusizeFlutterPlugin: VirtusizeMessageHandler {
 			case .userOpenedWidget:
 				selectedUserProductId = nil
 				
-				let shouldUpdateBodyProfileRecommendedSize = storeProductForBodyProfileRecSize?.externalId != storeProduct?.externalId
+				let shouldUpdateBodyProfileRecommendedSize = bodyProfileRecommendedSize?.product?.externalId != storeProduct?.externalId
 
 				recommendationWorkItem = DispatchWorkItem { [weak self] in
 					self?.getRecommendation(
@@ -434,7 +433,7 @@ extension SwiftVirtusizeFlutterPlugin: VirtusizeMessageHandler {
 				}
 			case .userUpdatedBodyMeasurements:
 				if let sizeRecName = (event.data as? [String: Any])?["sizeRecName"] as? String {
-					bodyProfileRecommendedSize = BodyProfileRecommendedSize(sizeName: sizeRecName)
+					bodyProfileRecommendedSize = BodyProfileRecommendedSize(sizeName: sizeRecName, product: storeProduct)
 					recommendationWorkItem = DispatchWorkItem { [weak self] in
 						self?.getRecommendation(
 							self?.currentWorkItem,
