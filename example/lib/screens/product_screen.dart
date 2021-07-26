@@ -38,7 +38,7 @@ class _ProductScreenState extends State<ProductScreen> {
         // Set the product's external ID
         externalId: _externalID,
         // Set the product image URL
-        imageUrl: 'http://www.image.com/goods/12345.jpg');
+        imageURL: 'http://www.image.com/goods/12345.jpg');
 
     VirtusizePlugin.instance.setVirtusizeMessageListener(
         VirtusizeMessageListener(vsEvent: (eventName) {

@@ -66,7 +66,7 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         messageHandler = object : VirtusizeMessageHandler {
             override fun onError(error: VirtusizeError) {
                 scope.launch {
-                    channel.invokeMethod(VirtusizeFlutterMethod.VS_ERROR, error.toString())
+                    channel.invokeMethod(VirtusizeFlutterMethod.ON_VS_ERROR, error.toString())
                 }
             }
 
@@ -80,7 +80,7 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 }
                 eventName?.let {
                     scope.launch {
-                        channel.invokeMethod(VirtusizeFlutterMethod.VS_EVENT, eventName)
+                        channel.invokeMethod(VirtusizeFlutterMethod.ON_VS_EVENT, eventName)
                     }
                 }
 
@@ -185,7 +185,7 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
         when (call.method) {
-            "setVirtusizeProps" -> {
+            VirtusizeFlutterMethod.SET_VIRTUSIZE_PROPS -> {
                 if (call.arguments == null) {
                     val error = VirtusizeFlutterErrors.noArguments
                     result.error(error.errorCode, error.errorMessage, null)
@@ -240,7 +240,7 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                     )
                 )
             }
-            "setUserID" -> {
+            VirtusizeFlutterMethod.SET_USER_ID -> {
                 if (call.arguments == null) {
                     val error = VirtusizeFlutterErrors.noArguments
                     result.error(error.errorCode, error.errorMessage, null)
@@ -248,7 +248,7 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 }
                 virtusize?.setUserId(call.arguments.toString())
             }
-            "getProductDataCheck" -> {
+            VirtusizeFlutterMethod.GET_PRODUCT_DATA_CHECK -> {
                 val externalId = call.argument<String>(VirtusizeFlutterKey.EXTERNAL_PRODUCT_ID)
                 if (externalId == null) {
                     val error = VirtusizeFlutterErrors.argumentNotSet(VirtusizeFlutterKey.EXTERNAL_PRODUCT_ID)
@@ -268,7 +268,7 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                     result.success(productDataCheck?.jsonString)
                 }
             }
-            "openVirtusizeWebView" -> {
+            VirtusizeFlutterMethod.OPEN_VIRTUSIZE_WEB_VIEW -> {
                 val virtusizeProduct =
                     virtusizeProductSet.firstOrNull { product -> product.externalId == externalProductIDStack.last() }
                 if (virtusizeProduct?.productCheckData == null) {
@@ -281,7 +281,7 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                     messageHandler
                 )
             }
-            "getRecommendationText" -> {
+            VirtusizeFlutterMethod.GET_RECOMMENDATION_TEXT -> {
                 val storeProductId = call.arguments as? Int
                 if(storeProductId == null) {
                     val error = VirtusizeFlutterErrors.argumentNotSet(VirtusizeFlutterKey.STORE_PRODUCT_ID)
@@ -294,10 +294,10 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                     getRecommendation(this, result, storeProductId = storeProductId)
                 }
             }
-            "getPrivacyPolicyLink" -> {
+            VirtusizeFlutterMethod.GET_PRIVACY_POLICY_LINK -> {
                 result.success(VirtusizeFlutterUtils.getPrivacyPolicyLink(context, virtusize?.displayLanguage))
             }
-            "sendOrder" -> {
+            VirtusizeFlutterMethod.SEND_ORDER -> {
                 scope.launch {
                     repository.sendOrder(
                         virtusize,
@@ -311,7 +311,7 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                         })
                 }
             }
-            "addProduct" -> {
+            VirtusizeFlutterMethod.ADD_PRODUCT -> {
                 val externalId = call.arguments as? String
                 if (externalId == null) {
                     val error = VirtusizeFlutterErrors.argumentNotSet(VirtusizeFlutterKey.EXTERNAL_PRODUCT_ID)
@@ -320,7 +320,7 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 }
                 externalProductIDStack.add(externalId)
             }
-            "removeProduct" -> {
+            VirtusizeFlutterMethod.REMOVE_PRODUCT -> {
                 externalProductIDStack.removeLast()
             }
             else -> {
@@ -346,7 +346,7 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         storeProductSet.add(storeProduct!!)
 
         channel.invokeMethod(
-            VirtusizeFlutterMethod.PRODUCT,
+            VirtusizeFlutterMethod.ON_PRODUCT,
             mutableMapOf(
                 VirtusizeFlutterKey.STORE_PRODUCT_ID to storeProduct.id,
                 VirtusizeFlutterKey.IMAGE_TYPE to "store",
@@ -379,7 +379,7 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 result.error(error.errorCode, error.errorMessage, null)
             } else {
                 channel.invokeMethod(
-                    VirtusizeFlutterMethod.REC_CHANGE,
+                    VirtusizeFlutterMethod.ON_REC_CHANGE,
                     mutableMapOf(
                         VirtusizeFlutterKey.EXTERNAL_PRODUCT_ID to storeProduct!!.externalId,
                         VirtusizeFlutterKey.REC_TEXT to null,
@@ -417,7 +417,7 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                     result.error(error.errorCode, error.errorMessage, null)
                 } else {
                     channel.invokeMethod(
-                        VirtusizeFlutterMethod.REC_CHANGE,
+                        VirtusizeFlutterMethod.ON_REC_CHANGE,
                         mutableMapOf(
                             VirtusizeFlutterKey.EXTERNAL_PRODUCT_ID to storeProduct!!.externalId,
                             VirtusizeFlutterKey.REC_TEXT to null,
@@ -457,7 +457,7 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         )
 
         channel.invokeMethod(
-            VirtusizeFlutterMethod.PRODUCT,
+            VirtusizeFlutterMethod.ON_PRODUCT,
             mutableMapOf(
                 VirtusizeFlutterKey.STORE_PRODUCT_ID to storeProduct!!.id,
                 VirtusizeFlutterKey.IMAGE_TYPE to "user",
@@ -482,7 +482,7 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         )
 
         result?.success(resultMap) ?: run {
-            channel.invokeMethod(VirtusizeFlutterMethod.REC_CHANGE, resultMap)
+            channel.invokeMethod(VirtusizeFlutterMethod.ON_REC_CHANGE, resultMap)
         }
     }
 

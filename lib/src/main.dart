@@ -28,17 +28,17 @@ class VirtusizePlugin {
         StreamController<Recommendation>.broadcast();
 
     IVirtusizePlugin.instance._channel.setMethodCallHandler((call) {
-      if (call.method == VirtusizeFlutterMethod.recChange) {
+      if (call.method == VirtusizeFlutterMethod.onRecChange) {
         IVirtusizePlugin.instance._recController
             .add(Recommendation(json.encode(call.arguments)));
-      } else if (call.method == VirtusizeFlutterMethod.product) {
+      } else if (call.method == VirtusizeFlutterMethod.onProduct) {
         IVirtusizePlugin.instance._productController
             .add(VirtusizeProduct(json.encode(call.arguments)));
-      } else if (call.method == VirtusizeFlutterMethod.vsEvent) {
+      } else if (call.method == VirtusizeFlutterMethod.onVSEvent) {
         if (_virtusizeMessageListener != null) {
           _virtusizeMessageListener.vsEvent.call(call.arguments);
         }
-      } else if (call.method == VirtusizeFlutterMethod.vsError) {
+      } else if (call.method == VirtusizeFlutterMethod.onVSError) {
         if (_virtusizeMessageListener != null) {
           _virtusizeMessageListener.vsError.call(call.arguments);
         }
@@ -60,9 +60,9 @@ class VirtusizePlugin {
     }
     try {
       Map<dynamic, dynamic> result = await IVirtusizePlugin.instance._channel
-          .invokeMethod('setVirtusizeProps', {
+          .invokeMethod(VirtusizeFlutterMethod.setVirtusizeProps, {
         VirtusizeFlutterKey.apiKey: apiKey,
-        VirtusizeFlutterKey.externalUserID: externalUserId,
+        VirtusizeFlutterKey.externalUserId: externalUserId,
         VirtusizeFlutterKey.environment: env.value,
         VirtusizeFlutterKey.language: language != null ? language.value : null,
         VirtusizeFlutterKey.showSGI: showSGI,
@@ -84,23 +84,23 @@ class VirtusizePlugin {
     }
   }
 
-  Future<void> setUserID(String userId) async {
+  Future<void> setUserId(String userId) async {
     if (userId == null || userId.isEmpty) {
       print('Failed to set the external user ID: userId is null or empty');
       return;
     }
     try {
       await IVirtusizePlugin.instance._channel
-          .invokeMethod('setUserID', userId);
+          .invokeMethod(VirtusizeFlutterMethod.setUserId, userId);
     } on PlatformException catch (error) {
       print('Failed to set the external user ID: $error');
     }
   }
 
   Future<void> setProduct(
-      {@required String externalId, String imageUrl}) async {
+      {@required String externalId, String imageURL}) async {
     ProductDataCheck productDataCheck =
-        await getProductDataCheck(externalId, imageUrl);
+        await getProductDataCheck(externalId, imageURL);
     IVirtusizePlugin.instance._pdcController.add(productDataCheck);
     if (productDataCheck.isValidProduct) {
       _getRecommendationText(productDataCheck: productDataCheck);
@@ -108,13 +108,13 @@ class VirtusizePlugin {
   }
 
   Future<ProductDataCheck> getProductDataCheck(
-      String externalId, String imageUrl) async {
+      String externalId, String imageURL) async {
     try {
       ProductDataCheck productDataCheck = await IVirtusizePlugin
           .instance._channel
-          .invokeMethod('getProductDataCheck', {
-        VirtusizeFlutterKey.externalProductID: externalId,
-        VirtusizeFlutterKey.imageUrl: imageUrl
+          .invokeMethod(VirtusizeFlutterMethod.getProductDataCheck, {
+        VirtusizeFlutterKey.externalProductId: externalId,
+        VirtusizeFlutterKey.imageURL: imageURL
       }).then((value) => ProductDataCheck(value, externalId));
       if (_virtusizeMessageListener != null) {
         _virtusizeMessageListener.productDataCheckData.call(productDataCheck);
@@ -134,18 +134,18 @@ class VirtusizePlugin {
     try {
       IVirtusizePlugin.instance._recController.add(Recommendation(json.encode(
           await IVirtusizePlugin.instance._channel.invokeMethod(
-              'getRecommendationText', productDataCheck.productId))));
+          VirtusizeFlutterMethod.getRecommendationText, productDataCheck.productId))));
     } on PlatformException catch (error) {
       print('Failed to get RecommendationText: $error');
       IVirtusizePlugin.instance._recController.add(Recommendation(
-          "{\"${VirtusizeFlutterKey.externalProductID}\": \"${productDataCheck.externalProductId}\"}"));
+          "{\"${VirtusizeFlutterKey.externalProductId}\": \"${productDataCheck.externalProductId}\"}"));
     }
   }
 
   Future<void> openVirtusizeWebView() async {
     try {
       await IVirtusizePlugin.instance._channel
-          .invokeMethod('openVirtusizeWebView');
+          .invokeMethod(VirtusizeFlutterMethod.openVirtusizeWebView);
     } on PlatformException catch (error) {
       print('Failed to open the VirtusizeWebView: $error');
     }
@@ -161,7 +161,7 @@ class VirtusizePlugin {
       Function(Exception e) onError}) async {
     try {
       Map<dynamic, dynamic> sentOrder = await IVirtusizePlugin.instance._channel
-          .invokeMethod('sendOrder', order.toJson());
+          .invokeMethod(VirtusizeFlutterMethod.sendOrder, order.toJson());
       onSuccess(sentOrder);
     } on PlatformException catch (error) {
       print('Failed to send the order: $error');
@@ -179,26 +179,22 @@ class IVirtusizePlugin {
   VSText vsText;
 
   StreamController _vsTextController;
-
   Stream<VSText> get vsTextStream => _vsTextController.stream;
 
   StreamController _pdcController;
-
   Stream<ProductDataCheck> get pdcStream => _pdcController.stream;
 
   StreamController _productController;
-
   Stream<VirtusizeProduct> get productStream => _productController.stream;
 
   StreamController _recController;
-
   Stream<Recommendation> get recStream => _recController.stream;
 
   IVirtusizePlugin._();
 
   Future<String> getPrivacyPolicyLink() async {
     try {
-      return await _channel.invokeMethod('getPrivacyPolicyLink');
+      return await _channel.invokeMethod(VirtusizeFlutterMethod.getPrivacyPolicyLink);
     } on PlatformException catch (error) {
       print('Failed to get the privacy policy link: $error');
       return null;
@@ -210,7 +206,7 @@ class IVirtusizePlugin {
       return;
     }
     try {
-      await _channel.invokeMethod('addProduct', externalProductId);
+      await _channel.invokeMethod(VirtusizeFlutterMethod.addProduct, externalProductId);
     } on PlatformException catch (error) {
       print('Failed to add the product $externalProductId: $error');
     }
@@ -218,7 +214,7 @@ class IVirtusizePlugin {
 
   Future<void> removeProduct() async {
     try {
-      await _channel.invokeMethod('removeProduct');
+      await _channel.invokeMethod(VirtusizeFlutterMethod.removeProduct);
     } on PlatformException catch (error) {
       print('Failed to remove a product $error');
     }

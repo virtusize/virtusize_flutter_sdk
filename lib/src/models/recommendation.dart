@@ -4,7 +4,7 @@ import 'virtusize_model.dart';
 class Recommendation extends VirtusizeModel {
   Recommendation(data) : super(data);
 
-  String get externalProductID => decodedData[VirtusizeFlutterKey.externalProductID];
+  String get externalProductID => decodedData[VirtusizeFlutterKey.externalProductId];
 
   String get text => decodedData[VirtusizeFlutterKey.recText];
 

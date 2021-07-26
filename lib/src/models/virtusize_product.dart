@@ -20,9 +20,9 @@ class VirtusizeProduct extends VirtusizeModel {
     return null;
   }
 
-  int get storeProductID => decodedData[VirtusizeFlutterKey.productID];
+  int get storeProductID => decodedData[VirtusizeFlutterKey.productId];
 
-  String get imageUrl  => decodedData[VirtusizeFlutterKey.imageUrl];
+  String get imageUrl  => decodedData[VirtusizeFlutterKey.imageURL];
 
   int get productType => decodedData[VirtusizeFlutterKey.productType];
 

@@ -1,21 +1,33 @@
 class VirtusizeFlutterMethod {
-  static String vsEvent = "onVSEvent";
-  static String vsError = "onVSError";
-  static String product = "onProduct";
-  static String recChange = "onRecChange";
+  // Flutter to native
+  static String setVirtusizeProps = "setVirtusizeProps";
+  static String setUserId = "setUserId";
+  static String getProductDataCheck = "getProductDataCheck";
+  static String openVirtusizeWebView = "openVirtusizeWebView";
+  static String getRecommendationText = "getRecommendationText";
+  static String getPrivacyPolicyLink = "getPrivacyPolicyLink";
+  static String sendOrder = "sendOrder";
+  static String addProduct = "addProduct";
+  static String removeProduct = "removeProduct";
+
+  // native to Flutter
+  static String onVSEvent = "onVSEvent";
+  static String onVSError = "onVSError";
+  static String onProduct = "onProduct";
+  static String onRecChange = "onRecChange";
 }
 
 class VirtusizeFlutterKey {
   static String apiKey = "apiKey";
-  static String externalUserID = "externalUserId";
+  static String externalUserId = "externalUserId";
   static String environment = "env";
   static String language = "language";
   static String showSGI = "showSGI";
   static String allowedLanguages = "allowedLanguages";
   static String detailsPanelCards = "detailsPanelCards";
-  static String externalProductID = "externalProductID";
-  static String imageUrl = "imageUrl";
-  static String productID = "storeProductID";
+  static String externalProductId = "externalProductId";
+  static String imageURL = "imageURL";
+  static String productId = "storeProductId";
   static String virtusizeProps = "virtusizeProps";
   static String displayLanguage = "displayLanguage";
   static String imageType = "imageType";
