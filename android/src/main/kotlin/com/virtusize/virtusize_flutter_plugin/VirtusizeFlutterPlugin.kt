@@ -381,6 +381,7 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 channel.invokeMethod(
                     VirtusizeFlutterMethod.REC_CHANGE,
                     mutableMapOf(
+                        VirtusizeFlutterKey.EXTERNAL_PRODUCT_ID to storeProduct!!.externalId,
                         VirtusizeFlutterKey.REC_TEXT to null,
                         VirtusizeFlutterKey.SHOW_USER_PRODUCT_IMAGE to false
                     )
@@ -418,7 +419,7 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                     channel.invokeMethod(
                         VirtusizeFlutterMethod.REC_CHANGE,
                         mutableMapOf(
-                            VirtusizeFlutterKey.EXTERNAL_PRODUCT_ID to null,
+                            VirtusizeFlutterKey.EXTERNAL_PRODUCT_ID to storeProduct!!.externalId,
                             VirtusizeFlutterKey.REC_TEXT to null,
                             VirtusizeFlutterKey.SHOW_USER_PRODUCT_IMAGE to false
                         )
