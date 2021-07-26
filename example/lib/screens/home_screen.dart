@@ -17,7 +17,7 @@ class _HomeScreenState extends State<HomeScreen> {
         // Set the product's external ID
         externalId: 'vs_dress',
         // Set the product image URL
-        imageUrl: 'http://www.image.com/goods/12345.jpg');
+        imageURL: 'http://www.image.com/goods/12345.jpg');
 
     VirtusizePlugin.instance.setVirtusizeMessageListener(
         VirtusizeMessageListener(vsEvent: (eventName) {

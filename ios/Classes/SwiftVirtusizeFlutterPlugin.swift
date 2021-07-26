@@ -46,45 +46,45 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 	
 	public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
 		switch call.method {
-			case "setVirtusizeProps":
+			case VirtusizeFlutterMethod.setVirtusizeProps:
 				guard let arguments = call.arguments as? [String: Any] else {
 					result(FlutterError.noArguments)
 					return
 				}
-				if let apiKey = arguments["apiKey"] as? String {
+				if let apiKey = arguments[VirtusizeFlutterKey.apiKey] as? String {
 					Virtusize.APIKey = apiKey
 				} else {
-					result(FlutterError.argumentNotSet("apiKey"))
+					result(FlutterError.argumentNotSet(VirtusizeFlutterKey.apiKey))
 				}
 
-				if let userID = arguments["externalUserId"] as? String {
-					Virtusize.userID = userID
+				if let userId = arguments[VirtusizeFlutterKey.externalUserId] as? String {
+					Virtusize.userID = userId
 				}
 				
-				if let envStr = arguments["env"] as? String,
+				if let envStr = arguments[VirtusizeFlutterKey.environment] as? String,
 				   let env = VirtusizeEnvironment.allCases.first(where: { "\($0.self)" == envStr.lowercased() }) {
 					Virtusize.environment = env
 				}
 				
 				var virtusizeBuilder = VirtusizeParamsBuilder()
 				
-				if let langStr = arguments["language"] as? String,
-				   let lang = VirtusizeLanguage.allCases.first(where: { $0.shortDescription == langStr })
+				if let langStr = arguments[VirtusizeFlutterKey.language] as? String,
+				   let lang = VirtusizeLanguage.allCases.first(where: { $0.langStr == langStr })
 				{
 					virtusizeBuilder = virtusizeBuilder.setLanguage(lang)
 				}
 				
-				if let showSGI = arguments["showSGI"] as? Bool {
+				if let showSGI = arguments[VirtusizeFlutterKey.showSGI] as? Bool {
 					virtusizeBuilder = virtusizeBuilder.setShowSGI(showSGI)
 				}
 				
-				if let allowedLangStrArray = arguments["allowedLanguages"] as? [String] {
+				if let allowedLangStrArray = arguments[VirtusizeFlutterKey.allowedLanguages] as? [String] {
 					let allowedLangs = VirtusizeLanguage.allCases
-						.filter{ allowedLangStrArray.contains($0.shortDescription) }
+						.filter{ allowedLangStrArray.contains($0.langStr) }
 					virtusizeBuilder = virtusizeBuilder.setAllowedLanguages(allowedLangs)
 				}
 				
-				if let detailsPanelCardsStrArray = arguments["detailsPanelCards"] as? [String] {
+				if let detailsPanelCardsStrArray = arguments[VirtusizeFlutterKey.detailsPanelCards] as? [String] {
 					let detailsPanelCards = VirtusizeInfoCategory.allCases
 						.filter{ detailsPanelCardsStrArray
 							.map {
@@ -97,27 +97,27 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 				
 				Virtusize.params = virtusizeBuilder.build()
 				result([
-					"virtusizeProps": arguments,
-					"displayLang": Virtusize.displayLanguage?.rawValue
+					VirtusizeFlutterKey.virtusizeProps: arguments,
+					VirtusizeFlutterKey.displayLanguage: Virtusize.displayLanguage?.rawValue
 				])
-			case "setUserID":
-				guard let userID = call.arguments as? String, !userID.isEmpty else {
+			case VirtusizeFlutterMethod.setUserId:
+				guard let userId = call.arguments as? String, !userId.isEmpty else {
 					result(FlutterError.invalidUserID)
 					return
 				}
-				Virtusize.userID = userID
-			case "getProductDataCheck":
+				Virtusize.userID = userId
+			case VirtusizeFlutterMethod.getProductDataCheck:
 				guard let arguments = call.arguments as? [String: Any] else {
 					result(FlutterError.noArguments)
 					return
 				}
-				guard let productId = arguments["externalId"] as? String   else {
-					result(FlutterError.argumentNotSet("externalId"))
+				guard let productId = arguments[VirtusizeFlutterKey.externalProductId] as? String   else {
+					result(FlutterError.argumentNotSet(VirtusizeFlutterKey.externalProductId))
 					return
 				}
 				
 				var imageURL: URL? = nil
-				if let imageURLString = arguments["imageUrl"] as? String {
+				if let imageURLString = arguments[VirtusizeFlutterKey.imageURL] as? String {
 					imageURL = URL(string: imageURLString)
 				}
 				
@@ -135,7 +135,7 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 					}
 					result(pdcJsonString)
 				}
-			case "openVirtusizeWebView":
+			case VirtusizeFlutterMethod.openVirtusizeWebView:
 				let product = storeProductSet.first { $0.externalId == externalProductIDStack.last }
 				if let viewController = VirtusizeWebViewController(
 					product: product,
@@ -145,9 +145,9 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 					let flutterRootViewController = UIApplication.shared.windows.first?.rootViewController
 					flutterRootViewController?.present(viewController, animated: true)
 				}
-			case "getRecommendationText":
+			case VirtusizeFlutterMethod.getRecommendationText:
 				guard let storeProductId = call.arguments as? Int else {
-					result(FlutterError.argumentNotSet("storeProductId"))
+					result(FlutterError.argumentNotSet(VirtusizeFlutterKey.storeProductId))
 					return
 				}
 
@@ -179,9 +179,9 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 						recommendationItem.perform()
 					}
 				}
-			case "getPrivacyPolicyLink":
+			case VirtusizeFlutterMethod.getPrivacyPolicyLink:
 				result(repository.getPrivacyPolicyLink())
-			case "sendOrder":
+			case VirtusizeFlutterMethod.sendOrder:
 				guard let orderDict = call.arguments as? [String : Any?] else {
 					result(FlutterError.noArguments)
 					return
@@ -191,14 +191,14 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 				},onError: { error in
 					result(FlutterError.sendOrder(error.localizedDescription))
 				})
-			case "addProduct":
+			case VirtusizeFlutterMethod.addProduct:
 				guard let externalProductId = call.arguments as? String else {
-					result(FlutterError.argumentNotSet("externalProductId"))
+					result(FlutterError.argumentNotSet(VirtusizeFlutterKey.externalProductId))
 					return
 				}
 				
 				externalProductIDStack.append(externalProductId)
-			case "removeProduct":
+			case VirtusizeFlutterMethod.removeProduct:
 				externalProductIDStack.removeLast()
 			default:
 				result(FlutterMethodNotImplemented)
@@ -218,13 +218,13 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 		self.serverStoreProductSet.insert(storeProduct!)
 
 		flutterChannel?.invokeMethod(
-			"onProduct",
+			VirtusizeFlutterMethod.onProduct,
 			arguments: [
-				"storeProductID": storeProduct!.id,
-				"imageType": "store",
-				"imageUrl": storeProduct!.cloudinaryImageUrlString,
-				"productType": storeProduct!.productType,
-				"productStyle": storeProduct!.productStyle
+				VirtusizeFlutterKey.storeProductId: storeProduct!.id,
+				VirtusizeFlutterKey.imageType: "store",
+				VirtusizeFlutterKey.imageURL: storeProduct!.cloudinaryImageUrlString,
+				VirtusizeFlutterKey.productType: storeProduct!.productType,
+				VirtusizeFlutterKey.productStyle: storeProduct!.productStyle
 			]
 		)
 
@@ -250,10 +250,11 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 				result(FlutterError.nullAPIResult("userSessionResponse"))
 			} else {
 				flutterChannel?.invokeMethod(
-					"onRecChange",
+					VirtusizeFlutterMethod.onRecChange,
 					arguments: [
-						"text": nil,
-						"showUserProductImage": false
+						VirtusizeFlutterKey.externalProductId: storeProduct!.externalId,
+						VirtusizeFlutterKey.recText: nil,
+						VirtusizeFlutterKey.showUserProductImage: false
 					]
 				)
 			}
@@ -288,10 +289,11 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 					result(FlutterError.nullAPIResult("userProducts"))
 				} else {
 					flutterChannel?.invokeMethod(
-						"onRecChange",
+						VirtusizeFlutterMethod.onRecChange,
 						arguments: [
-							"text": nil,
-							"showUserProductImage": false
+							VirtusizeFlutterKey.externalProductId: storeProduct!.externalId,
+							VirtusizeFlutterKey.recText: nil,
+							VirtusizeFlutterKey.showUserProductImage: false
 						]
 					)
 				}
@@ -331,13 +333,13 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 		)
 
 		flutterChannel?.invokeMethod(
-			"onProduct",
+			VirtusizeFlutterMethod.onProduct,
 			arguments:  [
-				"storeProductID": storeProduct!.id,
-				"imageType": "user",
-				"imageUrl" : userProductRecommendedSize?.bestUserProduct?.cloudinaryImageUrlString,
-				"productType": userProductRecommendedSize?.bestUserProduct?.productType,
-				"productStyle": userProductRecommendedSize?.bestUserProduct?.productStyle
+				VirtusizeFlutterKey.storeProductId: storeProduct!.id,
+				VirtusizeFlutterKey.imageType: "user",
+				VirtusizeFlutterKey.imageURL : userProductRecommendedSize?.bestUserProduct?.cloudinaryImageUrlString,
+				VirtusizeFlutterKey.productType: userProductRecommendedSize?.bestUserProduct?.productType,
+				VirtusizeFlutterKey.productStyle: userProductRecommendedSize?.bestUserProduct?.productStyle
 			]
 		)
 		
@@ -350,16 +352,16 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 		)
 		
 		let arguments: [String : Any] = [
-			"externalProductID": storeProduct!.externalId,
-			"text": recText,
-			"showUserProductImage": userProductRecommendedSize?.bestUserProduct != nil
+			VirtusizeFlutterKey.externalProductId: storeProduct!.externalId,
+			VirtusizeFlutterKey.recText: recText,
+			VirtusizeFlutterKey.showUserProductImage: userProductRecommendedSize?.bestUserProduct != nil
 		]
 
 		if let result = result {
 			result(arguments)
 		} else {
 			flutterChannel?.invokeMethod(
-				"onRecChange",
+				VirtusizeFlutterMethod.onRecChange,
 				arguments: arguments
 			)
 		}
@@ -377,7 +379,7 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 extension SwiftVirtusizeFlutterPlugin: VirtusizeMessageHandler {
 	public func virtusizeController(_ controller: VirtusizeWebViewController?, didReceiveError error: VirtusizeError) {
 		currentWorkItem = DispatchWorkItem { [weak self] in
-			self?.flutterChannel?.invokeMethod("onVSError", arguments: error.debugDescription)
+			self?.flutterChannel?.invokeMethod(VirtusizeFlutterMethod.onVSError, arguments: error.debugDescription)
 		}
 		DispatchQueue.global().async(execute: currentWorkItem!)
 	}
@@ -385,8 +387,8 @@ extension SwiftVirtusizeFlutterPlugin: VirtusizeMessageHandler {
 	public func virtusizeController(_ controller: VirtusizeWebViewController?, didReceiveEvent event: VirtusizeEvent) {
 		let eventsWorkItem = DispatchWorkItem { [weak self] in
 			if let eventData = event.data as? [String: Any],
-			   let eventName = eventData["name"] ?? eventData["eventName"] {
-				self?.flutterChannel?.invokeMethod("onVSEvent", arguments: eventName)
+			   let eventName = eventData[VirtusizeEventKey.shortEventName] ?? eventData[VirtusizeEventKey.eventName] {
+				self?.flutterChannel?.invokeMethod(VirtusizeFlutterMethod.onVSEvent, arguments: eventName)
 			}
 		}
 		
@@ -414,7 +416,7 @@ extension SwiftVirtusizeFlutterPlugin: VirtusizeMessageHandler {
 					repository.updateUserAuthData(bid: data["x-vs-bid"] as? String, auth: data["x-vs-auth"] as? String)
 				}
 			case .userSelectedProduct:
-				if let userProductId = (event.data as? [String: Any])?["userProductId"] as? Int {
+				if let userProductId = (event.data as? [String: Any])?[VirtusizeEventKey.userProductID] as? Int {
 					selectedUserProductId = userProductId
 				}
 				recommendationWorkItem = DispatchWorkItem { [weak self] in
@@ -425,7 +427,7 @@ extension SwiftVirtusizeFlutterPlugin: VirtusizeMessageHandler {
 					)
 				}
 			case .userAddedProduct:
-				if let userProductId = (event.data as? [String: Any])?["userProductId"] as? Int {
+				if let userProductId = (event.data as? [String: Any])?[VirtusizeEventKey.userProductID] as? Int {
 					selectedUserProductId = userProductId
 				}
 				recommendationWorkItem = DispatchWorkItem { [weak self] in
@@ -436,7 +438,7 @@ extension SwiftVirtusizeFlutterPlugin: VirtusizeMessageHandler {
 					)
 				}
 			case .userChangedRecommendationType:
-				let recommendationType = (event.data as? [String: Any])?["recommendationType"] as? String
+				let recommendationType = (event.data as? [String: Any])?[VirtusizeEventKey.recType] as? String
 				let changedType = (recommendationType != nil) ? SizeRecommendationType.init(rawValue: recommendationType!) : nil
 				recommendationWorkItem = DispatchWorkItem { [weak self] in
 					self?.getRecommendation(
@@ -447,7 +449,7 @@ extension SwiftVirtusizeFlutterPlugin: VirtusizeMessageHandler {
 					)
 				}
 			case .userUpdatedBodyMeasurements:
-				if let sizeRecName = (event.data as? [String: Any])?["sizeRecName"] as? String {
+				if let sizeRecName = (event.data as? [String: Any])?[VirtusizeEventKey.sizeRecName] as? String {
 					bodyProfileRecommendedSize = BodyProfileRecommendedSize(sizeName: sizeRecName, product: storeProduct)
 					recommendationWorkItem = DispatchWorkItem { [weak self] in
 						self?.getRecommendation(
