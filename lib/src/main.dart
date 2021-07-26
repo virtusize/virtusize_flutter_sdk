@@ -107,7 +107,7 @@ class VirtusizePlugin {
       ProductDataCheck productDataCheck = await IVirtusizePlugin
           .instance._channel
           .invokeMethod('getProductDataCheck', {
-        'externalId': externalId,
+        'externalProductID': externalId,
         'imageUrl': imageUrl
       }).then((value) => ProductDataCheck(value, externalId));
       if (_virtusizeMessageListener != null) {
@@ -172,6 +172,7 @@ class IVirtusizePlugin {
 
   StreamController _vsTextController;
 
+  // TODO: Remove sinks
   StreamSink<VSText> get _vsTextSink => _vsTextController.sink;
 
   Stream<VSText> get vsTextStream => _vsTextController.stream;

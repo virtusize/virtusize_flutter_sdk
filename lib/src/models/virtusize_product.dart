@@ -26,4 +26,9 @@ class VirtusizeProduct extends VirtusizeModel {
   int get productType => decodedData["productType"];
 
   String get productStyle => decodedData["productStyle"];
+
+  @override
+  String toString() {
+    return decodedData.toString();
+  }
 }

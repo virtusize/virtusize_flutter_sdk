@@ -111,8 +111,8 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 					result(FlutterError.noArguments)
 					return
 				}
-				guard let productId = arguments["externalId"] as? String   else {
-					result(FlutterError.argumentNotSet("externalId"))
+				guard let productId = arguments["externalProductID"] as? String   else {
+					result(FlutterError.argumentNotSet("externalProductID"))
 					return
 				}
 				
