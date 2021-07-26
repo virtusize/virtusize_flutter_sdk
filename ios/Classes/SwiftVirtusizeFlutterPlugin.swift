@@ -61,7 +61,7 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 					Virtusize.userID = userID
 				}
 				
-				if let envStr = arguments[VirtusizeFlutterKey.env] as? String,
+				if let envStr = arguments[VirtusizeFlutterKey.environment] as? String,
 				   let env = VirtusizeEnvironment.allCases.first(where: { "\($0.self)" == envStr.lowercased() }) {
 					Virtusize.environment = env
 				}
@@ -147,7 +147,7 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 				}
 			case "getRecommendationText":
 				guard let storeProductId = call.arguments as? Int else {
-					result(FlutterError.argumentNotSet(VirtusizeFlutterKey.productID))
+					result(FlutterError.argumentNotSet(VirtusizeFlutterKey.storeProductID))
 					return
 				}
 
@@ -220,7 +220,7 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 		flutterChannel?.invokeMethod(
 			"onProduct",
 			arguments: [
-				VirtusizeFlutterKey.productID: storeProduct!.id,
+				VirtusizeFlutterKey.storeProductID: storeProduct!.id,
 				VirtusizeFlutterKey.imageType: "store",
 				VirtusizeFlutterKey.imageUrl: storeProduct!.cloudinaryImageUrlString,
 				VirtusizeFlutterKey.productType: storeProduct!.productType,
@@ -335,7 +335,7 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 		flutterChannel?.invokeMethod(
 			VirtusizeFlutterMethod.product,
 			arguments:  [
-				VirtusizeFlutterKey.productID: storeProduct!.id,
+				VirtusizeFlutterKey.storeProductID: storeProduct!.id,
 				VirtusizeFlutterKey.imageType: "user",
 				VirtusizeFlutterKey.imageUrl : userProductRecommendedSize?.bestUserProduct?.cloudinaryImageUrlString,
 				VirtusizeFlutterKey.productType: userProductRecommendedSize?.bestUserProduct?.productType,

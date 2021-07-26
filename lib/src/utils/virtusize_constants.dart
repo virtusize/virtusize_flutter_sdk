@@ -8,7 +8,7 @@ class VirtusizeFlutterMethod {
 class VirtusizeFlutterKey {
   static String apiKey = "apiKey";
   static String externalUserID = "externalUserId";
-  static String env = "env";
+  static String environment = "env";
   static String language = "language";
   static String showSGI = "showSGI";
   static String allowedLanguages = "allowedLanguages";
@@ -17,10 +17,10 @@ class VirtusizeFlutterKey {
   static String imageUrl = "imageUrl";
   static String productID = "storeProductID";
   static String virtusizeProps = "virtusizeProps";
-  static String displayLanguage = "displayLang";
+  static String displayLanguage = "displayLanguage";
   static String imageType = "imageType";
   static String productType = "productType";
   static String productStyle = "productStyle";
-  static String recText = "text";
+  static String recText = "recText";
   static String showUserProductImage = "showUserProductImage";
 }

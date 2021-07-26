@@ -284,7 +284,7 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             "getRecommendationText" -> {
                 val storeProductId = call.arguments as? Int
                 if(storeProductId == null) {
-                    val error = VirtusizeFlutterErrors.argumentNotSet(VirtusizeFlutterKey.PRODUCT_ID)
+                    val error = VirtusizeFlutterErrors.argumentNotSet(VirtusizeFlutterKey.STORE_PRODUCT_ID)
                     result.error(error.errorCode, error.errorMessage, null)
                     return
                 }
@@ -348,7 +348,7 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         channel.invokeMethod(
             VirtusizeFlutterMethod.PRODUCT,
             mutableMapOf(
-                VirtusizeFlutterKey.PRODUCT_ID to storeProduct.id,
+                VirtusizeFlutterKey.STORE_PRODUCT_ID to storeProduct.id,
                 VirtusizeFlutterKey.IMAGE_TYPE to "store",
                 VirtusizeFlutterKey.IMAGE_URL to storeProduct.getProductImageURL(),
                 VirtusizeFlutterKey.PRODUCT_TYPE to storeProduct.productType,
@@ -459,7 +459,7 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         channel.invokeMethod(
             VirtusizeFlutterMethod.PRODUCT,
             mutableMapOf(
-                VirtusizeFlutterKey.PRODUCT_ID to storeProduct!!.id,
+                VirtusizeFlutterKey.STORE_PRODUCT_ID to storeProduct!!.id,
                 VirtusizeFlutterKey.IMAGE_TYPE to "user",
                 VirtusizeFlutterKey.IMAGE_URL to userProductRecommendedSize?.bestUserProduct?.getProductImageURL(),
                 VirtusizeFlutterKey.PRODUCT_TYPE to userProductRecommendedSize?.bestUserProduct?.productType,

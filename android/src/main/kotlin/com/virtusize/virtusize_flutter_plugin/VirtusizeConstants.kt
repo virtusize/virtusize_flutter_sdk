@@ -15,13 +15,13 @@ internal object VirtusizeFlutterKey {
     const val DETAILS_PANEL_CARDS = "detailsPanelCards"
     const val EXTERNAL_PRODUCT_ID = "externalProductID"
     const val IMAGE_URL = "imageUrl"
-    const val PRODUCT_ID = "storeProductID"
+    const val STORE_PRODUCT_ID = "storeProductID"
     const val VIRTUSIZE_PROPS = "virtusizeProps"
-    const val DISPLAY_LANGUAGE = "displayLang"
+    const val DISPLAY_LANGUAGE = "displayLanguage"
     const val IMAGE_TYPE = "imageType"
     const val PRODUCT_TYPE = "productType"
     const val PRODUCT_STYLE = "productStyle"
-    const val REC_TEXT = "text"
+    const val REC_TEXT = "recText"
     const val SHOW_USER_PRODUCT_IMAGE = "showUserProductImage"
 }
 

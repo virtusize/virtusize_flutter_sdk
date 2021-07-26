@@ -63,7 +63,7 @@ class VirtusizePlugin {
           .invokeMethod('setVirtusizeProps', {
         VirtusizeFlutterKey.apiKey: apiKey,
         VirtusizeFlutterKey.externalUserID: externalUserId,
-        VirtusizeFlutterKey.env: env.value,
+        VirtusizeFlutterKey.environment: env.value,
         VirtusizeFlutterKey.language: language != null ? language.value : null,
         VirtusizeFlutterKey.showSGI: showSGI,
         VirtusizeFlutterKey.allowedLanguages: allowedLanguages.map((language) {
