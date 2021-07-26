@@ -69,7 +69,7 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 				var virtusizeBuilder = VirtusizeParamsBuilder()
 				
 				if let langStr = arguments[VirtusizeFlutterKey.language] as? String,
-				   let lang = VirtusizeLanguage.allCases.first(where: { $0.shortDescription == langStr })
+				   let lang = VirtusizeLanguage.allCases.first(where: { $0.langStr == langStr })
 				{
 					virtusizeBuilder = virtusizeBuilder.setLanguage(lang)
 				}
@@ -80,7 +80,7 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 				
 				if let allowedLangStrArray = arguments[VirtusizeFlutterKey.allowedLanguages] as? [String] {
 					let allowedLangs = VirtusizeLanguage.allCases
-						.filter{ allowedLangStrArray.contains($0.shortDescription) }
+						.filter{ allowedLangStrArray.contains($0.langStr) }
 					virtusizeBuilder = virtusizeBuilder.setAllowedLanguages(allowedLangs)
 				}
 				
