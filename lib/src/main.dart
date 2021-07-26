@@ -9,6 +9,7 @@ import 'models/product_data_check.dart';
 import 'models/virtusize_enums.dart';
 import 'models/virtusize_order.dart';
 import 'res/text.dart';
+import 'utils/virtusize_constants.dart';
 import 'utils/virtusize_message_listener.dart';
 
 class VirtusizePlugin {
@@ -25,18 +26,19 @@ class VirtusizePlugin {
         StreamController<VirtusizeProduct>.broadcast();
     IVirtusizePlugin.instance._recController =
         StreamController<Recommendation>.broadcast();
+
     IVirtusizePlugin.instance._channel.setMethodCallHandler((call) {
-      if (call.method == "onRecChange") {
-        IVirtusizePlugin.instance._recSink
+      if (call.method == VirtusizeFlutterMethod.recChange) {
+        IVirtusizePlugin.instance._recController
             .add(Recommendation(json.encode(call.arguments)));
-      } else if (call.method == "onProduct") {
+      } else if (call.method == VirtusizeFlutterMethod.product) {
         IVirtusizePlugin.instance._productController
             .add(VirtusizeProduct(json.encode(call.arguments)));
-      } else if (call.method == "onVSEvent") {
+      } else if (call.method == VirtusizeFlutterMethod.vsEvent) {
         if (_virtusizeMessageListener != null) {
           _virtusizeMessageListener.vsEvent.call(call.arguments);
         }
-      } else if (call.method == "onVSError") {
+      } else if (call.method == VirtusizeFlutterMethod.vsError) {
         if (_virtusizeMessageListener != null) {
           _virtusizeMessageListener.vsError.call(call.arguments);
         }
@@ -59,19 +61,21 @@ class VirtusizePlugin {
     try {
       Map<dynamic, dynamic> result = await IVirtusizePlugin.instance._channel
           .invokeMethod('setVirtusizeProps', {
-        'apiKey': apiKey,
-        'externalUserId': externalUserId,
-        'env': env.value,
-        'language': language != null ? language.value : null,
-        'showSGI': showSGI,
-        'allowedLanguages': allowedLanguages.map((language) {
+        VirtusizeFlutterKey.apiKey: apiKey,
+        VirtusizeFlutterKey.externalUserID: externalUserId,
+        VirtusizeFlutterKey.env: env.value,
+        VirtusizeFlutterKey.language: language != null ? language.value : null,
+        VirtusizeFlutterKey.showSGI: showSGI,
+        VirtusizeFlutterKey.allowedLanguages: allowedLanguages.map((language) {
           return language.value;
         }).toList(),
-        'detailsPanelCards': detailsPanelCards.map((infoCategory) {
+        VirtusizeFlutterKey.detailsPanelCards:
+            detailsPanelCards.map((infoCategory) {
           return infoCategory.value;
         }).toList()
       });
-      VSText.load(result["displayLang"], language).then((value) {
+      VSText.load(result[VirtusizeFlutterKey.displayLanguage], language)
+          .then((value) {
         IVirtusizePlugin.instance._vsTextController.add(value);
         IVirtusizePlugin.instance.vsText = value;
       });
@@ -95,20 +99,22 @@ class VirtusizePlugin {
 
   Future<void> setProduct(
       {@required String externalId, String imageUrl}) async {
-    ProductDataCheck productDataCheck = await getProductDataCheck(externalId, imageUrl);
+    ProductDataCheck productDataCheck =
+        await getProductDataCheck(externalId, imageUrl);
     IVirtusizePlugin.instance._pdcController.add(productDataCheck);
     if (productDataCheck.isValidProduct) {
       _getRecommendationText(productId: productDataCheck.productId);
     }
   }
 
-  Future<ProductDataCheck> getProductDataCheck(String externalId, String imageUrl) async {
+  Future<ProductDataCheck> getProductDataCheck(
+      String externalId, String imageUrl) async {
     try {
       ProductDataCheck productDataCheck = await IVirtusizePlugin
           .instance._channel
           .invokeMethod('getProductDataCheck', {
-        'externalProductID': externalId,
-        'imageUrl': imageUrl
+        VirtusizeFlutterKey.externalProductID: externalId,
+        VirtusizeFlutterKey.imageUrl: imageUrl
       }).then((value) => ProductDataCheck(value, externalId));
       if (_virtusizeMessageListener != null) {
         _virtusizeMessageListener.productDataCheckData.call(productDataCheck);
@@ -125,12 +131,12 @@ class VirtusizePlugin {
 
   Future<void> _getRecommendationText({@required int productId}) async {
     try {
-      IVirtusizePlugin.instance._recSink.add(Recommendation(json.encode(
+      IVirtusizePlugin.instance._recController.add(Recommendation(json.encode(
           await IVirtusizePlugin.instance._channel
               .invokeMethod('getRecommendationText', productId))));
     } on PlatformException catch (error) {
       print('Failed to get RecommendationText: $error');
-      IVirtusizePlugin.instance._recSink.add(Recommendation(null));
+      IVirtusizePlugin.instance._recController.add(Recommendation(null));
     }
   }
 
@@ -176,7 +182,6 @@ class IVirtusizePlugin {
 
   StreamController _pdcController;
 
-
   Stream<ProductDataCheck> get pdcStream => _pdcController.stream;
 
   StreamController _productController;
@@ -184,8 +189,6 @@ class IVirtusizePlugin {
   Stream<VirtusizeProduct> get productStream => _productController.stream;
 
   StreamController _recController;
-
-  StreamSink<Recommendation> get _recSink => _recController.sink;
 
   Stream<Recommendation> get recStream => _recController.stream;
 

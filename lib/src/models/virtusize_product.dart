@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/virtusize_enums.dart';
+import '../utils/virtusize_constants.dart';
 import 'virtusize_model.dart';
 
 class VirtusizeProduct extends VirtusizeModel {
@@ -8,7 +9,7 @@ class VirtusizeProduct extends VirtusizeModel {
 
   Image networkProductImage;
 
-  String get _imageType => decodedData["imageType"];
+  String get _imageType => decodedData[VirtusizeFlutterKey.imageType];
 
   ProductImageType get imageType {
     if (_imageType == "store") {
@@ -19,13 +20,13 @@ class VirtusizeProduct extends VirtusizeModel {
     return null;
   }
 
-  int get storeProductID => decodedData["storeProductID"];
+  int get storeProductID => decodedData[VirtusizeFlutterKey.productID];
 
-  String get imageUrl  => decodedData["imageUrl"];
+  String get imageUrl  => decodedData[VirtusizeFlutterKey.imageUrl];
 
-  int get productType => decodedData["productType"];
+  int get productType => decodedData[VirtusizeFlutterKey.productType];
 
-  String get productStyle => decodedData["productStyle"];
+  String get productStyle => decodedData[VirtusizeFlutterKey.productStyle];
 
   @override
   String toString() {
