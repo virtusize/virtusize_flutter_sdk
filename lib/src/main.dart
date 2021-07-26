@@ -103,7 +103,7 @@ class VirtusizePlugin {
         await getProductDataCheck(externalId, imageUrl);
     IVirtusizePlugin.instance._pdcController.add(productDataCheck);
     if (productDataCheck.isValidProduct) {
-      _getRecommendationText(productId: productDataCheck.productId);
+      _getRecommendationText(productDataCheck: productDataCheck);
     }
   }
 
@@ -129,14 +129,16 @@ class VirtusizePlugin {
     return null;
   }
 
-  Future<void> _getRecommendationText({@required int productId}) async {
+  Future<void> _getRecommendationText(
+      {@required ProductDataCheck productDataCheck}) async {
     try {
       IVirtusizePlugin.instance._recController.add(Recommendation(json.encode(
-          await IVirtusizePlugin.instance._channel
-              .invokeMethod('getRecommendationText', productId))));
+          await IVirtusizePlugin.instance._channel.invokeMethod(
+              'getRecommendationText', productDataCheck.productId))));
     } on PlatformException catch (error) {
       print('Failed to get RecommendationText: $error');
-      IVirtusizePlugin.instance._recController.add(Recommendation(null));
+      IVirtusizePlugin.instance._recController.add(Recommendation(
+          "{\"${VirtusizeFlutterKey.externalProductID}\": \"${productDataCheck.externalProductId}\"}"));
     }
   }
 
