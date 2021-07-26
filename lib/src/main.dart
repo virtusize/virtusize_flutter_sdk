@@ -30,7 +30,7 @@ class VirtusizePlugin {
         IVirtusizePlugin.instance._recSink
             .add(Recommendation(json.encode(call.arguments)));
       } else if (call.method == "onProduct") {
-        IVirtusizePlugin.instance._productSink
+        IVirtusizePlugin.instance._productController
             .add(VirtusizeProduct(json.encode(call.arguments)));
       } else if (call.method == "onVSEvent") {
         if (_virtusizeMessageListener != null) {
@@ -72,7 +72,7 @@ class VirtusizePlugin {
         }).toList()
       });
       VSText.load(result["displayLang"], language).then((value) {
-        IVirtusizePlugin.instance._vsTextSink.add(value);
+        IVirtusizePlugin.instance._vsTextController.add(value);
         IVirtusizePlugin.instance.vsText = value;
       });
     } on PlatformException catch (error) {
@@ -96,7 +96,7 @@ class VirtusizePlugin {
   Future<void> setProduct(
       {@required String externalId, String imageUrl}) async {
     ProductDataCheck productDataCheck = await getProductDataCheck(externalId, imageUrl);
-    IVirtusizePlugin.instance._pdcSink.add(productDataCheck);
+    IVirtusizePlugin.instance._pdcController.add(productDataCheck);
     if (productDataCheck.isValidProduct) {
       _getRecommendationText(productId: productDataCheck.productId);
     }
@@ -172,20 +172,14 @@ class IVirtusizePlugin {
 
   StreamController _vsTextController;
 
-  // TODO: Remove sinks
-  StreamSink<VSText> get _vsTextSink => _vsTextController.sink;
-
   Stream<VSText> get vsTextStream => _vsTextController.stream;
 
   StreamController _pdcController;
 
-  StreamSink<ProductDataCheck> get _pdcSink => _pdcController.sink;
 
   Stream<ProductDataCheck> get pdcStream => _pdcController.stream;
 
   StreamController _productController;
-
-  StreamSink<VirtusizeProduct> get _productSink => _productController.sink;
 
   Stream<VirtusizeProduct> get productStream => _productController.stream;
 
