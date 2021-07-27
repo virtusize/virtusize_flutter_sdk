@@ -40,7 +40,7 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
   StreamSubscription<Recommendation> _recSubscription;
   StreamSubscription<VirtusizeProduct> _productSubscription;
 
-  VSText _vsText = IVirtusizePlugin.instance.vsText;
+  VSText _vsText = IVirtusizeSDK.instance.vsText;
   ProductDataCheck _productDataCheck;
   bool _hasError;
   bool _isLoading;
@@ -55,15 +55,15 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
     super.initState();
 
     _vsTextSubscription =
-        IVirtusizePlugin.instance.vsTextStream.listen((vsText) {
+        IVirtusizeSDK.instance.vsTextStream.listen((vsText) {
       _vsText = vsText;
     });
 
-    _pdcSubscription = IVirtusizePlugin.instance.pdcStream.listen((pdc) {
+    _pdcSubscription = IVirtusizeSDK.instance.pdcStream.listen((pdc) {
       if (_productDataCheck != null) {
         return;
       }
-      IVirtusizePlugin.instance
+      IVirtusizeSDK.instance
           .addProduct(externalProductId: pdc.externalProductId);
       setState(() {
         _isLoading = true;
@@ -73,7 +73,7 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
     });
 
     _productSubscription =
-        IVirtusizePlugin.instance.productStream.listen((product) {
+        IVirtusizeSDK.instance.productStream.listen((product) {
       if (_productDataCheck.productId != product.productId ||
           (!compareProduct(widgetProduct: _storeProduct, serverProduct: product) &&
               !compareProduct(widgetProduct: _userProduct, serverProduct: product))) {
@@ -106,7 +106,7 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
     });
 
     _recSubscription =
-        IVirtusizePlugin.instance.recStream.listen((recommendation) {
+        IVirtusizeSDK.instance.recStream.listen((recommendation) {
       if (_productDataCheck.externalProductId !=
           recommendation.externalProductID) {
         return;
@@ -141,7 +141,7 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
 
   @override
   void dispose() {
-    IVirtusizePlugin.instance.removeProduct();
+    IVirtusizeSDK.instance.removeProduct();
     _vsTextSubscription.cancel();
     _pdcSubscription.cancel();
     _productSubscription.cancel();
@@ -158,11 +158,11 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
   }
 
   Future<void> _openVirtusizeWebview() async {
-    await VirtusizePlugin.instance.openVirtusizeWebView();
+    await VirtusizeSDK.instance.openVirtusizeWebView();
   }
 
   Future<void> _openPrivacyPolicyLink() async {
-    String _url = await IVirtusizePlugin.instance.getPrivacyPolicyLink();
+    String _url = await IVirtusizeSDK.instance.getPrivacyPolicyLink();
     await canLaunch(_url)
         ? await launch(_url, forceSafariVC: false)
         : throw 'Could not launch $_url';

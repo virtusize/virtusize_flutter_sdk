@@ -26,7 +26,7 @@ class _VirtusizeButtonState extends State<VirtusizeButton> {
   StreamSubscription<VSText> _vsTextSubscription;
   StreamSubscription<ProductDataCheck> _pdcSubscription;
 
-  VSText _vsText = IVirtusizePlugin.instance.vsText;
+  VSText _vsText = IVirtusizeSDK.instance.vsText;
   bool _isValidProduct;
 
   @override
@@ -34,16 +34,16 @@ class _VirtusizeButtonState extends State<VirtusizeButton> {
     super.initState();
 
     _vsTextSubscription =
-        IVirtusizePlugin.instance.vsTextStream.listen((vsText) {
+        IVirtusizeSDK.instance.vsTextStream.listen((vsText) {
       _vsText = vsText;
     });
 
     _pdcSubscription =
-        IVirtusizePlugin.instance.pdcStream.listen((productDataCheck) {
+        IVirtusizeSDK.instance.pdcStream.listen((productDataCheck) {
       if (_isValidProduct != null) {
         return;
       }
-      IVirtusizePlugin.instance
+      IVirtusizeSDK.instance
           .addProduct(externalProductId: productDataCheck.externalProductId);
       setState(() {
         _isValidProduct = productDataCheck.isValidProduct;
@@ -53,7 +53,7 @@ class _VirtusizeButtonState extends State<VirtusizeButton> {
 
   @override
   void dispose() {
-    IVirtusizePlugin.instance.removeProduct();
+    IVirtusizeSDK.instance.removeProduct();
     _vsTextSubscription.cancel();
     _pdcSubscription.cancel();
     super.dispose();
@@ -80,7 +80,7 @@ class _VirtusizeButtonState extends State<VirtusizeButton> {
   }
 
   Future<void> _openVirtusizeWebview() async {
-    await VirtusizePlugin.instance.openVirtusizeWebView();
+    await VirtusizeSDK.instance.openVirtusizeWebView();
   }
 
   ElevatedButton _buildVSButton(Color color, Widget child) {

@@ -34,7 +34,7 @@ class _ProductScreenState extends State<ProductScreen> {
 
     _externalID = widget.externalID ?? _externalIDList[Random().nextInt(_externalIDList.length)];
 
-    VirtusizePlugin.instance.setProduct(
+    VirtusizeSDK.instance.setProduct(
         externalId: _externalID,
         imageURL: 'http://www.image.com/goods/12345.jpg');
   }

@@ -14,14 +14,14 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
 
     /// Set up the product information in order to populate the Virtusize view
-    VirtusizePlugin.instance.setProduct(
+    VirtusizeSDK.instance.setProduct(
         // Set the product's external ID
         externalId: 'vs_dress',
         // Set the product image URL
         imageURL: 'http://www.image.com/goods/12345.jpg');
 
     /// Optional: Set a VirtusizeMessageListener to listen to the events or the product data check result from Virtusize
-    VirtusizePlugin.instance.setVirtusizeMessageListener(
+    VirtusizeSDK.instance.setVirtusizeMessageListener(
         VirtusizeMessageListener(vsEvent: (eventName) {
       print("Virtusize event: $eventName");
     }, vsError: (error) {
@@ -75,7 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 BorderRadius.all(Radius.circular(32.0)))),
 
                     /// Implement the [OnPressed] callback with the [VirtusizePlugin.instance.openVirtusizeWebView] function if you customize the button
-                    onPressed: VirtusizePlugin.instance.openVirtusizeWebView),
+                    onPressed: VirtusizeSDK.instance.openVirtusizeWebView),
               )),
               Container(height: 16),
 
@@ -118,7 +118,7 @@ class _HomeScreenState extends State<HomeScreen> {
   /// for a [VirtusizeOrderItem] are optional
   void _sendOrder() {
     /// You can set the user ID anytime before sending an order
-    VirtusizePlugin.instance.setUserId("123456");
+    VirtusizeSDK.instance.setUserId("123456");
 
     /// Create an order with items
     VirtusizeOrder order =
@@ -138,7 +138,7 @@ class _HomeScreenState extends State<HomeScreen> {
     ]);
 
     /// Send the order
-    VirtusizePlugin.instance.sendOrder(
+    VirtusizeSDK.instance.sendOrder(
         order: order,
         // This onSuccess callback is optional and gets called when the app successfully sends the order
         onSuccess: (sentOrder) {

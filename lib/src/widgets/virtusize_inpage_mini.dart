@@ -33,7 +33,7 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
   StreamSubscription<ProductDataCheck> _pdcSubscription;
   StreamSubscription<Recommendation> _recSubscription;
 
-  VSText _vsText = IVirtusizePlugin.instance.vsText;
+  VSText _vsText = IVirtusizeSDK.instance.vsText;
   ProductDataCheck _productDataCheck;
   bool _isLoading;
   bool _hasError;
@@ -44,16 +44,16 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
     super.initState();
 
     _vsTextSubscription =
-        IVirtusizePlugin.instance.vsTextStream.listen((vsLocalization) {
+        IVirtusizeSDK.instance.vsTextStream.listen((vsLocalization) {
       _vsText = vsLocalization;
       _recText = _vsText.localization.vsLoadingText;
     });
 
-    _pdcSubscription = IVirtusizePlugin.instance.pdcStream.listen((pdc) {
+    _pdcSubscription = IVirtusizeSDK.instance.pdcStream.listen((pdc) {
       if (_productDataCheck != null) {
         return;
       }
-      IVirtusizePlugin.instance
+      IVirtusizeSDK.instance
           .addProduct(externalProductId: pdc.externalProductId);
       setState(() {
         _isLoading = true;
@@ -63,7 +63,7 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
     });
 
     _recSubscription =
-        IVirtusizePlugin.instance.recStream.listen((recommendation) {
+        IVirtusizeSDK.instance.recStream.listen((recommendation) {
       if (_productDataCheck.externalProductId !=
           recommendation.externalProductID) {
         return;
@@ -81,7 +81,7 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
 
   @override
   void dispose() {
-    IVirtusizePlugin.instance.removeProduct();
+    IVirtusizeSDK.instance.removeProduct();
     _vsTextSubscription.cancel();
     _pdcSubscription.cancel();
     _recSubscription.cancel();
@@ -100,7 +100,7 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
   }
 
   Future<void> _openVirtusizeWebview() async {
-    await VirtusizePlugin.instance.openVirtusizeWebView();
+    await VirtusizeSDK.instance.openVirtusizeWebView();
   }
 
   Widget _buildVSInPageMini() {

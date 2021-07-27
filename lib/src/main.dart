@@ -13,32 +13,32 @@ import 'utils/virtusize_constants.dart';
 import 'utils/virtusize_message_listener.dart';
 
 /// The main class for flutter apps to access
-class VirtusizePlugin {
+class VirtusizeSDK {
   /// The singleton instance of this class
-  static final VirtusizePlugin instance = VirtusizePlugin._();
+  static final VirtusizeSDK instance = VirtusizeSDK._();
 
   /// A listener to receive Virtusize-specific messages from Native
   VirtusizeMessageListener _virtusizeMessageListener;
 
-  /// Initialize the [VirtusizePlugin] instance
-  VirtusizePlugin._() {
+  /// Initialize the [VirtusizeSDK] instance
+  VirtusizeSDK._() {
     // The broadcast stream controllers
-    IVirtusizePlugin.instance._vsTextController =
+    IVirtusizeSDK.instance._vsTextController =
     StreamController<VSText>.broadcast();
-    IVirtusizePlugin.instance._pdcController =
+    IVirtusizeSDK.instance._pdcController =
     StreamController<ProductDataCheck>.broadcast();
-    IVirtusizePlugin.instance._productController =
+    IVirtusizeSDK.instance._productController =
     StreamController<VirtusizeProduct>.broadcast();
-    IVirtusizePlugin.instance._recController =
+    IVirtusizeSDK.instance._recController =
     StreamController<Recommendation>.broadcast();
 
     // Set the method call handler to receive data from Native
-    IVirtusizePlugin.instance._channel.setMethodCallHandler((call) {
+    IVirtusizeSDK.instance._channel.setMethodCallHandler((call) {
       if (call.method == VirtusizeFlutterMethod.onRecChange) {
-        IVirtusizePlugin.instance._recController
+        IVirtusizeSDK.instance._recController
             .add(Recommendation(json.encode(call.arguments)));
       } else if (call.method == VirtusizeFlutterMethod.onProduct) {
-        IVirtusizePlugin.instance._productController
+        IVirtusizeSDK.instance._productController
             .add(VirtusizeProduct(json.encode(call.arguments)));
       } else if (call.method == VirtusizeFlutterMethod.onVSEvent) {
         if (_virtusizeMessageListener != null) {
@@ -82,7 +82,7 @@ class VirtusizePlugin {
     try {
 
       // [paramsData] is a map with two key-value pairs to return the Virtusize parameters and the display language from Native
-      Map<dynamic, dynamic> paramsData = await IVirtusizePlugin.instance._channel
+      Map<dynamic, dynamic> paramsData = await IVirtusizeSDK.instance._channel
           .invokeMethod(VirtusizeFlutterMethod.setVirtusizeParams, {
         VirtusizeFlutterKey.apiKey: apiKey,
         VirtusizeFlutterKey.externalUserId: userId,
@@ -101,8 +101,8 @@ class VirtusizePlugin {
       // Loads the i18n localization data and the custom font information
       VSText.load(paramsData[VirtusizeFlutterKey.displayLanguage], language)
           .then((value) {
-        IVirtusizePlugin.instance._vsTextController.add(value);
-        IVirtusizePlugin.instance.vsText = value;
+        IVirtusizeSDK.instance._vsTextController.add(value);
+        IVirtusizeSDK.instance.vsText = value;
       });
     } on PlatformException catch (error) {
       print('Failed to set the Virtusize parameters: $error');
@@ -116,7 +116,7 @@ class VirtusizePlugin {
       return;
     }
     try {
-      await IVirtusizePlugin.instance._channel
+      await IVirtusizeSDK.instance._channel
           .invokeMethod(VirtusizeFlutterMethod.setUserId, userId);
     } on PlatformException catch (error) {
       print('Failed to set the external user ID: $error');
@@ -134,7 +134,7 @@ class VirtusizePlugin {
     assert(externalId != null);
     ProductDataCheck productDataCheck =
     await _getProductDataCheck(externalId, imageURL);
-    IVirtusizePlugin.instance._pdcController.add(productDataCheck);
+    IVirtusizeSDK.instance._pdcController.add(productDataCheck);
     if (productDataCheck != null && productDataCheck.isValidProduct) {
       _getRecommendationText(productDataCheck: productDataCheck);
     }
@@ -144,7 +144,7 @@ class VirtusizePlugin {
   Future<ProductDataCheck> _getProductDataCheck(
       String externalId, String imageURL) async {
     try {
-      ProductDataCheck productDataCheck = await IVirtusizePlugin
+      ProductDataCheck productDataCheck = await IVirtusizeSDK
           .instance._channel
           .invokeMethod(VirtusizeFlutterMethod.getProductDataCheck, {
         VirtusizeFlutterKey.externalProductId: externalId,
@@ -171,13 +171,13 @@ class VirtusizePlugin {
   Future<void> _getRecommendationText(
       {@required ProductDataCheck productDataCheck}) async {
     try {
-      IVirtusizePlugin.instance._recController.add(Recommendation(json.encode(
-          await IVirtusizePlugin.instance._channel.invokeMethod(
+      IVirtusizeSDK.instance._recController.add(Recommendation(json.encode(
+          await IVirtusizeSDK.instance._channel.invokeMethod(
               VirtusizeFlutterMethod.getRecommendationText,
               productDataCheck.productId))));
     } on PlatformException catch (error) {
       print('Failed to get the recommendation text: $error');
-      IVirtusizePlugin.instance._recController.add(Recommendation(
+      IVirtusizeSDK.instance._recController.add(Recommendation(
           "{\"${VirtusizeFlutterKey.externalProductId}\": \"${productDataCheck.externalProductId}\"}"));
     }
   }
@@ -185,7 +185,7 @@ class VirtusizePlugin {
   /// A function for clients to open the Virtusize webview (only when they customize their own button using the [VirtusizeButton] widget)
   Future<void> openVirtusizeWebView() async {
     try {
-      await IVirtusizePlugin.instance._channel
+      await IVirtusizeSDK.instance._channel
           .invokeMethod(VirtusizeFlutterMethod.openVirtusizeWebView);
     } on PlatformException catch (error) {
       print('Failed to open the VirtusizeWebView: $error');
@@ -208,7 +208,7 @@ class VirtusizePlugin {
         Function(Exception e) onError}) async {
     assert(order != null);
     try {
-      Map<dynamic, dynamic> sentOrder = await IVirtusizePlugin.instance._channel
+      Map<dynamic, dynamic> sentOrder = await IVirtusizeSDK.instance._channel
           .invokeMethod(VirtusizeFlutterMethod.sendOrder, order.toJson());
       onSuccess(sentOrder);
     } on PlatformException catch (error) {
@@ -219,9 +219,9 @@ class VirtusizePlugin {
 }
 
 /// The main internal class
-class IVirtusizePlugin {
+class IVirtusizeSDK {
   /// The singleton instance of this class
-  static final IVirtusizePlugin instance = IVirtusizePlugin._();
+  static final IVirtusizeSDK instance = IVirtusizeSDK._();
 
   /// The method channel which creates a bridge to communicate between Flutter and Native
   MethodChannel _channel =
@@ -246,7 +246,7 @@ class IVirtusizePlugin {
   StreamController _recController;
   Stream<Recommendation> get recStream => _recController.stream;
 
-  IVirtusizePlugin._();
+  IVirtusizeSDK._();
 
   /// A function to get the privacy policy link from Native
   Future<String> getPrivacyPolicyLink() async {
