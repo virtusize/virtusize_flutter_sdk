@@ -14,10 +14,10 @@ import 'utils/virtusize_message_listener.dart';
 
 /// The main class for flutter apps to access
 class VirtusizePlugin {
-  /// The singleton instance
+  /// The singleton instance of this class
   static final VirtusizePlugin instance = VirtusizePlugin._();
 
-  /// A message listener to receive Virtusize specific messages from Native
+  /// A listener to receive Virtusize-specific messages from Native
   VirtusizeMessageListener _virtusizeMessageListener;
 
   /// Initialize the [VirtusizePlugin] instance
@@ -53,28 +53,35 @@ class VirtusizePlugin {
     });
   }
 
-  /// A function for clients to set the virtusize parameters
+  /// A function for clients to set the Virtusize parameters
   Future<void> setVirtusizeParams(
-      /// The API key that is unique and provided for Virtusize clients
+
+      /// The unique API key provided for Virtusize clients
       {@required String apiKey,
-      /// The user id that is the unique user id from the client system
-      String userId,
-      /// The Virtusize environment that defaults to the `global` domain
-      Env env = Env.global,
-      /// The [Language] that sets the initial language the Virtusize web app will load in
-      Language language,
-      /// The Boolean value to determine whether the Virtusize web app will fetch SGI and use SGI flow for users to add user generated items to their wardrobe
-      bool showSGI = false,
-      /// The languages that the user can switch to using the Language Selector
-      List<Language> allowedLanguages = Language.values,
-      /// The info categories that will be displayed in the Product Details tab
-      List<InfoCategory> detailsPanelCards = InfoCategory.values}) async {
+
+        /// The user ID from the client's system (should be unique)
+        String userId,
+
+        /// The Virtusize environment (defaults to the `global` domain)
+        Env env = Env.global,
+
+        /// The [Language] that sets the initial language the Virtusize web app will load in
+        Language language,
+
+        /// The boolean value to determine if the Virtusize web app should use the SGI flow for users to add user-generated items to their wardrobe
+        bool showSGI = false,
+
+        /// The languages that the user can switch between using the Language Selector
+        List<Language> allowedLanguages = Language.values,
+
+        /// The info categories that will be displayed in the Product Details tab
+        List<InfoCategory> detailsPanelCards = InfoCategory.values}) async {
     if (apiKey == null) {
       throw FlutterError("The API key is required");
     }
     try {
 
-      // Gets the data of the set Virtusize parameters and the display language from Native
+      // [paramsData] is a map with two key-value pairs to return the Virtusize parameters and the display language from Native
       Map<dynamic, dynamic> paramsData = await IVirtusizePlugin.instance._channel
           .invokeMethod(VirtusizeFlutterMethod.setVirtusizeParams, {
         VirtusizeFlutterKey.apiKey: apiKey,
@@ -91,7 +98,7 @@ class VirtusizePlugin {
         }).toList()
       });
 
-      // Loads the localization and the custom font
+      // Loads the i18n localization data and the custom font information
       VSText.load(paramsData[VirtusizeFlutterKey.displayLanguage], language)
           .then((value) {
         IVirtusizePlugin.instance._vsTextController.add(value);
@@ -116,12 +123,14 @@ class VirtusizePlugin {
     }
   }
 
-  /// A function for clients to set the product info
+  /// A function for clients to set the Product Info
   Future<void> setProduct(
-      /// A string to represent a external product ID from a client's system
+
+      /// A string to represent an external product ID from the client's system
       {@required String externalId,
-      /// The URL of the product image that is fully qualified with the domain and the protocol
-      String imageURL}) async {
+
+        /// The URL of the product image that is fully qualified with a domain name (FQDN) and the HTTPS protocol
+        String imageURL}) async {
     assert(externalId != null);
     ProductDataCheck productDataCheck =
     await _getProductDataCheck(externalId, imageURL);
@@ -131,7 +140,7 @@ class VirtusizePlugin {
     }
   }
 
-  /// A private function to get the product data check result from Native
+  /// A private function to get the [ProductDataCheck] result from Native
   Future<ProductDataCheck> _getProductDataCheck(
       String externalId, String imageURL) async {
     try {
@@ -173,7 +182,7 @@ class VirtusizePlugin {
     }
   }
 
-  /// A function for clients to open the Virtusize webview if they customize their own button
+  /// A function for clients to open the Virtusize webview (only when they customize their own button using the [VirtusizeButton] widget)
   Future<void> openVirtusizeWebView() async {
     try {
       await IVirtusizePlugin.instance._channel
@@ -183,7 +192,7 @@ class VirtusizePlugin {
     }
   }
 
-  /// A function for clients to set the Virtusize message listener to listen to callback messages
+  /// A function for clients to set a listener for Virtusize-specific messages
   void setVirtusizeMessageListener(VirtusizeMessageListener listener) {
     assert(listener != null);
     _virtusizeMessageListener = listener;
@@ -191,12 +200,12 @@ class VirtusizePlugin {
 
   /// A function for clients to send an order to the Virtusize server
   Future<void> sendOrder(
-      /// An order to be sent to the server
+      /// A [VirtusizeOrder] to be sent to the server
       {@required VirtusizeOrder order,
-      /// A callback to get the order data back when sending an order is successful
-      Function(Map<dynamic, dynamic> sentOrder) onSuccess,
-      /// A callback to get an error exception back when sending an order is unsuccessful
-      Function(Exception e) onError}) async {
+        /// [onSuccess] callback to get a map of the order data back when `sendOrder` is successful
+        Function(Map<dynamic, dynamic> sentOrder) onSuccess,
+        /// [onError] callback to get an error exception back when `sendOrder` is unsuccessful
+        Function(Exception e) onError}) async {
     assert(order != null);
     try {
       Map<dynamic, dynamic> sentOrder = await IVirtusizePlugin.instance._channel
@@ -211,7 +220,7 @@ class VirtusizePlugin {
 
 /// The main internal class
 class IVirtusizePlugin {
-  /// The singleton instance
+  /// The singleton instance of this class
   static final IVirtusizePlugin instance = IVirtusizePlugin._();
 
   /// The method channel which creates a bridge to communicate between Flutter and Native
@@ -249,8 +258,8 @@ class IVirtusizePlugin {
     }
   }
 
-  /// A function to add an external product ID to the stack in Native
-  /// which records the visited order of the external product IDs that are tied with the Virtusize widgets
+  /// A function to add a product ID to the (external) Product ID stack in Native.
+  /// The most recently visited product will be at the top of the stack.
   Future<void> addProduct({@required String externalProductId}) async {
     if (externalProductId == null) {
       return;
