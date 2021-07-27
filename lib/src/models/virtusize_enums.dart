@@ -1,3 +1,4 @@
+/// This enum contains all the styles that can be applied to the Virtusize widgets
 enum VirtusizeStyle { None, Black, Teal }
 
 extension VirtusizeStyleExtension on VirtusizeStyle {
@@ -6,17 +7,21 @@ extension VirtusizeStyleExtension on VirtusizeStyle {
   }
 }
 
-enum Env { staging, global, japan, korea }
 
-extension EnvExtension on Env {
+/// This enum contains all available Virtusize environments
+enum VSEnvironment { staging, global, japan, korea }
+
+extension VSEnvExtension on VSEnvironment {
   String get value {
     return ["STAGING", "GLOBAL", "JAPAN", "KOREA"][this.index];
   }
 }
 
-enum Language { en, jp, kr }
 
-extension LanguageExtension on Language {
+/// This enum contains all the possible display languages of the Virtusize webview
+enum VSLanguage { en, jp, kr }
+
+extension LanguageExtension on VSLanguage {
   String get value {
     return ["EN", "JP", "KR"][this.index];
   }
@@ -26,9 +31,11 @@ extension LanguageExtension on Language {
   }
 }
 
-enum InfoCategory { modelInfo, generalFit, brandSizing, material }
 
-extension InfoCategoryExtension on InfoCategory {
+/// This enum contains all the possible info categories that will be displayed in the Product Details tab of the Virtusize webview
+enum VSInfoCategory { modelInfo, generalFit, brandSizing, material }
+
+extension InfoCategoryExtension on VSInfoCategory {
   String get value {
     return [
       "MODEL_INFO",
@@ -38,5 +45,3 @@ extension InfoCategoryExtension on InfoCategory {
     ][this.index];
   }
 }
-
-enum ProductImageType { store, user }

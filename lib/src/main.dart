@@ -8,7 +8,7 @@ import 'models/virtusize_product.dart';
 import 'models/product_data_check.dart';
 import 'models/virtusize_enums.dart';
 import 'models/virtusize_order.dart';
-import 'res/text.dart';
+import 'res/vs_text.dart';
 import 'utils/virtusize_constants.dart';
 import 'utils/virtusize_message_listener.dart';
 
@@ -63,19 +63,19 @@ class VirtusizeSDK {
         String userId,
 
         /// The Virtusize environment (defaults to the `global` domain)
-        Env env = Env.global,
+        VSEnvironment environment = VSEnvironment.global,
 
-        /// The [Language] that sets the initial language the Virtusize web app will load in
-        Language language,
+        /// The [VSLanguage] that sets the initial language the Virtusize web app will load in
+        VSLanguage language,
 
         /// The boolean value to determine if the Virtusize web app should use the SGI flow for users to add user-generated items to their wardrobe
         bool showSGI = false,
 
         /// The languages that the user can switch between using the Language Selector
-        List<Language> allowedLanguages = Language.values,
+        List<VSLanguage> allowedLanguages = VSLanguage.values,
 
         /// The info categories that will be displayed in the Product Details tab
-        List<InfoCategory> detailsPanelCards = InfoCategory.values}) async {
+        List<VSInfoCategory> detailsPanelCards = VSInfoCategory.values}) async {
     if (apiKey == null) {
       throw FlutterError("The API key is required");
     }
@@ -86,7 +86,7 @@ class VirtusizeSDK {
           .invokeMethod(VirtusizeFlutterMethod.setVirtusizeParams, {
         VirtusizeFlutterKey.apiKey: apiKey,
         VirtusizeFlutterKey.externalUserId: userId,
-        VirtusizeFlutterKey.environment: env.value,
+        VirtusizeFlutterKey.environment: environment.value,
         VirtusizeFlutterKey.language: language != null ? language.value : null,
         VirtusizeFlutterKey.showSGI: showSGI,
         VirtusizeFlutterKey.allowedLanguages: allowedLanguages.map((language) {

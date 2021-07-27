@@ -13,15 +13,15 @@ Future<void> main() async {
       // For using the Order API, a user ID is required. You can also set the user ID later
       userId: '123',
       // By default, the Virtusize environment will be set to GLOBAL
-      env: Env.staging,
+      environment: VSEnvironment.staging,
       // By default, the initial language will be set based on the Virtusize environment
-      language: Language.jp,
+      language: VSLanguage.jp,
       // By default, ShowSGI is false
       showSGI: true,
       // By default, Virtusize allows all the possible languages
-      allowedLanguages: [Language.en, Language.jp],
+      allowedLanguages: [VSLanguage.en, VSLanguage.jp],
       // By default, Virtusize displays all the possible info categories in the Product Details tab
-      detailsPanelCards: [InfoCategory.generalFit, InfoCategory.brandSizing]);
+      detailsPanelCards: [VSInfoCategory.generalFit, VSInfoCategory.brandSizing]);
 
   runApp(MyApp());
 }

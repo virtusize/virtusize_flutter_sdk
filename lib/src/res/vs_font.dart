@@ -6,7 +6,7 @@ import '../../src/models/virtusize_enums.dart';
 enum VSFontSize { xsmall, small, normal, large, xlarge, xxlarge }
 
 class VSFont {
-  final Language language;
+  final VSLanguage language;
 
   VSFont(this.language);
 
@@ -20,28 +20,28 @@ class VSFont {
         color: color);
   }
 
-  /// Gets the font family based on the [Language] value
-  String _getFontFamily(Language language) {
+  /// Gets the font family based on the [VSLanguage] value
+  String _getFontFamily(VSLanguage language) {
     String fontFamilyName;
     switch(language) {
-      case Language.en:
+      case VSLanguage.en:
         // TODO: Proxima Nova is not a open source font. Need to find an alternative
         fontFamilyName = "ProximaNova";
         break;
-      case Language.jp:
+      case VSLanguage.jp:
         fontFamilyName = "NotoSansJP";
         break;
-      case Language.kr:
+      case VSLanguage.kr:
         fontFamilyName = "NotoSansKR";
         break;
     }
     return fontFamilyName;
   }
 
-  /// Gets the font size based on the [Language] and [VSFontSize] values
-  double _getFontSize(Language language, VSFontSize fontSize) {
-    Map<List<Language>, Map<VSFontSize, double>> langFontSizeMap = {
-      [Language.en]: {
+  /// Gets the font size based on the [VSLanguage] and [VSFontSize] values
+  double _getFontSize(VSLanguage language, VSFontSize fontSize) {
+    Map<List<VSLanguage>, Map<VSFontSize, double>> langFontSizeMap = {
+      [VSLanguage.en]: {
         VSFontSize.xsmall: 12.0,
         VSFontSize.small: 14.0,
         VSFontSize.normal: 16.0,
@@ -49,7 +49,7 @@ class VSFont {
         VSFontSize.xlarge: 22.0,
         VSFontSize.xxlarge: 28.0
       },
-      [Language.jp, Language.kr]: {
+      [VSLanguage.jp, VSLanguage.kr]: {
         VSFontSize.xsmall: 10.0,
         VSFontSize.small: 12.0,
         VSFontSize.normal: 14.0,

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
-import '../models/virtusize_enums.dart';
 import '../utils/virtusize_constants.dart';
 import 'virtusize_model.dart';
+
+/// This enum contains the two possible product image types
+enum ProductImageType { store, user }
 
 class VirtusizeProduct extends VirtusizeModel {
   VirtusizeProduct(data) : super(data);

@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 
 import '../main.dart';
 import '../models/product_data_check.dart';
-import '../res/colors.dart';
-import '../res/font.dart';
-import '../res/images.dart';
-import '../res/text.dart';
+import '../res/vs_colors.dart';
+import '../res/vs_font.dart';
+import '../res/vs_images.dart';
+import '../res/vs_text.dart';
 import '../../flutter_virtusize_sdk.dart';
 
 class VirtusizeButton extends StatefulWidget {
