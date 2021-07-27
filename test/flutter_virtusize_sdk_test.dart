@@ -1,6 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import '../lib/flutter_virtusize_sdk.dart';
+import '../lib/virtusize_sdk.dart';
 import '../lib/src/utils/virtusize_constants.dart';
 
 void main() {

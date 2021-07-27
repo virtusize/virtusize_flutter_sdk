@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_virtusize_sdk/flutter_virtusize_sdk.dart';
+import 'package:flutter_virtusize_sdk/virtusize_sdk.dart';
 
 class ProductScreen extends StatefulWidget {
   final String externalID;
