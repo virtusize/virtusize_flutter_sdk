@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 
-import 'package:virtusize_flutter_plugin/virtusize_plugin.dart';
+import 'package:flutter_virtusize_sdk/flutter_virtusize_sdk.dart';
 import 'screens/home_screen.dart';
 
 Future<void> main() async {
@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      /// Refer to the code in the HomeScreen to see how to set up your product info and the Virtusize widgets
+        /// Refer to the code in the HomeScreen to see how to set up your product info and the Virtusize widgets
         home: HomeScreen()
     );
   }

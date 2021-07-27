@@ -1,9 +1,9 @@
 #
 # To learn more about a Podspec see http://guides.cocoapods.org/syntax/podspec.html.
-# Run `pod lib lint virtusize_flutter_plugin.podspec` to validate before publishing.
+# Run `pod lib lint flutter_virtusize_sdk.podspec` to validate before publishing.
 #
 Pod::Spec.new do |s|
-  s.name             = 'virtusize_flutter_plugin'
+  s.name             = 'flutter_virtusize_sdk'
   s.version          = '0.0.1'
   s.summary          = 'Virtusize integration in Flutter'
   s.description      = <<-DESC
@@ -15,7 +15,7 @@ Virtusize integration in Flutter
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'
-	
+
 #	s.dependency 'Virtusize', '~> 2.2.1'
   s.preserve_paths = 'Virtusize.framework'
   s.xcconfig = { 'OTHER_LDFLAGS' => '-framework Virtusize' }

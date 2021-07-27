@@ -8,7 +8,7 @@ import '../res/colors.dart';
 import '../res/font.dart';
 import '../res/images.dart';
 import '../res/text.dart';
-import '../../virtusize_plugin.dart';
+import '../../flutter_virtusize_sdk.dart';
 
 class VirtusizeButton extends StatefulWidget {
   final Widget child;

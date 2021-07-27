@@ -1,4 +1,4 @@
-library virtusize_plugin;
+library flutter_virtusize_sdk;
 
 export 'src/main.dart' hide IVirtusizePlugin;
 export 'src/models/virtusize_enums.dart';

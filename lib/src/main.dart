@@ -24,13 +24,13 @@ class VirtusizePlugin {
   VirtusizePlugin._() {
     // The broadcast stream controllers
     IVirtusizePlugin.instance._vsTextController =
-        StreamController<VSText>.broadcast();
+    StreamController<VSText>.broadcast();
     IVirtusizePlugin.instance._pdcController =
-        StreamController<ProductDataCheck>.broadcast();
+    StreamController<ProductDataCheck>.broadcast();
     IVirtusizePlugin.instance._productController =
-        StreamController<VirtusizeProduct>.broadcast();
+    StreamController<VirtusizeProduct>.broadcast();
     IVirtusizePlugin.instance._recController =
-        StreamController<Recommendation>.broadcast();
+    StreamController<Recommendation>.broadcast();
 
     // Set the method call handler to receive data from Native
     IVirtusizePlugin.instance._channel.setMethodCallHandler((call) {
@@ -86,7 +86,7 @@ class VirtusizePlugin {
           return language.value;
         }).toList(),
         VirtusizeFlutterKey.detailsPanelCards:
-            detailsPanelCards.map((infoCategory) {
+        detailsPanelCards.map((infoCategory) {
           return infoCategory.value;
         }).toList()
       });
@@ -124,7 +124,7 @@ class VirtusizePlugin {
       String imageURL}) async {
     assert(externalId != null);
     ProductDataCheck productDataCheck =
-        await _getProductDataCheck(externalId, imageURL);
+    await _getProductDataCheck(externalId, imageURL);
     IVirtusizePlugin.instance._pdcController.add(productDataCheck);
     if (productDataCheck != null && productDataCheck.isValidProduct) {
       _getRecommendationText(productDataCheck: productDataCheck);
@@ -216,7 +216,7 @@ class IVirtusizePlugin {
 
   /// The method channel which creates a bridge to communicate between Flutter and Native
   MethodChannel _channel =
-      const MethodChannel('com.virtusize/virtusize_flutter_plugin');
+  const MethodChannel('com.virtusize/flutter_virtusize_sdk');
 
   /// For caching the i18n localization data and the custom font info
   VSText vsText;

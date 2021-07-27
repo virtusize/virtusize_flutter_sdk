@@ -14,7 +14,7 @@ class VSText {
   /// Loads the localization from the local i18n json files and the custom font info
   static Future<VSText> load(String localeName, Language language) async {
     VirtusizeLocalization localization = VirtusizeLocalization(
-        await rootBundle.loadString('packages/virtusize_flutter_plugin/assets/i18n/$localeName.json'));
+        await rootBundle.loadString('packages/flutter_virtusize_sdk/assets/i18n/$localeName.json'));
     try {
       language = Language.values.firstWhere((lang) => lang.langCode == localeName);
     } catch(e) {

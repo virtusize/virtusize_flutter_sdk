@@ -11,7 +11,7 @@ import '../res/colors.dart';
 import '../res/font.dart';
 import '../res/images.dart';
 import '../res/text.dart';
-import '../../virtusize_plugin.dart';
+import '../../flutter_virtusize_sdk.dart';
 import 'animated_dots.dart';
 import 'animated_product_images.dart';
 import 'cta_button.dart';

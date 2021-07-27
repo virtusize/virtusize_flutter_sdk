@@ -1,4 +1,4 @@
-package com.virtusize.virtusize_flutter_plugin
+package com.virtusize.flutter_virtusize_sdk
 
 internal class VirtusizeFlutterErrors {
     companion object {

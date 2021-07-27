@@ -2,8 +2,8 @@ import Flutter
 import UIKit
 import Virtusize
 
-public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
-
+public class SwiftFlutterVirtusizeSdkPlugin: NSObject, FlutterPlugin {
+  
 	/// The FlutterMethodChannel that will create the communication between Flutter and native iOS
 	private var flutterChannel: FlutterMethodChannel?
 
@@ -39,8 +39,8 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 	}
 	
 	public static func register(with registrar: FlutterPluginRegistrar) {
-		let channel = FlutterMethodChannel(name: "com.virtusize/virtusize_flutter_plugin", binaryMessenger: registrar.messenger())
-		let instance = SwiftVirtusizeFlutterPlugin(channel: channel)
+		let channel = FlutterMethodChannel(name: "com.virtusize/flutter_virtusize_sdk", binaryMessenger: registrar.messenger())
+		let instance = SwiftFlutterVirtusizeSdkPlugin(channel: channel)
 		registrar.addMethodCallDelegate(instance, channel: channel)
 	}
 	
@@ -376,7 +376,7 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 	}
 }
 
-extension SwiftVirtusizeFlutterPlugin: VirtusizeMessageHandler {
+extension SwiftFlutterVirtusizeSdkPlugin: VirtusizeMessageHandler {
 	public func virtusizeController(_ controller: VirtusizeWebViewController?, didReceiveError error: VirtusizeError) {
 		currentWorkItem = DispatchWorkItem { [weak self] in
 			self?.flutterChannel?.invokeMethod(VirtusizeFlutterMethod.onVSError, arguments: error.debugDescription)
