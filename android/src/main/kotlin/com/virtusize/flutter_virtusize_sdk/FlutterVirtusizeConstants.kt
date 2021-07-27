@@ -1,4 +1,4 @@
-internal object VirtusizeFlutterMethod {
+internal object FlutterVirtusizeMethod {
     // Flutter to Android
     const val SET_VIRTUSIZE_PARAMS = "setVirtusizeParams"
     const val SET_USER_ID = "setUserId"
@@ -17,7 +17,7 @@ internal object VirtusizeFlutterMethod {
     const val ON_REC_CHANGE = "onRecChange"
 }
 
-internal object VirtusizeFlutterKey {
+internal object FlutterVirtusizeKey {
     const val API_KEY = "apiKey"
     const val EXTERNAL_USER_ID = "externalUserId"
     const val ENVIRONMENT = "env"

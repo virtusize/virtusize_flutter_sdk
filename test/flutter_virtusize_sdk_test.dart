@@ -18,7 +18,7 @@ void main() {
     channel.setMockMethodCallHandler(null);
   });
 
-  test(VirtusizeFlutterMethod.setVirtusizeParams, () async {
+  test(FlutterVirtusizeMethod.setVirtusizeParams, () async {
     expect(await VirtusizeSDK.instance.setVirtusizeParams, '42');
   });
 }

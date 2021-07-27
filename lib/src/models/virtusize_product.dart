@@ -13,7 +13,7 @@ class VirtusizeProduct extends VirtusizeModel {
   Image networkProductImage;
 
   /// The product image type as a String
-  String get _imageType => decodedData[VirtusizeFlutterKey.imageType];
+  String get _imageType => decodedData[FlutterVirtusizeKey.imageType];
 
   /// The product image type as a [ProductImageType]
   ProductImageType get imageType {
@@ -26,16 +26,16 @@ class VirtusizeProduct extends VirtusizeModel {
   }
 
   /// An integer to represent the internal product ID in the Virtusize server
-  int get productId => decodedData[VirtusizeFlutterKey.productId];
+  int get productId => decodedData[FlutterVirtusizeKey.productId];
 
   /// The product image URL
-  String get imageURL  => decodedData[VirtusizeFlutterKey.imageURL];
+  String get imageURL  => decodedData[FlutterVirtusizeKey.imageURL];
 
   /// The product type
-  int get productType => decodedData[VirtusizeFlutterKey.productType];
+  int get productType => decodedData[FlutterVirtusizeKey.productType];
 
   /// The product style
-  String get productStyle => decodedData[VirtusizeFlutterKey.productStyle];
+  String get productStyle => decodedData[FlutterVirtusizeKey.productStyle];
 
   @override
   String toString() {

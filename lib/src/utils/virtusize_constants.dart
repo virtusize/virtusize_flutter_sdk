@@ -1,4 +1,4 @@
-class VirtusizeFlutterMethod {
+class FlutterVirtusizeMethod {
   // Flutter to Native
   static String setVirtusizeParams = "setVirtusizeParams";
   static String setUserId = "setUserId";
@@ -17,7 +17,7 @@ class VirtusizeFlutterMethod {
   static String onRecChange = "onRecChange";
 }
 
-class VirtusizeFlutterKey {
+class FlutterVirtusizeKey {
   static String apiKey = "apiKey";
   static String externalUserId = "externalUserId";
   static String environment = "env";

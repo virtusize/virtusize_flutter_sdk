@@ -66,7 +66,7 @@ class FlutterVirtusizeSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware
     messageHandler = object : VirtusizeMessageHandler {
       override fun onError(error: VirtusizeError) {
         scope.launch {
-          channel.invokeMethod(VirtusizeFlutterMethod.ON_VS_ERROR, error.toString())
+          channel.invokeMethod(FlutterVirtusizeMethod.ON_VS_ERROR, error.toString())
         }
       }
 
@@ -80,7 +80,7 @@ class FlutterVirtusizeSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware
         }
         eventName?.let {
           scope.launch {
-            channel.invokeMethod(VirtusizeFlutterMethod.ON_VS_EVENT, eventName)
+            channel.invokeMethod(FlutterVirtusizeMethod.ON_VS_EVENT, eventName)
           }
         }
 
@@ -185,46 +185,46 @@ class FlutterVirtusizeSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware
 
   override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
     when (call.method) {
-      VirtusizeFlutterMethod.SET_VIRTUSIZE_PARAMS -> {
+      FlutterVirtusizeMethod.SET_VIRTUSIZE_PARAMS -> {
         if (call.arguments == null) {
-          val error = VirtusizeFlutterErrors.noArguments
+          val error = FlutterVirtusizeErrors.noArguments
           result.error(error.errorCode, error.errorMessage, null)
           return
         }
 
         var virtusizeBuilder = VirtusizeBuilder().init(context)
 
-        call.argument<String>(VirtusizeFlutterKey.API_KEY)?.let { apiKey ->
+        call.argument<String>(FlutterVirtusizeKey.API_KEY)?.let { apiKey ->
           virtusizeBuilder = virtusizeBuilder.setApiKey(apiKey)
         } ?: run {
-          val error = VirtusizeFlutterErrors.argumentNotSet(VirtusizeFlutterKey.API_KEY)
+          val error = FlutterVirtusizeErrors.argumentNotSet(FlutterVirtusizeKey.API_KEY)
           result.error(error.errorCode, error.errorMessage, null)
           return
         }
 
-        call.argument<String>(VirtusizeFlutterKey.EXTERNAL_USER_ID)?.let { userId ->
+        call.argument<String>(FlutterVirtusizeKey.EXTERNAL_USER_ID)?.let { userId ->
           virtusizeBuilder = virtusizeBuilder.setUserId(userId)
         }
 
-        call.argument<String>(VirtusizeFlutterKey.ENVIRONMENT)?.let { env ->
+        call.argument<String>(FlutterVirtusizeKey.ENVIRONMENT)?.let { env ->
           virtusizeBuilder = virtusizeBuilder.setEnv(VirtusizeEnvironment.valueOf(env))
         }
 
-        call.argument<String>(VirtusizeFlutterKey.LANGUAGE)?.let { lang ->
+        call.argument<String>(FlutterVirtusizeKey.LANGUAGE)?.let { lang ->
           virtusizeBuilder = virtusizeBuilder.setLanguage(VirtusizeLanguage.valueOf(lang))
         }
 
-        call.argument<Boolean>(VirtusizeFlutterKey.SHOW_SGI)?.let { showSGI ->
+        call.argument<Boolean>(FlutterVirtusizeKey.SHOW_SGI)?.let { showSGI ->
           virtusizeBuilder = virtusizeBuilder.setShowSGI(showSGI)
         }
 
-        call.argument<List<String>>(VirtusizeFlutterKey.ALLOW_LANGUAGES)?.let { langList ->
+        call.argument<List<String>>(FlutterVirtusizeKey.ALLOW_LANGUAGES)?.let { langList ->
           val allowedLanguages =
             langList.map { VirtusizeLanguage.valueOf(it) }.toMutableList()
           virtusizeBuilder = virtusizeBuilder.setAllowedLanguages(allowedLanguages)
         }
 
-        call.argument<List<String>>(VirtusizeFlutterKey.DETAILS_PANEL_CARDS)?.let { detailsPanelCardList ->
+        call.argument<List<String>>(FlutterVirtusizeKey.DETAILS_PANEL_CARDS)?.let { detailsPanelCardList ->
           val detailsPanelCards =
             detailsPanelCardList.map { VirtusizeInfoCategory.valueOf(it) }
               .toMutableList()
@@ -235,29 +235,29 @@ class FlutterVirtusizeSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware
 
         result.success(
           mutableMapOf(
-            VirtusizeFlutterKey.VIRTUSIZE_PARAMS to call.arguments.toString(),
-            VirtusizeFlutterKey.DISPLAY_LANGUAGE to virtusize?.displayLanguage?.value
+            FlutterVirtusizeKey.VIRTUSIZE_PARAMS to call.arguments.toString(),
+            FlutterVirtusizeKey.DISPLAY_LANGUAGE to virtusize?.displayLanguage?.value
           )
         )
       }
-      VirtusizeFlutterMethod.SET_USER_ID -> {
+      FlutterVirtusizeMethod.SET_USER_ID -> {
         if (call.arguments == null) {
-          val error = VirtusizeFlutterErrors.noArguments
+          val error = FlutterVirtusizeErrors.noArguments
           result.error(error.errorCode, error.errorMessage, null)
           return
         }
         virtusize?.setUserId(call.arguments.toString())
       }
-      VirtusizeFlutterMethod.GET_PRODUCT_DATA_CHECK -> {
-        val externalId = call.argument<String>(VirtusizeFlutterKey.EXTERNAL_PRODUCT_ID)
+      FlutterVirtusizeMethod.GET_PRODUCT_DATA_CHECK -> {
+        val externalId = call.argument<String>(FlutterVirtusizeKey.EXTERNAL_PRODUCT_ID)
         if (externalId == null) {
-          val error = VirtusizeFlutterErrors.argumentNotSet(VirtusizeFlutterKey.EXTERNAL_PRODUCT_ID)
+          val error = FlutterVirtusizeErrors.argumentNotSet(FlutterVirtusizeKey.EXTERNAL_PRODUCT_ID)
           result.error(error.errorCode, error.errorMessage, null)
           return
         }
         val virtusizeProduct = VirtusizeProduct(
           externalId = externalId,
-          imageUrl = call.argument<String>(VirtusizeFlutterKey.IMAGE_URL)
+          imageUrl = call.argument<String>(FlutterVirtusizeKey.IMAGE_URL)
         )
         scope.launch {
           val productDataCheck = repository.productDataCheck(virtusizeProduct)
@@ -268,7 +268,7 @@ class FlutterVirtusizeSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware
           result.success(productDataCheck?.jsonString)
         }
       }
-      VirtusizeFlutterMethod.OPEN_VIRTUSIZE_WEB_VIEW -> {
+      FlutterVirtusizeMethod.OPEN_VIRTUSIZE_WEB_VIEW -> {
         val virtusizeProduct =
           virtusizeProductSet.firstOrNull { product -> product.externalId == externalProductIDStack.last() }
         if (virtusizeProduct?.productCheckData == null) {
@@ -281,10 +281,10 @@ class FlutterVirtusizeSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware
           messageHandler
         )
       }
-      VirtusizeFlutterMethod.GET_RECOMMENDATION_TEXT -> {
+      FlutterVirtusizeMethod.GET_RECOMMENDATION_TEXT -> {
         val storeProductId = call.arguments as? Int
         if(storeProductId == null) {
-          val error = VirtusizeFlutterErrors.argumentNotSet(VirtusizeFlutterKey.STORE_PRODUCT_ID)
+          val error = FlutterVirtusizeErrors.argumentNotSet(FlutterVirtusizeKey.STORE_PRODUCT_ID)
           result.error(error.errorCode, error.errorMessage, null)
           return
         }
@@ -294,10 +294,10 @@ class FlutterVirtusizeSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware
           getRecommendation(this, result, storeProductId = storeProductId)
         }
       }
-      VirtusizeFlutterMethod.GET_PRIVACY_POLICY_LINK -> {
+      FlutterVirtusizeMethod.GET_PRIVACY_POLICY_LINK -> {
         result.success(VirtusizeFlutterUtils.getPrivacyPolicyLink(context, virtusize?.displayLanguage))
       }
-      VirtusizeFlutterMethod.SEND_ORDER -> {
+      FlutterVirtusizeMethod.SEND_ORDER -> {
         scope.launch {
           repository.sendOrder(
             virtusize,
@@ -306,21 +306,21 @@ class FlutterVirtusizeSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware
               result.success(call.arguments)
             },
             onError = {
-              val error = VirtusizeFlutterErrors.sendOrder(it.message)
+              val error = FlutterVirtusizeErrors.sendOrder(it.message)
               result.error(error.errorCode, error.errorMessage, null)
             })
         }
       }
-      VirtusizeFlutterMethod.ADD_PRODUCT -> {
+      FlutterVirtusizeMethod.ADD_PRODUCT -> {
         val externalId = call.arguments as? String
         if (externalId == null) {
-          val error = VirtusizeFlutterErrors.argumentNotSet(VirtusizeFlutterKey.EXTERNAL_PRODUCT_ID)
+          val error = FlutterVirtusizeErrors.argumentNotSet(FlutterVirtusizeKey.EXTERNAL_PRODUCT_ID)
           result.error(error.errorCode, error.errorMessage, null)
           return
         }
         externalProductIDStack.add(externalId)
       }
-      VirtusizeFlutterMethod.REMOVE_PRODUCT -> {
+      FlutterVirtusizeMethod.REMOVE_PRODUCT -> {
         externalProductIDStack.removeLast()
       }
       else -> {
@@ -338,7 +338,7 @@ class FlutterVirtusizeSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware
 
     val storeProduct = repository.getStoreProduct(storeProductId)
     if (storeProduct == null) {
-      val error = VirtusizeFlutterErrors.nullAPIResult("storeProduct")
+      val error = FlutterVirtusizeErrors.nullAPIResult("storeProduct")
       result.error(error.errorCode, error.errorMessage, null)
       scope.cancel()
     }
@@ -346,26 +346,26 @@ class FlutterVirtusizeSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware
     storeProductSet.add(storeProduct!!)
 
     channel.invokeMethod(
-      VirtusizeFlutterMethod.ON_PRODUCT,
+      FlutterVirtusizeMethod.ON_PRODUCT,
       mutableMapOf(
-        VirtusizeFlutterKey.STORE_PRODUCT_ID to storeProduct.id,
-        VirtusizeFlutterKey.IMAGE_TYPE to "store",
-        VirtusizeFlutterKey.IMAGE_URL to storeProduct.getProductImageURL(),
-        VirtusizeFlutterKey.PRODUCT_TYPE to storeProduct.productType,
-        VirtusizeFlutterKey.PRODUCT_STYLE to storeProduct.storeProductMeta?.additionalInfo?.style
+        FlutterVirtusizeKey.STORE_PRODUCT_ID to storeProduct.id,
+        FlutterVirtusizeKey.IMAGE_TYPE to "store",
+        FlutterVirtusizeKey.IMAGE_URL to storeProduct.getProductImageURL(),
+        FlutterVirtusizeKey.PRODUCT_TYPE to storeProduct.productType,
+        FlutterVirtusizeKey.PRODUCT_STYLE to storeProduct.storeProductMeta?.additionalInfo?.style
       )
     )
 
     productTypes = repository.getProductTypes()
     if (productTypes == null) {
-      val error = VirtusizeFlutterErrors.nullAPIResult("productTypes")
+      val error = FlutterVirtusizeErrors.nullAPIResult("productTypes")
       result.error(error.errorCode, error.errorMessage, null)
       scope.cancel()
     }
 
     i18nLocalization = repository.getI18nLocalization(virtusize?.displayLanguage)
     if (i18nLocalization == null) {
-      val error = VirtusizeFlutterErrors.nullAPIResult("i18nLocalization")
+      val error = FlutterVirtusizeErrors.nullAPIResult("i18nLocalization")
       result.error(error.errorCode, error.errorMessage, null)
       scope.cancel()
     }
@@ -375,15 +375,15 @@ class FlutterVirtusizeSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware
     val userSessionResponse = repository.getUserSessionResponse()
     if (userSessionResponse == null) {
       if (result != null) {
-        val error = VirtusizeFlutterErrors.nullAPIResult("userSessionResponse")
+        val error = FlutterVirtusizeErrors.nullAPIResult("userSessionResponse")
         result.error(error.errorCode, error.errorMessage, null)
       } else {
         channel.invokeMethod(
-          VirtusizeFlutterMethod.ON_REC_CHANGE,
+          FlutterVirtusizeMethod.ON_REC_CHANGE,
           mutableMapOf(
-            VirtusizeFlutterKey.EXTERNAL_PRODUCT_ID to storeProduct!!.externalId,
-            VirtusizeFlutterKey.REC_TEXT to null,
-            VirtusizeFlutterKey.SHOW_USER_PRODUCT_IMAGE to false
+            FlutterVirtusizeKey.EXTERNAL_PRODUCT_ID to storeProduct!!.externalId,
+            FlutterVirtusizeKey.REC_TEXT to null,
+            FlutterVirtusizeKey.SHOW_USER_PRODUCT_IMAGE to false
           )
         )
       }
@@ -413,15 +413,15 @@ class FlutterVirtusizeSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware
       userProducts = repository.getUserProducts()
       if (userProducts == null) {
         if (result != null) {
-          val error = VirtusizeFlutterErrors.nullAPIResult("userProducts")
+          val error = FlutterVirtusizeErrors.nullAPIResult("userProducts")
           result.error(error.errorCode, error.errorMessage, null)
         } else {
           channel.invokeMethod(
-            VirtusizeFlutterMethod.ON_REC_CHANGE,
+            FlutterVirtusizeMethod.ON_REC_CHANGE,
             mutableMapOf(
-              VirtusizeFlutterKey.EXTERNAL_PRODUCT_ID to storeProduct!!.externalId,
-              VirtusizeFlutterKey.REC_TEXT to null,
-              VirtusizeFlutterKey.SHOW_USER_PRODUCT_IMAGE to false
+              FlutterVirtusizeKey.EXTERNAL_PRODUCT_ID to storeProduct!!.externalId,
+              FlutterVirtusizeKey.REC_TEXT to null,
+              FlutterVirtusizeKey.SHOW_USER_PRODUCT_IMAGE to false
             )
           )
         }
@@ -457,13 +457,13 @@ class FlutterVirtusizeSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware
     )
 
     channel.invokeMethod(
-      VirtusizeFlutterMethod.ON_PRODUCT,
+      FlutterVirtusizeMethod.ON_PRODUCT,
       mutableMapOf(
-        VirtusizeFlutterKey.STORE_PRODUCT_ID to storeProduct!!.id,
-        VirtusizeFlutterKey.IMAGE_TYPE to "user",
-        VirtusizeFlutterKey.IMAGE_URL to userProductRecommendedSize?.bestUserProduct?.getProductImageURL(),
-        VirtusizeFlutterKey.PRODUCT_TYPE to userProductRecommendedSize?.bestUserProduct?.productType,
-        VirtusizeFlutterKey.PRODUCT_STYLE to userProductRecommendedSize?.bestUserProduct?.storeProductMeta?.additionalInfo?.style
+        FlutterVirtusizeKey.STORE_PRODUCT_ID to storeProduct!!.id,
+        FlutterVirtusizeKey.IMAGE_TYPE to "user",
+        FlutterVirtusizeKey.IMAGE_URL to userProductRecommendedSize?.bestUserProduct?.getProductImageURL(),
+        FlutterVirtusizeKey.PRODUCT_TYPE to userProductRecommendedSize?.bestUserProduct?.productType,
+        FlutterVirtusizeKey.PRODUCT_STYLE to userProductRecommendedSize?.bestUserProduct?.storeProductMeta?.additionalInfo?.style
       )
     )
 
@@ -476,13 +476,13 @@ class FlutterVirtusizeSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware
     )
 
     val resultMap = mutableMapOf(
-      VirtusizeFlutterKey.EXTERNAL_PRODUCT_ID to storeProduct!!.externalId,
-      VirtusizeFlutterKey.REC_TEXT to recText,
-      VirtusizeFlutterKey.SHOW_USER_PRODUCT_IMAGE to (userProductRecommendedSize?.bestUserProduct != null)
+      FlutterVirtusizeKey.EXTERNAL_PRODUCT_ID to storeProduct!!.externalId,
+      FlutterVirtusizeKey.REC_TEXT to recText,
+      FlutterVirtusizeKey.SHOW_USER_PRODUCT_IMAGE to (userProductRecommendedSize?.bestUserProduct != null)
     )
 
     result?.success(resultMap) ?: run {
-      channel.invokeMethod(VirtusizeFlutterMethod.ON_REC_CHANGE, resultMap)
+      channel.invokeMethod(FlutterVirtusizeMethod.ON_REC_CHANGE, resultMap)
     }
   }
 

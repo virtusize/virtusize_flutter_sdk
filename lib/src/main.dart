@@ -34,17 +34,17 @@ class VirtusizeSDK {
 
     // Set the method call handler to receive data from Native
     IVirtusizeSDK.instance._channel.setMethodCallHandler((call) {
-      if (call.method == VirtusizeFlutterMethod.onRecChange) {
+      if (call.method == FlutterVirtusizeMethod.onRecChange) {
         IVirtusizeSDK.instance._recController
             .add(Recommendation(json.encode(call.arguments)));
-      } else if (call.method == VirtusizeFlutterMethod.onProduct) {
+      } else if (call.method == FlutterVirtusizeMethod.onProduct) {
         IVirtusizeSDK.instance._productController
             .add(VirtusizeProduct(json.encode(call.arguments)));
-      } else if (call.method == VirtusizeFlutterMethod.onVSEvent) {
+      } else if (call.method == FlutterVirtusizeMethod.onVSEvent) {
         if (_virtusizeMessageListener != null) {
           _virtusizeMessageListener.vsEvent.call(call.arguments);
         }
-      } else if (call.method == VirtusizeFlutterMethod.onVSError) {
+      } else if (call.method == FlutterVirtusizeMethod.onVSError) {
         if (_virtusizeMessageListener != null) {
           _virtusizeMessageListener.vsError.call(call.arguments);
         }
@@ -83,23 +83,23 @@ class VirtusizeSDK {
 
       // [paramsData] is a map with two key-value pairs to return the Virtusize parameters and the display language from Native
       Map<dynamic, dynamic> paramsData = await IVirtusizeSDK.instance._channel
-          .invokeMethod(VirtusizeFlutterMethod.setVirtusizeParams, {
-        VirtusizeFlutterKey.apiKey: apiKey,
-        VirtusizeFlutterKey.externalUserId: userId,
-        VirtusizeFlutterKey.environment: environment.value,
-        VirtusizeFlutterKey.language: language != null ? language.value : null,
-        VirtusizeFlutterKey.showSGI: showSGI,
-        VirtusizeFlutterKey.allowedLanguages: allowedLanguages.map((language) {
+          .invokeMethod(FlutterVirtusizeMethod.setVirtusizeParams, {
+        FlutterVirtusizeKey.apiKey: apiKey,
+        FlutterVirtusizeKey.externalUserId: userId,
+        FlutterVirtusizeKey.environment: environment.value,
+        FlutterVirtusizeKey.language: language != null ? language.value : null,
+        FlutterVirtusizeKey.showSGI: showSGI,
+        FlutterVirtusizeKey.allowedLanguages: allowedLanguages.map((language) {
           return language.value;
         }).toList(),
-        VirtusizeFlutterKey.detailsPanelCards:
+        FlutterVirtusizeKey.detailsPanelCards:
         detailsPanelCards.map((infoCategory) {
           return infoCategory.value;
         }).toList()
       });
 
       // Loads the i18n localization data and the custom font information
-      VSText.load(paramsData[VirtusizeFlutterKey.displayLanguage], language)
+      VSText.load(paramsData[FlutterVirtusizeKey.displayLanguage], language)
           .then((value) {
         IVirtusizeSDK.instance._vsTextController.add(value);
         IVirtusizeSDK.instance.vsText = value;
@@ -117,7 +117,7 @@ class VirtusizeSDK {
     }
     try {
       await IVirtusizeSDK.instance._channel
-          .invokeMethod(VirtusizeFlutterMethod.setUserId, userId);
+          .invokeMethod(FlutterVirtusizeMethod.setUserId, userId);
     } on PlatformException catch (error) {
       print('Failed to set the external user ID: $error');
     }
@@ -146,9 +146,9 @@ class VirtusizeSDK {
     try {
       ProductDataCheck productDataCheck = await IVirtusizeSDK
           .instance._channel
-          .invokeMethod(VirtusizeFlutterMethod.getProductDataCheck, {
-        VirtusizeFlutterKey.externalProductId: externalId,
-        VirtusizeFlutterKey.imageURL: imageURL
+          .invokeMethod(FlutterVirtusizeMethod.getProductDataCheck, {
+        FlutterVirtusizeKey.externalProductId: externalId,
+        FlutterVirtusizeKey.imageURL: imageURL
       }).then((value) => ProductDataCheck(value, externalId));
 
       if (_virtusizeMessageListener != null) {
@@ -173,12 +173,12 @@ class VirtusizeSDK {
     try {
       IVirtusizeSDK.instance._recController.add(Recommendation(json.encode(
           await IVirtusizeSDK.instance._channel.invokeMethod(
-              VirtusizeFlutterMethod.getRecommendationText,
+              FlutterVirtusizeMethod.getRecommendationText,
               productDataCheck.productId))));
     } on PlatformException catch (error) {
       print('Failed to get the recommendation text: $error');
       IVirtusizeSDK.instance._recController.add(Recommendation(
-          "{\"${VirtusizeFlutterKey.externalProductId}\": \"${productDataCheck.externalProductId}\"}"));
+          "{\"${FlutterVirtusizeKey.externalProductId}\": \"${productDataCheck.externalProductId}\"}"));
     }
   }
 
@@ -186,7 +186,7 @@ class VirtusizeSDK {
   Future<void> openVirtusizeWebView() async {
     try {
       await IVirtusizeSDK.instance._channel
-          .invokeMethod(VirtusizeFlutterMethod.openVirtusizeWebView);
+          .invokeMethod(FlutterVirtusizeMethod.openVirtusizeWebView);
     } on PlatformException catch (error) {
       print('Failed to open the VirtusizeWebView: $error');
     }
@@ -209,7 +209,7 @@ class VirtusizeSDK {
     assert(order != null);
     try {
       Map<dynamic, dynamic> sentOrder = await IVirtusizeSDK.instance._channel
-          .invokeMethod(VirtusizeFlutterMethod.sendOrder, order.toJson());
+          .invokeMethod(FlutterVirtusizeMethod.sendOrder, order.toJson());
       onSuccess(sentOrder);
     } on PlatformException catch (error) {
       print('Failed to send an order: $error');
@@ -251,7 +251,7 @@ class IVirtusizeSDK {
   /// A function to get the privacy policy link from Native
   Future<String> getPrivacyPolicyLink() async {
     try {
-      return await _channel.invokeMethod(VirtusizeFlutterMethod.getPrivacyPolicyLink);
+      return await _channel.invokeMethod(FlutterVirtusizeMethod.getPrivacyPolicyLink);
     } on PlatformException catch (error) {
       print('Failed to get the privacy policy link: $error');
       return null;
@@ -266,7 +266,7 @@ class IVirtusizeSDK {
     }
     try {
       await _channel.invokeMethod(
-          VirtusizeFlutterMethod.addProduct, externalProductId);
+          FlutterVirtusizeMethod.addProduct, externalProductId);
     } on PlatformException catch (error) {
       print('Failed to add the product $externalProductId: $error');
     }
@@ -275,7 +275,7 @@ class IVirtusizeSDK {
   /// A function to remove the most recent visited external product ID from the stack in Native
   Future<void> removeProduct() async {
     try {
-      await _channel.invokeMethod(VirtusizeFlutterMethod.removeProduct);
+      await _channel.invokeMethod(FlutterVirtusizeMethod.removeProduct);
     } on PlatformException catch (error) {
       print('Failed to remove a product $error');
     }

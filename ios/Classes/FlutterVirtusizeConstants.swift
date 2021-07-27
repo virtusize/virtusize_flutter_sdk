@@ -1,4 +1,4 @@
-struct VirtusizeFlutterMethod {
+struct FlutterVirtusizeMethod {
 	/// Flutter to iOS
 	static let setVirtusizeParams = "setVirtusizeParams"
 	static let setUserId = "setUserId"
@@ -17,7 +17,7 @@ struct VirtusizeFlutterMethod {
 	static let onRecChange = "onRecChange"
 }
 
-struct VirtusizeFlutterKey {
+struct FlutterVirtusizeKey {
 	static let apiKey = "apiKey"
 	static let externalUserId = "externalUserId"
 	static let environment = "env"
