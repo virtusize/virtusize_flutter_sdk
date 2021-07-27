@@ -4,7 +4,7 @@ import '../lib/flutter_virtusize_sdk.dart';
 import '../lib/src/utils/virtusize_constants.dart';
 
 void main() {
-  const MethodChannel channel = MethodChannel('virtusize_flutter_plugin');
+  const MethodChannel channel = MethodChannel('com.virtusize/flutter_virtusize_sdk');
 
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -19,6 +19,6 @@ void main() {
   });
 
   test(VirtusizeFlutterMethod.setVirtusizeParams, () async {
-    expect(await VirtusizePlugin.instance.setVirtusizeParams, '42');
+    expect(await VirtusizeSDK.instance.setVirtusizeParams, '42');
   });
 }
