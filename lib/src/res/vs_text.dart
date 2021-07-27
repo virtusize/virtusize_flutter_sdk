@@ -4,7 +4,7 @@ import '../../src/models/virtusize_enums.dart';
 import '../../src/res/vs_font.dart';
 import '../../src/models/virtusize_localization.dart';
 
-/// A class to cache the i18n localization data and the custom font info based on a designated language
+/// A class to cache the i18n localization data and the custom font info based on the designated language
 class VSText {
   VSText._(this.localization, this.vsFont);
 

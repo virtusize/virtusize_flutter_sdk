@@ -8,7 +8,7 @@ class VSImages {
   static Image vsSignature = Image.asset('assets/images/vs_signature.png', package: 'flutter_virtusize_sdk');
   static Image circleDashedBorder = Image.asset('assets/images/circle_dashed_border.png', package: 'flutter_virtusize_sdk');
 
-  /// Gets the product type image based on the product type and style
+  /// Gets the product type image based on the [productType] and [style]
   static Image getProductTypeImage({@required int productType, String style}) {
     String postFixName;
     if(style != null) {

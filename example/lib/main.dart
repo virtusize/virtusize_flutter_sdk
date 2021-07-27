@@ -5,22 +5,24 @@ import 'package:flutter_virtusize_sdk/flutter_virtusize_sdk.dart';
 import 'screens/home_screen.dart';
 
 Future<void> main() async {
+
   /// Add the following code before running your app
   WidgetsFlutterBinding.ensureInitialized();
   VirtusizeSDK.instance.setVirtusizeParams(
+
       // Only the API key is required
       apiKey: '15cc36e1d7dad62b8e11722ce1a245cb6c5e6692',
-      // For using the Order API, a user ID is required. You can also set the user ID later
+      // For using the Order API, a user ID is also required. (can be set later)
       userId: '123',
-      // By default, the Virtusize environment will be set to GLOBAL
+      // By default, the Virtusize environment will be set to VSEnvironment.global
       environment: VSEnvironment.staging,
-      // By default, the initial language will be set based on the Virtusize environment
+      // By default, the initial language will be set according to the Virtusize environment
       language: VSLanguage.jp,
       // By default, ShowSGI is false
       showSGI: true,
-      // By default, Virtusize allows all the possible languages
+      // By default, Virtusize allows all possible languages
       allowedLanguages: [VSLanguage.en, VSLanguage.jp],
-      // By default, Virtusize displays all the possible info categories in the Product Details tab
+      // By default, Virtusize displays all possible info categories in the Product Details tab
       detailsPanelCards: [VSInfoCategory.generalFit, VSInfoCategory.brandSizing]);
 
   runApp(MyApp());
