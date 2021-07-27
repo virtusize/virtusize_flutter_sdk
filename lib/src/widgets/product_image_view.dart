@@ -39,7 +39,7 @@ class ProductImageView extends StatelessWidget {
                     image: product.networkProductImage.image,
                     fit: BoxFit.contain)
                 : DecorationImage(
-                    image: VSImages.getProuctTypeImage(
+                    image: VSImages.getProductTypeImage(
                             productType: product.productType,
                             style: product.productStyle)
                         .image,

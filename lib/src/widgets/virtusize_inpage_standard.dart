@@ -74,12 +74,12 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
 
     _productSubscription =
         IVirtusizePlugin.instance.productStream.listen((product) {
-      if (_productDataCheck.productId != product.storeProductID ||
-          (!isTheSameProduct(_storeProduct, product) &&
-              !isTheSameProduct(_userProduct, product))) {
+      if (_productDataCheck.productId != product.productId ||
+          (!compareProduct(widgetProduct: _storeProduct, serverProduct: product) &&
+              !compareProduct(widgetProduct: _userProduct, serverProduct: product))) {
         return;
       }
-      String imageUrl = product.imageUrl ?? "";
+      String imageUrl = product.imageURL ?? "";
       Image networkImage = Image.network(imageUrl);
       final ImageStream stream =
           networkImage.image.resolve(ImageConfiguration.empty);
@@ -123,9 +123,9 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
     });
   }
 
-  bool isTheSameProduct(VirtusizeProduct productA, VirtusizeProduct productB) {
-    return productA == null ||
-        (productA != null && productA.imageType == productB.imageType);
+  bool compareProduct({@required VirtusizeProduct widgetProduct, @required VirtusizeProduct serverProduct}) {
+    return widgetProduct == null ||
+        (widgetProduct != null && widgetProduct.imageType == serverProduct.imageType);
   }
 
   void _splitRecTexts(String recText) {
@@ -152,7 +152,7 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
   @override
   Widget build(BuildContext context) {
     if (_productDataCheck != null && _productDataCheck.isValidProduct) {
-      return _createVSInPageStandard(context);
+      return _buildVSInPageStandard(context);
     }
     return Container();
   }
@@ -168,14 +168,14 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
         : throw 'Could not launch $_url';
   }
 
-  Widget _createVSInPageStandard(BuildContext context) {
+  Widget _buildVSInPageStandard(BuildContext context) {
     return Container(
         margin: EdgeInsets.symmetric(horizontal: widget.horizontalMargin),
         width: double.infinity,
         child: Column(children: [
           _hasError
-              ? _createVSInPageStandardOnError()
-              : _createVSInPageCardView(context),
+              ? _buildVSInPageStandardOnError()
+              : _buildVSInPageCardView(context),
           !_hasError && !_isLoading ? Container(height: 10) : Container(),
           !_hasError && !_isLoading
               ? Row(
@@ -198,10 +198,10 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
         ]));
   }
 
-  Widget _createVSInPageCardView(BuildContext context) {
-    double _inpageCardWidth =
+  Widget _buildVSInPageCardView(BuildContext context) {
+    double _inPageCardWidth =
         MediaQuery.of(context).size.width - widget.horizontalMargin * 2;
-    bool overlayImages = _inpageCardWidth <= 411;
+    bool overlayImages = _inPageCardWidth <= 411;
 
     Color color;
     switch (widget.style) {
@@ -312,7 +312,7 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
     );
   }
 
-  Widget _createVSInPageStandardOnError() {
+  Widget _buildVSInPageStandardOnError() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [

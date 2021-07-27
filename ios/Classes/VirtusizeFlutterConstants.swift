@@ -1,6 +1,6 @@
 struct VirtusizeFlutterMethod {
 	/// Flutter to iOS
-	static let setVirtusizeProps = "setVirtusizeProps"
+	static let setVirtusizeParams = "setVirtusizeParams"
 	static let setUserId = "setUserId"
 	static let getProductDataCheck = "getProductDataCheck"
 	static let openVirtusizeWebView = "openVirtusizeWebView"
@@ -28,7 +28,7 @@ struct VirtusizeFlutterKey {
 	static let externalProductId = "externalProductId"
 	static let imageURL = "imageURL"
 	static let storeProductId = "storeProductId"
-	static let virtusizeProps = "virtusizeProps"
+	static let virtusizeParams = "virtusizeParams"
 	static let displayLanguage = "displayLanguage"
 	static let imageType = "imageType"
 	static let productType = "productType"

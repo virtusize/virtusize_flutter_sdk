@@ -92,7 +92,7 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
   Widget build(BuildContext context) {
     if (_productDataCheck != null && _productDataCheck.isValidProduct) {
       return GestureDetector(
-        child: _createVSInPageMini(),
+        child: _buildVSInPageMini(),
         onTap: !_hasError ? _openVirtusizeWebview : () => {},
       );
     }
@@ -103,7 +103,7 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
     await VirtusizePlugin.instance.openVirtusizeWebView();
   }
 
-  Widget _createVSInPageMini() {
+  Widget _buildVSInPageMini() {
     Color color;
     switch (widget.style) {
       case VirtusizeStyle.Black:
@@ -121,13 +121,13 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
         color: _isLoading || _hasError ? Colors.white : color,
         width: double.infinity,
         child: _hasError
-            ? _createVSInPageMiniOnError()
+            ? _buildVSInPageMiniOnError()
             : _isLoading
-                ? _createVSInPageMiniOnLoading()
-                : _createVSInPageMiniOnFinishedLoading(themeColor: color));
+                ? _buildVSInPageMiniOnLoading()
+                : _buildVSInPageMiniOnFinishedLoading(themeColor: color));
   }
 
-  Widget _createVSInPageMiniOnLoading() {
+  Widget _buildVSInPageMiniOnLoading() {
     return Row(children: [
       Container(
           margin: EdgeInsets.only(left: 6),
@@ -151,7 +151,7 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
     ]);
   }
 
-  Widget _createVSInPageMiniOnFinishedLoading({Color themeColor}) {
+  Widget _buildVSInPageMiniOnFinishedLoading({Color themeColor}) {
     return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
       Flexible(
           child: Container(
@@ -171,7 +171,7 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
     ]);
   }
 
-  Widget _createVSInPageMiniOnError() {
+  Widget _buildVSInPageMiniOnError() {
     return Row(children: [
       Container(
           margin: EdgeInsets.only(left: 6),

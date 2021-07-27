@@ -68,11 +68,11 @@ class _VirtusizeButtonState extends State<VirtusizeButton> {
           break;
         case VirtusizeStyle.Black:
           Color color = VSColors.vsGray900;
-          return _createVSButton(color, widget.child);
+          return _buildVSButton(color, widget.child);
           break;
         case VirtusizeStyle.Teal:
           Color color = VSColors.vsTeal;
-          return _createVSButton(color, widget.child);
+          return _buildVSButton(color, widget.child);
           break;
       }
     }
@@ -83,7 +83,7 @@ class _VirtusizeButtonState extends State<VirtusizeButton> {
     await VirtusizePlugin.instance.openVirtusizeWebView();
   }
 
-  ElevatedButton _createVSButton(Color color, Widget child) {
+  ElevatedButton _buildVSButton(Color color, Widget child) {
     return ElevatedButton(
       child: Row(
         mainAxisSize: MainAxisSize.min,

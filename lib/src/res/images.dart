@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// The Virtusize images
 class VSImages {
   static Image vsIcon = Image.asset('assets/images/vs_icon.png', package: 'virtusize_flutter_plugin');
   static Image rightArrow = Image.asset('assets/images/right_arrow.png', package: 'virtusize_flutter_plugin');
@@ -7,7 +8,8 @@ class VSImages {
   static Image vsSignature = Image.asset('assets/images/vs_signature.png', package: 'virtusize_flutter_plugin');
   static Image circleDashedBorder = Image.asset('assets/images/circle_dashed_border.png', package: 'virtusize_flutter_plugin');
 
-  static Image getProuctTypeImage({@required int productType, String style}) {
+  /// Gets the product type image based on the product type and style
+  static Image getProductTypeImage({@required int productType, String style}) {
     String postFixName;
     if(style != null) {
        postFixName = '${productType}_$style';

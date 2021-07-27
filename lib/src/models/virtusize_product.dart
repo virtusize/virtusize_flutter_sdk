@@ -7,10 +7,13 @@ import 'virtusize_model.dart';
 class VirtusizeProduct extends VirtusizeModel {
   VirtusizeProduct(data) : super(data);
 
+  /// The image loaded from the [imageURL]
   Image networkProductImage;
 
+  /// The product image type as a String
   String get _imageType => decodedData[VirtusizeFlutterKey.imageType];
 
+  /// The product image type as a [ProductImageType]
   ProductImageType get imageType {
     if (_imageType == "store") {
       return ProductImageType.store;
@@ -20,12 +23,16 @@ class VirtusizeProduct extends VirtusizeModel {
     return null;
   }
 
-  int get storeProductID => decodedData[VirtusizeFlutterKey.productId];
+  /// An integer to represent the internal product ID in the Virtusize server
+  int get productId => decodedData[VirtusizeFlutterKey.productId];
 
-  String get imageUrl  => decodedData[VirtusizeFlutterKey.imageURL];
+  /// The product image URL
+  String get imageURL  => decodedData[VirtusizeFlutterKey.imageURL];
 
+  /// The product type
   int get productType => decodedData[VirtusizeFlutterKey.productType];
 
+  /// The product style
   String get productStyle => decodedData[VirtusizeFlutterKey.productStyle];
 
   @override

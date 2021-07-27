@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../src/models/virtusize_enums.dart';
 
+/// All the available font sizes based on the Virtusize design system
 enum VSFontSize { xsmall, small, normal, large, xlarge, xxlarge }
 
 class VSFont {
@@ -9,19 +10,22 @@ class VSFont {
 
   VSFont(this.language);
 
+  /// Gets the [TextStyle]
   TextStyle getTextStyle(
       {@required VSFontSize fontSize, FontWeight fontWeight, Color color}) {
     return TextStyle(
-        fontSize: _getFontSize(fontSize),
-        fontFamily: _getFontFamily(),
+        fontSize: _getFontSize(language, fontSize),
+        fontFamily: _getFontFamily(language),
         fontWeight: fontWeight,
         color: color);
   }
 
-  String _getFontFamily() {
+  /// Gets the font family based on the [Language] value
+  String _getFontFamily(Language language) {
     String fontFamilyName;
     switch(language) {
       case Language.en:
+        // TODO: Proxima Nova is not a open source font. Need to find an alternative
         fontFamilyName = "ProximaNova";
         break;
       case Language.jp:
@@ -34,7 +38,8 @@ class VSFont {
     return fontFamilyName;
   }
 
-  double _getFontSize(VSFontSize fontSize) {
+  /// Gets the font size based on the [Language] and [VSFontSize] values
+  double _getFontSize(Language language, VSFontSize fontSize) {
     Map<List<Language>, Map<VSFontSize, double>> langFontSizeMap = {
       [Language.en]: {
         VSFontSize.xsmall: 12.0,

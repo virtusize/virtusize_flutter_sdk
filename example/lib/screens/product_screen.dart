@@ -35,21 +35,8 @@ class _ProductScreenState extends State<ProductScreen> {
     _externalID = widget.externalID ?? _externalIDList[Random().nextInt(_externalIDList.length)];
 
     VirtusizePlugin.instance.setProduct(
-        // Set the product's external ID
         externalId: _externalID,
-        // Set the product image URL
         imageURL: 'http://www.image.com/goods/12345.jpg');
-
-    VirtusizePlugin.instance.setVirtusizeMessageListener(
-        VirtusizeMessageListener(vsEvent: (eventName) {
-      print("ProductScreen Virtusize event: $eventName");
-    }, vsError: (error) {
-      print("ProductScreen Virtusize error: $error");
-    }, productDataCheckData: (productDataCheck) {
-      print('ProductScreen ProductDataCheck: $productDataCheck');
-    }, productDataCheckError: (error) {
-      print('ProductScreen ProductDataCheck error: $error');
-    }));
   }
 
   @override

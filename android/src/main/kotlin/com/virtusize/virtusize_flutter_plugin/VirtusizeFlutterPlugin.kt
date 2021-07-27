@@ -185,7 +185,7 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
         when (call.method) {
-            VirtusizeFlutterMethod.SET_VIRTUSIZE_PROPS -> {
+            VirtusizeFlutterMethod.SET_VIRTUSIZE_PARAMS -> {
                 if (call.arguments == null) {
                     val error = VirtusizeFlutterErrors.noArguments
                     result.error(error.errorCode, error.errorMessage, null)
@@ -235,7 +235,7 @@ class VirtusizeFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
                 result.success(
                     mutableMapOf(
-                        VirtusizeFlutterKey.VIRTUSIZE_PROPS to call.arguments.toString(),
+                        VirtusizeFlutterKey.VIRTUSIZE_PARAMS to call.arguments.toString(),
                         VirtusizeFlutterKey.DISPLAY_LANGUAGE to virtusize?.displayLanguage?.value
                     )
                 )
