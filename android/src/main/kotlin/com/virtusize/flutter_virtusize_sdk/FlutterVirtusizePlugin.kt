@@ -21,7 +21,7 @@ import io.flutter.plugin.common.MethodChannel.Result
 import kotlinx.coroutines.*
 import java.lang.IllegalArgumentException
 
-class FlutterVirtusizeSdkPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
+class FlutterVirtusizePlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
   // The MethodChannel that will create the communication between Flutter and native Android
   private lateinit var channel: MethodChannel
 

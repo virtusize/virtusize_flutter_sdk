@@ -1,4 +1,4 @@
-#import "FlutterVirtusizeSdkPlugin.h"
+#import "FlutterVirtusizePlugin.h"
 #if __has_include(<flutter_virtusize_sdk/flutter_virtusize_sdk-Swift.h>)
 #import <flutter_virtusize_sdk/flutter_virtusize_sdk-Swift.h>
 #else
@@ -8,8 +8,8 @@
 #import "flutter_virtusize_sdk-Swift.h"
 #endif
 
-@implementation FlutterVirtusizeSdkPlugin
+@implementation FlutterVirtusizePlugin
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
-  [SwiftFlutterVirtusizeSdkPlugin registerWithRegistrar:registrar];
+  [SwiftFlutterVirtusizePlugin registerWithRegistrar:registrar];
 }
 @end
