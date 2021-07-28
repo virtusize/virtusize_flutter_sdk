@@ -65,10 +65,10 @@ class VirtusizeSDK {
         /// The Virtusize environment (defaults to the `global` domain)
         VSEnvironment environment = VSEnvironment.global,
 
-        /// The [VSLanguage] that sets the initial language the Virtusize web app will load in
+        /// The [VSLanguage] that sets the initial language the Virtusize webview will load in
         VSLanguage language,
 
-        /// The boolean value to determine if the Virtusize web app should use the SGI flow for users to add user-generated items to their wardrobe
+        /// The boolean value to determine if the Virtusize webview should use the SGI flow for users to add user-generated items to their wardrobe
         bool showSGI = false,
 
         /// The languages that the user can switch between using the Language Selector
