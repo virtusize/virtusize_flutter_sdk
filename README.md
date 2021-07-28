@@ -2,7 +2,7 @@
 
 [![pub package](https://img.shields.io/pub/v/virtusize_flutter_sdk.svg)](https://pub.dev/packages/virtusize_flutter_sdk)
 
-A Flutter [plugin](https://flutter.dev/developing-packages/) that wraps Virtusize Native SDKs ([Android](https://github.com/virtusize/integration_android) & [iOS](https://github.com/virtusize/integration_ios)).
+A Flutter [plugin](https://flutter.dev/developing-packages/) that wraps Virtusize Native SDKs for [Android](https://github.com/virtusize/integration_android) & [iOS](https://github.com/virtusize/integration_ios).
 
 
 
@@ -53,9 +53,23 @@ This is the integration for Flutter apps only. For web integration, refer to the
 
 ## Requirements
 
-- iOS 10.3+
-- Android `minSdkVersion` >= 21
-
+- **iOS 10.3+**
+  
+  Specify the iOS version at least `10.3` in `ios/Podfile`:
+  ```
+  platform :ios, '10.3'
+  ```
+  
+- **Android 5.0+ (API Level 21+)**
+  
+  Set the `minSdkVersion` to at least `21` in `android/app/build.gradle`:
+  ```gradle
+  android {
+    defaultConfig {
+        minSdkVersion 21
+    }
+  }
+  ```
 
 
 ## Usage 
@@ -78,7 +92,7 @@ This is the integration for Flutter apps only. For web integration, refer to the
 
 1. Starting from API 30, Android requires package visibility in your AndroidManifest.xml to open URLs in an app.
 
-    To enable opening URLs of the SDK, add the required `<queries>` element to the `AndroidManifest.xml`.
+    To be able to open URLs for the SDK, add the required `<queries>` element to the `AndroidManifest.xml`.
     
     ```xml
     <queries>
@@ -89,9 +103,7 @@ This is the integration for Flutter apps only. For web integration, refer to the
     </queries>
     ```
 
-2. Inherit from **FlutterFragmentActivity** instead of FlutterActivity in the `android/app/src/main/MainActivity`.
-
-    This is necessary for the SDK to be able to open the Virtusize webview in a Fragment.
+2. To able to open the Virtusize webview in Fragment for the SDK, inherit from **FlutterFragmentActivity** instead of FlutterActivity in the `android/app/src/main/MainActivity`.
     
     ```diff
     - import io.flutter.embedding.android.FlutterActivity
@@ -101,14 +113,13 @@ This is the integration for Flutter apps only. For web integration, refer to the
     + class MainActivity: FlutterFragmentActivity() {
     }
     ```
-    
-    
+
 
 ### 2. Flutter
 
 #### (1) Initialization
 
-Set up the Virtusize parameters before calling runApp using the `VirtusizeSDK.instance.setVirtusizeParams` function. 
+Use the `VirtusizeSDK.instance.setVirtusizeParams` function to set up the Virtusize parameters before calling runApp.
 
 ```dart
 import 'package:virtusize_flutter_sdk/virtusize_sdk.dart';
@@ -138,13 +149,13 @@ Future<void> main() async {
 
 Possible argument configuration is shown in the following table:
 
-| Argument          | Argument Type        | Example                                                 | Description                                                  | Requirement                                                  |
-| ----------------- | -------------------- | ------------------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| apiKey            | String               | "api_key"                                               | A unique API key is provided to each Virtusize client.       | Yes                                                          |
-| userId            | String               | "123"                                                   | Passed from the client if the user is logged into the client's app. | Yes, if the Order API is used.                               |
-| env               | VSEnvironment        | VSEnvironment.staging                                   | The environment is the region you are running the integration from, either `VSEnvironment.staging`,  `VSEnvironment.global`, `VSEnvironment.japan` or `VSEnvironment.korea`. | No. By default, the Virtusize environment will be set to `VSEnvironment.global`. |
-| language          | VSLanguage           | VSLanguage.jp                                           | Sets the initial language that the integration will load in. The possible values are `VSLanguage.en`, `VSLanguage.jp` and `VSLanguage.kr` | No. By default, the initial language will be set based on the Virtusize environment. |
-| showSGI           | bool                 | true                                                    | Determines whether the integration should use SGI flow for users to add user generated items to their wardrobe. | No. By default, showSGI is set to false.                     |
+| Argument          | Argument Type          | Example                                                 | Description                                                  | Requirement                                                  |
+| ----------------- | --------------------   | ------------------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| apiKey            | String                 | "api_key"                                               | A unique API key is provided to each Virtusize client.       | Yes                                                          |
+| userId            | String                 | "123"                                                   | Passed from the client if the user is logged into the client's app. | Yes, if the Order API is used.                               |
+| env               | VSEnvironment          | VSEnvironment.staging                                   | The environment is the region you are running the integration from, either `VSEnvironment.staging`,  `VSEnvironment.global`, `VSEnvironment.japan` or `VSEnvironment.korea`. | No. By default, the Virtusize environment will be set to `VSEnvironment.global`. |
+| language          | VSLanguage             | VSLanguage.jp                                           | Sets the initial language that the integration will load in. The possible values are `VSLanguage.en`, `VSLanguage.jp` and `VSLanguage.kr` | No. By default, the initial language will be set based on the Virtusize environment. |
+| showSGI           | bool                   | true                                                    | Determines whether the integration should use SGI flow for users to add user generated items to their wardrobe. | No. By default, showSGI is set to false.                     |
 | allowedLanguages  | List<`VSLanguage`>     | [VSLanguage.en, VSLanguage.jp]                          | The languages which the user can switch to using the Language Selector | No. By default, the integration allows all possible languages to be displayed, including English, Japanese and Korean. |
 | detailsPanelCards | List<`VSInfoCategory`> | [VSInfoCategory.generalFit, VSInfoCategory.brandSizing] | The info categories which will be display in the Product Details tab. Possible categories are: `VSInfoCategory.modelInfo`, `VSInfoCategory.generalFit`, `VSInfoCategory.brandSizing` and `VSInfoCategory.material` | No. By default, the integration displays all the possible info categories in the Product Details tab. |
 
