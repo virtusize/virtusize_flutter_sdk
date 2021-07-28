@@ -1,4 +1,4 @@
-name: flutter_virtusize_sdk
+name: virtusize_flutter_sdk
 description: Virtusize integration in Flutter
 version: 0.0.1
 author:
@@ -29,10 +29,10 @@ flutter:
   plugin:
     platforms:
       android:
-        package: com.virtusize.flutter_virtusize_sdk
-        pluginClass: FlutterVirtusizePlugin
+        package: com.virtusize.virtusize_flutter_sdk
+        pluginClass: VirtusizeFlutterPlugin
       ios:
-        pluginClass: FlutterVirtusizePlugin
+        pluginClass: VirtusizeFlutterPlugin
 
   # To add assets to your plugin package, add an assets section, like this:
   assets:

@@ -1,5 +1,5 @@
-name: flutter_virtusize_sdk_example
-description: Demonstrates how to use the flutter_virtusize_sdk plugin.
+name: virtusize_flutter_sdk_example
+description: Demonstrates how to use the virtusize_flutter_sdk plugin.
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `pub publish`. This is preferred for private packages.
@@ -12,9 +12,9 @@ dependencies:
   flutter:
     sdk: flutter
 
-  flutter_virtusize_sdk:
+  virtusize_flutter_sdk:
     # When depending on this package from a real application you should use:
-    #   flutter_virtusize_sdk: ^x.y.z
+    #   virtusize_flutter_sdk: ^x.y.z
     # See https://dart.dev/tools/pub/dependencies#version-constraints
     # The example app is bundled with the plugin so we use a path dependency on
     # the parent directory to use the current plugin's version.

@@ -1,4 +1,4 @@
-package com.virutsize.flutter_virtusize_sdk_example
+package com.virtusize.virtusize_flutter_sdk_example
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -1,6 +1,4 @@
-package com.virtusize.flutter_virtusize_sdk
-
-internal class FlutterVirtusizeErrors {
+internal class VirtusizeFlutterErrors {
     companion object {
         val noArguments = FlutterError("NO_ARGUMENTS", errorMessage = "Missing arguments.")
         fun argumentNotSet(arg: String) = FlutterError("ARGUMENT_NOT_SET", errorMessage = "$arg is not set.")

@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_virtusize_sdk/virtusize_sdk.dart';
+import 'package:virtusize_flutter_sdk/virtusize_sdk.dart';
 // import '../screens/product_screen.dart';
 
 class HomeScreen extends StatefulWidget {
