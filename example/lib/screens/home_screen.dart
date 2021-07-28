@@ -27,7 +27,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }, vsError: (error) {
       print("Virtusize error: $error");
     }, productDataCheckSuccess: (productDataCheck) {
-      print('ProductDataCheck: $productDataCheck');
+      print('ProductDataCheck success: $productDataCheck');
     }, productDataCheckError: (error) {
       print('ProductDataCheck error: $error');
     }));
@@ -128,7 +128,7 @@ class _HomeScreenState extends State<HomeScreen> {
           size: "L",
           sizeAlias: "Large",
           variantId: "A001_SIZEL_RED",
-          imageUrl: "http://images.example.com/products/A001/red/image1xl.jpg",
+          imageURL: "http://images.example.com/products/A001/red/image1xl.jpg",
           color: "Red",
           gender: "W",
           unitPrice: 5100.00,
@@ -140,11 +140,11 @@ class _HomeScreenState extends State<HomeScreen> {
     /// Send the order
     VirtusizeSDK.instance.sendOrder(
         order: order,
-        // The onSuccess callback is optional and is called when the app has successfully sent the order
+        /// The [onSuccess] callback is optional and is called when the app has successfully sent the order
         onSuccess: (sentOrder) {
           print("Successfully sent the order $sentOrder");
         },
-        // The onError callback is optional and gets called when an error occurs while the app is sending the order
+        /// The [onError] callback is optional and gets called when an error occurs while the app is sending the order
         onError: (error) {
           print(error);
         });

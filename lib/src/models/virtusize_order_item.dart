@@ -15,7 +15,7 @@ class VirtusizeOrderItem {
   final String variantId;
 
   /// The image URL of the item
-  final String imageUrl;
+  final String imageURL;
 
   /// The color of the item, e.g. "Red", etc.
   final String color;
@@ -40,7 +40,7 @@ class VirtusizeOrderItem {
       @required this.size,
       this.sizeAlias,
       this.variantId,
-      @required this.imageUrl,
+      @required this.imageURL,
       this.color,
       this.gender,
       @required this.unitPrice,
@@ -49,7 +49,7 @@ class VirtusizeOrderItem {
       this.url}) {
     assert(externalProductId != null);
     assert(size != null);
-    assert(imageUrl != null);
+    assert(imageURL != null);
     assert(unitPrice != null);
     assert(currency != null);
   }
@@ -59,7 +59,7 @@ class VirtusizeOrderItem {
     Map<String, dynamic> orderItemJson = {
       'externalProductId': externalProductId,
       'size': size,
-      'imageUrl': imageUrl,
+      'imageUrl': imageURL,
       'unitPrice': unitPrice,
       'currency': currency,
       'quantity': quantity

@@ -6,7 +6,7 @@ import 'screens/home_screen.dart';
 
 Future<void> main() async {
 
-  /// Add the following code before running your app
+  /// Add the following code before calling runApp
   WidgetsFlutterBinding.ensureInitialized();
   VirtusizeSDK.instance.setVirtusizeParams(
 
@@ -15,7 +15,7 @@ Future<void> main() async {
       // For using the Order API, a user ID is also required. (can be set later)
       userId: '123',
       // By default, the Virtusize environment will be set to VSEnvironment.global
-      environment: VSEnvironment.staging,
+      env: VSEnvironment.staging,
       // By default, the initial language will be set according to the Virtusize environment
       language: VSLanguage.jp,
       // By default, ShowSGI is false
