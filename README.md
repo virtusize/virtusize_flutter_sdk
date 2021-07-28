@@ -21,14 +21,13 @@ A Flutter [plugin](https://flutter.dev/developing-packages/) that wraps Virtusiz
     - [Implement VirtusizeMessageHandler (Optional)](#3-implement-virtusizemessagehandler-optional)
 
 - [Implement Virtusize Widgets](#implement-virtusize-widgets)
-
   - [Virtusize Button](#1-virtusize-button)
   - [Virtusize InPage](#2-virtusize-inpage)
     - [InPage Standard](#2-inpage-standard)
     - [InPage Mini](#3-inpage-mini)
 
 - [The Order API](#the-order-api)
-- [Initialization](#1-initialization-1)
+  - [Initialization](#1-initialization-1)
   - [Create a *VirtusizeOrder* object for order data](#2-create-a-virtusizeorder-object-for-order-data)
   - [Send an Order](#3-send-an-order)
   
