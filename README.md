@@ -78,7 +78,7 @@ This is the integration for Flutter apps only. For web integration, refer to the
 
 1. Starting from API 30, Android requires package visibility in your AndroidManifest.xml to open URLs in an app.
 
-    To enable opening URLs of the SDK, add the required <queries> element to the `AndroidManifest.xml`.
+    To enable opening URLs of the SDK, add the required `<queries>` element to the `AndroidManifest.xml`.
     
     ```xml
     <queries>
@@ -145,8 +145,8 @@ Possible argument configuration is shown in the following table:
 | env               | VSEnvironment        | VSEnvironment.staging                                   | The environment is the region you are running the integration from, either `VSEnvironment.staging`,  `VSEnvironment.global`, `VSEnvironment.japan` or `VSEnvironment.korea`. | No. By default, the Virtusize environment will be set to `VSEnvironment.global`. |
 | language          | VSLanguage           | VSLanguage.jp                                           | Sets the initial language that the integration will load in. The possible values are `VSLanguage.en`, `VSLanguage.jp` and `VSLanguage.kr` | No. By default, the initial language will be set based on the Virtusize environment. |
 | showSGI           | bool                 | true                                                    | Determines whether the integration should use SGI flow for users to add user generated items to their wardrobe. | No. By default, showSGI is set to false.                     |
-| allowedLanguages  | List<VSLanguage>     | [VSLanguage.en, VSLanguage.jp]                          | The languages which the user can switch to using the Language Selector | No. By default, the integration allows all possible languages to be displayed, including English, Japanese and Korean. |
-| detailsPanelCards | List<VSInfoCategory> | [VSInfoCategory.generalFit, VSInfoCategory.brandSizing] | The info categories which will be display in the Product Details tab. Possible categories are: `VSInfoCategory.modelInfo`, `VSInfoCategory.generalFit`, `VSInfoCategory.brandSizing` and `VSInfoCategory.material` | No. By default, the integration displays all the possible info categories in the Product Details tab. |
+| allowedLanguages  | List<`VSLanguage`>     | [VSLanguage.en, VSLanguage.jp]                          | The languages which the user can switch to using the Language Selector | No. By default, the integration allows all possible languages to be displayed, including English, Japanese and Korean. |
+| detailsPanelCards | List<`VSInfoCategory`> | [VSInfoCategory.generalFit, VSInfoCategory.brandSizing] | The info categories which will be display in the Product Details tab. Possible categories are: `VSInfoCategory.modelInfo`, `VSInfoCategory.generalFit`, `VSInfoCategory.brandSizing` and `VSInfoCategory.material` | No. By default, the integration displays all the possible info categories in the Product Details tab. |
 
 
 
@@ -488,7 +488,7 @@ The ***VirtusizeOrder*** object gets passed to the `VirtusizeSDK.instance.sendOr
 | Argument         | Data Type                | Example             | Description                         |
 | ---------------- | ------------------------ | ------------------- | ----------------------------------- |
 | externalOrderId* | String                   | "20200601586"       | The order ID provided by the client |
-| items*           | List<VirtusizeOrderItem> | See the table below | A list of the order items.          |
+| items*           | List<`VirtusizeOrderItem`> | See the table below | A list of the order items.          |
 
 **VirtusizeOrderItem**
 
