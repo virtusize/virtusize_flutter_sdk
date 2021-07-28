@@ -1,5 +1,7 @@
 # Virtusize Flutter SDK
 
+[![pub package](https://img.shields.io/pub/v/virtusize_flutter_sdk.svg)](https://pub.dev/packages/virtusize_flutter_sdk)
+
 A Flutter [plugin](https://flutter.dev/developing-packages/) that wraps Virtusize Native SDKs ([Android](https://github.com/virtusize/integration_android) & [iOS](https://github.com/virtusize/integration_ios)).
 
 
