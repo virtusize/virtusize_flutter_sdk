@@ -126,10 +126,10 @@ Future<void> main() async {
       language: VSLanguage.jp,
       // By default, ShowSGI is false
       showSGI: true,
-      // // By default, Virtusize allows all possible languages
-      // allowedLanguages: [VSLanguage.en, VSLanguage.jp],
-      // // By default, Virtusize displays all possible info categories in the Product Details tab
-      // detailsPanelCards: [VSInfoCategory.generalFit, VSInfoCategory.brandSizing]
+      // By default, Virtusize allows all possible languages
+      allowedLanguages: [VSLanguage.en, VSLanguage.jp],
+      // By default, Virtusize displays all possible info categories in the Product Details tab
+      detailsPanelCards: [VSInfoCategory.generalFit, VSInfoCategory.brandSizing]
   );
 
   runApp(MyApp());
