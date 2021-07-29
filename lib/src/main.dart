@@ -32,23 +32,30 @@ class VirtusizeSDK {
     IVirtusizeSDK.instance._recController =
     StreamController<Recommendation>.broadcast();
 
+    // A map to match each method call from Native with its corresponding exectuion
+    Map<String, Function> methodCallExectuionMap = {
+      FlutterVirtusizeMethod.onRecChange: (call) => {
+        IVirtusizeSDK.instance._recController
+            .add(Recommendation(json.encode(call.arguments)))
+      },
+      FlutterVirtusizeMethod.onProduct: (call) => {
+        IVirtusizeSDK.instance._productController
+            .add(VirtusizeProduct(json.encode(call.arguments)))
+      },
+      FlutterVirtusizeMethod.onVSEvent: (call) => {
+        if (_virtusizeMessageListener != null)
+          {_virtusizeMessageListener.vsEvent.call(call.arguments)
+          }
+      },
+      FlutterVirtusizeMethod.onVSError: (call) => {
+        if (_virtusizeMessageListener != null)
+          {_virtusizeMessageListener.vsError.call(call.arguments)}
+      }
+    };
+
     // Set the method call handler to receive data from Native
     IVirtusizeSDK.instance._channel.setMethodCallHandler((call) {
-      if (call.method == FlutterVirtusizeMethod.onRecChange) {
-        IVirtusizeSDK.instance._recController
-            .add(Recommendation(json.encode(call.arguments)));
-      } else if (call.method == FlutterVirtusizeMethod.onProduct) {
-        IVirtusizeSDK.instance._productController
-            .add(VirtusizeProduct(json.encode(call.arguments)));
-      } else if (call.method == FlutterVirtusizeMethod.onVSEvent) {
-        if (_virtusizeMessageListener != null) {
-          _virtusizeMessageListener.vsEvent.call(call.arguments);
-        }
-      } else if (call.method == FlutterVirtusizeMethod.onVSError) {
-        if (_virtusizeMessageListener != null) {
-          _virtusizeMessageListener.vsError.call(call.arguments);
-        }
-      }
+      methodCallExectuionMap[call.method](call);
       return null;
     });
   }

@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:virtusize_flutter_sdk/virtusize_sdk.dart';
-// import '../screens/product_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -100,16 +99,7 @@ class _HomeScreenState extends State<HomeScreen> {
               /// A button to send a test order
               Center(
                   child: ElevatedButton(
-                      child: Text("Send a Test Order"), onPressed: _sendOrder)),
-              // Center(
-              //     child: ElevatedButton(
-              //         onPressed: () {
-              //           Navigator.push(context,
-              //               CupertinoPageRoute(builder: (_) {
-              //             return ProductScreen();
-              //           }));
-              //         },
-              //         child: Text("Go to next product page")))
+                      child: Text("Send a Test Order"), onPressed: _sendOrder))
             ])));
   }
 

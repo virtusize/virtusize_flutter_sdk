@@ -3,7 +3,7 @@ import UIKit
 import Virtusize
 
 public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
-  
+
 	/// The FlutterMethodChannel that will create the communication between Flutter and native iOS
 	private var flutterChannel: FlutterMethodChannel?
 
