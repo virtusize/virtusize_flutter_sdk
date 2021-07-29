@@ -97,10 +97,10 @@ You will need a unique API key and an Admin account, only available to Virtusize
     
     ```xml
     <queries>
-    <intent>
-     <action android:name="android.intent.action.VIEW" />
-     <data android:scheme="https" />
-    </intent>
+      <intent>
+        <action android:name="android.intent.action.VIEW" />
+        <data android:scheme="https" />
+      </intent>
     </queries>
     ```
 
@@ -200,14 +200,17 @@ void initState() {
     VirtusizeSDK.instance.setVirtusizeMessageListener(
         VirtusizeMessageListener(
             vsEvent: (eventName) {
-        				print("Virtusize event: $eventName");
-      			}, vsError: (error) {
-        				print("Virtusize error: $error");
-      			}, productDataCheckSuccess: (productDataCheck) {
-        				print('ProductDataCheck success: $productDataCheck');
-      			}, productDataCheckError: (error) {
-        				print('ProductDataCheck error: $error');
-      			}
+                print("Virtusize event: $eventName");
+            }, 
+            vsError: (error) {
+                print("Virtusize error: $error");
+            }, 
+            productDataCheckSuccess: (productDataCheck) {
+                print('ProductDataCheck success: $productDataCheck');
+            }, 
+            productDataCheckError: (error) {
+                print('ProductDataCheck error: $error');
+            }
        )
     );
 }
@@ -436,18 +439,18 @@ This is a mini version of InPage that you can place in your application. The dis
 
 - ##### Default Fonts
 
-  - Japanese
+  - **Japanese**
     - Noto Sans CJK JP
-    - 12sp (Message)
-    - 10sp (Button)
-  - Korean
+    - (Message) Text size: 12
+    - (Button) Text size: 10
+  - **Korean**
     - Noto Sans CJK KR
-    - 12sp (Message)
-    - 10sp (Button)
-  - English
+    - (Message) Text size: 12
+    - (Button) Text size: 10
+  - **English**
     - Proxima Nova
-    - 14sp (Message)
-    - 12sp (Button)
+    - (Message) Text size: 14
+    - (Button) Text size: 12
 
 - ##### UI customization
 
