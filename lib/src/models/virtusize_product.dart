@@ -1,16 +1,21 @@
 import 'package:flutter/material.dart';
 
-import '../models/virtusize_enums.dart';
 import '../utils/virtusize_constants.dart';
 import 'virtusize_model.dart';
+
+/// This enum contains the two possible product image types
+enum ProductImageType { store, user }
 
 class VirtusizeProduct extends VirtusizeModel {
   VirtusizeProduct(data) : super(data);
 
+  /// The image loaded from the [imageURL]
   Image networkProductImage;
 
-  String get _imageType => decodedData[VirtusizeFlutterKey.imageType];
+  /// The product image type as a String
+  String get _imageType => decodedData[FlutterVirtusizeKey.imageType];
 
+  /// The product image type as a [ProductImageType]
   ProductImageType get imageType {
     if (_imageType == "store") {
       return ProductImageType.store;
@@ -20,13 +25,17 @@ class VirtusizeProduct extends VirtusizeModel {
     return null;
   }
 
-  int get storeProductID => decodedData[VirtusizeFlutterKey.productId];
+  /// An integer to represent the internal product ID in the Virtusize server
+  int get productId => decodedData[FlutterVirtusizeKey.productId];
 
-  String get imageUrl  => decodedData[VirtusizeFlutterKey.imageURL];
+  /// The product image URL
+  String get imageURL  => decodedData[FlutterVirtusizeKey.imageURL];
 
-  int get productType => decodedData[VirtusizeFlutterKey.productType];
+  /// The product type
+  int get productType => decodedData[FlutterVirtusizeKey.productType];
 
-  String get productStyle => decodedData[VirtusizeFlutterKey.productStyle];
+  /// The product style
+  String get productStyle => decodedData[FlutterVirtusizeKey.productStyle];
 
   @override
   String toString() {

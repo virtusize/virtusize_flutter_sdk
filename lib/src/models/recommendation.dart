@@ -4,9 +4,12 @@ import 'virtusize_model.dart';
 class Recommendation extends VirtusizeModel {
   Recommendation(data) : super(data);
 
-  String get externalProductID => decodedData[VirtusizeFlutterKey.externalProductId];
+  /// A string to represent an external product ID in the client's system
+  String get externalProductID => decodedData[FlutterVirtusizeKey.externalProductId];
 
-  String get text => decodedData[VirtusizeFlutterKey.recText];
+  /// A recommendation text to be displayed on the [VirtusizeInPageStandard] or [VirtusizeInPageMini] widget
+  String get text => decodedData[FlutterVirtusizeKey.recText];
 
-  bool get showUserProductImage => decodedData[VirtusizeFlutterKey.showUserProductImage];
+  /// A boolean to determine whether to show the `user product` image on the [VirtusizeInPageStandard] widget
+  bool get showUserProductImage => decodedData[FlutterVirtusizeKey.showUserProductImage];
 }

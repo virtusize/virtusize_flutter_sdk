@@ -4,11 +4,11 @@ import 'package:flutter/material.dart';
 
 import '../main.dart';
 import '../models/product_data_check.dart';
-import '../res/colors.dart';
-import '../res/font.dart';
-import '../res/images.dart';
-import '../res/text.dart';
-import '../../virtusize_plugin.dart';
+import '../res/vs_colors.dart';
+import '../res/vs_font.dart';
+import '../res/vs_images.dart';
+import '../res/vs_text.dart';
+import '../../virtusize_sdk.dart';
 
 class VirtusizeButton extends StatefulWidget {
   final Widget child;
@@ -26,7 +26,7 @@ class _VirtusizeButtonState extends State<VirtusizeButton> {
   StreamSubscription<VSText> _vsTextSubscription;
   StreamSubscription<ProductDataCheck> _pdcSubscription;
 
-  VSText _vsText = IVirtusizePlugin.instance.vsText;
+  VSText _vsText = IVirtusizeSDK.instance.vsText;
   bool _isValidProduct;
 
   @override
@@ -34,16 +34,16 @@ class _VirtusizeButtonState extends State<VirtusizeButton> {
     super.initState();
 
     _vsTextSubscription =
-        IVirtusizePlugin.instance.vsTextStream.listen((vsText) {
+        IVirtusizeSDK.instance.vsTextStream.listen((vsText) {
       _vsText = vsText;
     });
 
     _pdcSubscription =
-        IVirtusizePlugin.instance.pdcStream.listen((productDataCheck) {
+        IVirtusizeSDK.instance.pdcStream.listen((productDataCheck) {
       if (_isValidProduct != null) {
         return;
       }
-      IVirtusizePlugin.instance
+      IVirtusizeSDK.instance
           .addProduct(externalProductId: productDataCheck.externalProductId);
       setState(() {
         _isValidProduct = productDataCheck.isValidProduct;
@@ -53,7 +53,7 @@ class _VirtusizeButtonState extends State<VirtusizeButton> {
 
   @override
   void dispose() {
-    IVirtusizePlugin.instance.removeProduct();
+    IVirtusizeSDK.instance.removeProduct();
     _vsTextSubscription.cancel();
     _pdcSubscription.cancel();
     super.dispose();
@@ -68,11 +68,11 @@ class _VirtusizeButtonState extends State<VirtusizeButton> {
           break;
         case VirtusizeStyle.Black:
           Color color = VSColors.vsGray900;
-          return _createVSButton(color, widget.child);
+          return _buildVSButton(color, widget.child);
           break;
         case VirtusizeStyle.Teal:
           Color color = VSColors.vsTeal;
-          return _createVSButton(color, widget.child);
+          return _buildVSButton(color, widget.child);
           break;
       }
     }
@@ -80,10 +80,10 @@ class _VirtusizeButtonState extends State<VirtusizeButton> {
   }
 
   Future<void> _openVirtusizeWebview() async {
-    await VirtusizePlugin.instance.openVirtusizeWebView();
+    await VirtusizeSDK.instance.openVirtusizeWebView();
   }
 
-  ElevatedButton _createVSButton(Color color, Widget child) {
+  ElevatedButton _buildVSButton(Color color, Widget child) {
     return ElevatedButton(
       child: Row(
         mainAxisSize: MainAxisSize.min,

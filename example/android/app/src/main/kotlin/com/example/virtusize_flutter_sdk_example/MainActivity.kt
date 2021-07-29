@@ -1,4 +1,4 @@
-package com.virtusize.virtusize_flutter_plugin_example
+package com.virtusize.virtusize_flutter_sdk_example
 
 import io.flutter.embedding.android.FlutterFragmentActivity
 

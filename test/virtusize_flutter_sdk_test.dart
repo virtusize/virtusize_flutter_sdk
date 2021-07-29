@@ -1,9 +1,10 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:virtusize_flutter_plugin/virtusize_plugin.dart';
+import '../lib/virtusize_sdk.dart';
+import '../lib/src/utils/virtusize_constants.dart';
 
 void main() {
-  const MethodChannel channel = MethodChannel('virtusize_flutter_plugin');
+  const MethodChannel channel = MethodChannel('com.virtusize/flutter_virtusize_sdk');
 
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -17,7 +18,7 @@ void main() {
     channel.setMockMethodCallHandler(null);
   });
 
-  test('setVirtusizeProps', () async {
-    expect(await VirtusizePlugin.instance.setVirtusizeProps, '42');
+  test(FlutterVirtusizeMethod.setVirtusizeParams, () async {
+    expect(await VirtusizeSDK.instance.setVirtusizeParams, '42');
   });
 }

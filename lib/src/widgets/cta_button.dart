@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../res/colors.dart';
-import '../res/images.dart';
+import '../res/vs_colors.dart';
+import '../res/vs_images.dart';
 
 class CTAButton extends StatelessWidget {
   final String text;

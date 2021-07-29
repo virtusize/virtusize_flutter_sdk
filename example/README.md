@@ -1,6 +1,6 @@
-# virtusize_flutter_plugin_example
+# virtusize_flutter_sdk_example
 
-Demonstrates how to use the virtusize_flutter_plugin plugin.
+Demonstrates how to use the virtusize_flutter_sdk plugin.
 
 ## Getting Started
 

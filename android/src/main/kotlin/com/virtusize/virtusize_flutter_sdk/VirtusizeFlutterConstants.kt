@@ -1,6 +1,6 @@
 internal object VirtusizeFlutterMethod {
     // Flutter to Android
-    const val SET_VIRTUSIZE_PROPS = "setVirtusizeProps"
+    const val SET_VIRTUSIZE_PARAMS = "setVirtusizeParams"
     const val SET_USER_ID = "setUserId"
     const val GET_PRODUCT_DATA_CHECK = "getProductDataCheck"
     const val OPEN_VIRTUSIZE_WEB_VIEW = "openVirtusizeWebView"
@@ -28,7 +28,7 @@ internal object VirtusizeFlutterKey {
     const val EXTERNAL_PRODUCT_ID = "externalProductId"
     const val IMAGE_URL = "imageURL"
     const val STORE_PRODUCT_ID = "storeProductId"
-    const val VIRTUSIZE_PROPS = "virtusizeProps"
+    const val VIRTUSIZE_PARAMS = "virtusizeParams"
     const val DISPLAY_LANGUAGE = "displayLanguage"
     const val IMAGE_TYPE = "imageType"
     const val PRODUCT_TYPE = "productType"

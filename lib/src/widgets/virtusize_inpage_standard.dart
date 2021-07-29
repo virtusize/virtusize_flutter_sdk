@@ -7,11 +7,11 @@ import '../main.dart';
 import '../models/recommendation.dart';
 import '../models/virtusize_product.dart';
 import '../models/product_data_check.dart';
-import '../res/colors.dart';
-import '../res/font.dart';
-import '../res/images.dart';
-import '../res/text.dart';
-import '../../virtusize_plugin.dart';
+import '../res/vs_colors.dart';
+import '../res/vs_font.dart';
+import '../res/vs_images.dart';
+import '../res/vs_text.dart';
+import '../../virtusize_sdk.dart';
 import 'animated_dots.dart';
 import 'animated_product_images.dart';
 import 'cta_button.dart';
@@ -40,7 +40,7 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
   StreamSubscription<Recommendation> _recSubscription;
   StreamSubscription<VirtusizeProduct> _productSubscription;
 
-  VSText _vsText = IVirtusizePlugin.instance.vsText;
+  VSText _vsText = IVirtusizeSDK.instance.vsText;
   ProductDataCheck _productDataCheck;
   bool _hasError;
   bool _isLoading;
@@ -55,15 +55,15 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
     super.initState();
 
     _vsTextSubscription =
-        IVirtusizePlugin.instance.vsTextStream.listen((vsText) {
+        IVirtusizeSDK.instance.vsTextStream.listen((vsText) {
       _vsText = vsText;
     });
 
-    _pdcSubscription = IVirtusizePlugin.instance.pdcStream.listen((pdc) {
+    _pdcSubscription = IVirtusizeSDK.instance.pdcStream.listen((pdc) {
       if (_productDataCheck != null) {
         return;
       }
-      IVirtusizePlugin.instance
+      IVirtusizeSDK.instance
           .addProduct(externalProductId: pdc.externalProductId);
       setState(() {
         _isLoading = true;
@@ -73,13 +73,13 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
     });
 
     _productSubscription =
-        IVirtusizePlugin.instance.productStream.listen((product) {
-      if (_productDataCheck.productId != product.storeProductID ||
-          (!isTheSameProduct(_storeProduct, product) &&
-              !isTheSameProduct(_userProduct, product))) {
+        IVirtusizeSDK.instance.productStream.listen((product) {
+      if (_productDataCheck.productId != product.productId ||
+          (!compareProduct(widgetProduct: _storeProduct, serverProduct: product) &&
+              !compareProduct(widgetProduct: _userProduct, serverProduct: product))) {
         return;
       }
-      String imageUrl = product.imageUrl ?? "";
+      String imageUrl = product.imageURL ?? "";
       Image networkImage = Image.network(imageUrl);
       final ImageStream stream =
           networkImage.image.resolve(ImageConfiguration.empty);
@@ -106,7 +106,7 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
     });
 
     _recSubscription =
-        IVirtusizePlugin.instance.recStream.listen((recommendation) {
+        IVirtusizeSDK.instance.recStream.listen((recommendation) {
       if (_productDataCheck.externalProductId !=
           recommendation.externalProductID) {
         return;
@@ -123,9 +123,9 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
     });
   }
 
-  bool isTheSameProduct(VirtusizeProduct productA, VirtusizeProduct productB) {
-    return productA == null ||
-        (productA != null && productA.imageType == productB.imageType);
+  bool compareProduct({@required VirtusizeProduct widgetProduct, @required VirtusizeProduct serverProduct}) {
+    return widgetProduct == null ||
+        (widgetProduct != null && widgetProduct.imageType == serverProduct.imageType);
   }
 
   void _splitRecTexts(String recText) {
@@ -141,7 +141,7 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
 
   @override
   void dispose() {
-    IVirtusizePlugin.instance.removeProduct();
+    IVirtusizeSDK.instance.removeProduct();
     _vsTextSubscription.cancel();
     _pdcSubscription.cancel();
     _productSubscription.cancel();
@@ -152,30 +152,30 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
   @override
   Widget build(BuildContext context) {
     if (_productDataCheck != null && _productDataCheck.isValidProduct) {
-      return _createVSInPageStandard(context);
+      return _buildVSInPageStandard(context);
     }
     return Container();
   }
 
   Future<void> _openVirtusizeWebview() async {
-    await VirtusizePlugin.instance.openVirtusizeWebView();
+    await VirtusizeSDK.instance.openVirtusizeWebView();
   }
 
   Future<void> _openPrivacyPolicyLink() async {
-    String _url = await IVirtusizePlugin.instance.getPrivacyPolicyLink();
+    String _url = await IVirtusizeSDK.instance.getPrivacyPolicyLink();
     await canLaunch(_url)
         ? await launch(_url, forceSafariVC: false)
         : throw 'Could not launch $_url';
   }
 
-  Widget _createVSInPageStandard(BuildContext context) {
+  Widget _buildVSInPageStandard(BuildContext context) {
     return Container(
         margin: EdgeInsets.symmetric(horizontal: widget.horizontalMargin),
         width: double.infinity,
         child: Column(children: [
           _hasError
-              ? _createVSInPageStandardOnError()
-              : _createVSInPageCardView(context),
+              ? _buildVSInPageStandardOnError()
+              : _buildVSInPageCardView(context),
           !_hasError && !_isLoading ? Container(height: 10) : Container(),
           !_hasError && !_isLoading
               ? Row(
@@ -198,10 +198,10 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
         ]));
   }
 
-  Widget _createVSInPageCardView(BuildContext context) {
-    double _inpageCardWidth =
+  Widget _buildVSInPageCardView(BuildContext context) {
+    double _inPageCardWidth =
         MediaQuery.of(context).size.width - widget.horizontalMargin * 2;
-    bool overlayImages = _inpageCardWidth <= 411;
+    bool overlayImages = _inPageCardWidth <= 411;
 
     Color color;
     switch (widget.style) {
@@ -312,7 +312,7 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
     );
   }
 
-  Widget _createVSInPageStandardOnError() {
+  Widget _buildVSInPageStandardOnError() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [

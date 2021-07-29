@@ -1,6 +1,6 @@
-class VirtusizeFlutterMethod {
-  // Flutter to native
-  static String setVirtusizeProps = "setVirtusizeProps";
+class FlutterVirtusizeMethod {
+  // Flutter to Native
+  static String setVirtusizeParams = "setVirtusizeParams";
   static String setUserId = "setUserId";
   static String getProductDataCheck = "getProductDataCheck";
   static String openVirtusizeWebView = "openVirtusizeWebView";
@@ -10,14 +10,14 @@ class VirtusizeFlutterMethod {
   static String addProduct = "addProduct";
   static String removeProduct = "removeProduct";
 
-  // native to Flutter
+  // Native to Flutter
   static String onVSEvent = "onVSEvent";
   static String onVSError = "onVSError";
   static String onProduct = "onProduct";
   static String onRecChange = "onRecChange";
 }
 
-class VirtusizeFlutterKey {
+class FlutterVirtusizeKey {
   static String apiKey = "apiKey";
   static String externalUserId = "externalUserId";
   static String environment = "env";
@@ -28,7 +28,7 @@ class VirtusizeFlutterKey {
   static String externalProductId = "externalProductId";
   static String imageURL = "imageURL";
   static String productId = "storeProductId";
-  static String virtusizeProps = "virtusizeProps";
+  static String virtusizeParams = "virtusizeParams";
   static String displayLanguage = "displayLanguage";
   static String imageType = "imageType";
   static String productType = "productType";

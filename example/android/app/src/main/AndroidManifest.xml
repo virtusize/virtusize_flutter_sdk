@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.virtusize.virtusize_flutter_plugin_example">
+    package="com.virtusize.virtusize_flutter_sdk_example">
    <application
-        android:label="virtusize_flutter_plugin_example"
+        android:label="virtusize_flutter_sdk_example"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

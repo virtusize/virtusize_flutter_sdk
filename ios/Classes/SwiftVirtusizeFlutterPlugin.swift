@@ -39,14 +39,14 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 	}
 	
 	public static func register(with registrar: FlutterPluginRegistrar) {
-		let channel = FlutterMethodChannel(name: "com.virtusize/virtusize_flutter_plugin", binaryMessenger: registrar.messenger())
+		let channel = FlutterMethodChannel(name: "com.virtusize/flutter_virtusize_sdk", binaryMessenger: registrar.messenger())
 		let instance = SwiftVirtusizeFlutterPlugin(channel: channel)
 		registrar.addMethodCallDelegate(instance, channel: channel)
 	}
 	
 	public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
 		switch call.method {
-			case VirtusizeFlutterMethod.setVirtusizeProps:
+			case VirtusizeFlutterMethod.setVirtusizeParams:
 				guard let arguments = call.arguments as? [String: Any] else {
 					result(FlutterError.noArguments)
 					return
@@ -97,7 +97,7 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 				
 				Virtusize.params = virtusizeBuilder.build()
 				result([
-					VirtusizeFlutterKey.virtusizeProps: arguments,
+					VirtusizeFlutterKey.virtusizeParams: arguments,
 					VirtusizeFlutterKey.displayLanguage: Virtusize.displayLanguage?.rawValue
 				])
 			case VirtusizeFlutterMethod.setUserId:

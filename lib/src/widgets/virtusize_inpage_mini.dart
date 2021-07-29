@@ -5,11 +5,11 @@ import 'package:flutter/material.dart';
 import '../main.dart';
 import '../models/recommendation.dart';
 import '../models/product_data_check.dart';
-import '../res/colors.dart';
-import '../res/font.dart';
-import '../res/images.dart';
-import '../res/text.dart';
-import '../../virtusize_plugin.dart';
+import '../res/vs_colors.dart';
+import '../res/vs_font.dart';
+import '../res/vs_images.dart';
+import '../res/vs_text.dart';
+import '../../virtusize_sdk.dart';
 import 'cta_button.dart';
 import 'animated_dots.dart';
 
@@ -33,7 +33,7 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
   StreamSubscription<ProductDataCheck> _pdcSubscription;
   StreamSubscription<Recommendation> _recSubscription;
 
-  VSText _vsText = IVirtusizePlugin.instance.vsText;
+  VSText _vsText = IVirtusizeSDK.instance.vsText;
   ProductDataCheck _productDataCheck;
   bool _isLoading;
   bool _hasError;
@@ -44,16 +44,16 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
     super.initState();
 
     _vsTextSubscription =
-        IVirtusizePlugin.instance.vsTextStream.listen((vsLocalization) {
+        IVirtusizeSDK.instance.vsTextStream.listen((vsLocalization) {
       _vsText = vsLocalization;
       _recText = _vsText.localization.vsLoadingText;
     });
 
-    _pdcSubscription = IVirtusizePlugin.instance.pdcStream.listen((pdc) {
+    _pdcSubscription = IVirtusizeSDK.instance.pdcStream.listen((pdc) {
       if (_productDataCheck != null) {
         return;
       }
-      IVirtusizePlugin.instance
+      IVirtusizeSDK.instance
           .addProduct(externalProductId: pdc.externalProductId);
       setState(() {
         _isLoading = true;
@@ -63,7 +63,7 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
     });
 
     _recSubscription =
-        IVirtusizePlugin.instance.recStream.listen((recommendation) {
+        IVirtusizeSDK.instance.recStream.listen((recommendation) {
       if (_productDataCheck.externalProductId !=
           recommendation.externalProductID) {
         return;
@@ -81,7 +81,7 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
 
   @override
   void dispose() {
-    IVirtusizePlugin.instance.removeProduct();
+    IVirtusizeSDK.instance.removeProduct();
     _vsTextSubscription.cancel();
     _pdcSubscription.cancel();
     _recSubscription.cancel();
@@ -92,7 +92,7 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
   Widget build(BuildContext context) {
     if (_productDataCheck != null && _productDataCheck.isValidProduct) {
       return GestureDetector(
-        child: _createVSInPageMini(),
+        child: _buildVSInPageMini(),
         onTap: !_hasError ? _openVirtusizeWebview : () => {},
       );
     }
@@ -100,10 +100,10 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
   }
 
   Future<void> _openVirtusizeWebview() async {
-    await VirtusizePlugin.instance.openVirtusizeWebView();
+    await VirtusizeSDK.instance.openVirtusizeWebView();
   }
 
-  Widget _createVSInPageMini() {
+  Widget _buildVSInPageMini() {
     Color color;
     switch (widget.style) {
       case VirtusizeStyle.Black:
@@ -121,13 +121,13 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
         color: _isLoading || _hasError ? Colors.white : color,
         width: double.infinity,
         child: _hasError
-            ? _createVSInPageMiniOnError()
+            ? _buildVSInPageMiniOnError()
             : _isLoading
-                ? _createVSInPageMiniOnLoading()
-                : _createVSInPageMiniOnFinishedLoading(themeColor: color));
+                ? _buildVSInPageMiniOnLoading()
+                : _buildVSInPageMiniOnFinishedLoading(themeColor: color));
   }
 
-  Widget _createVSInPageMiniOnLoading() {
+  Widget _buildVSInPageMiniOnLoading() {
     return Row(children: [
       Container(
           margin: EdgeInsets.only(left: 6),
@@ -151,7 +151,7 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
     ]);
   }
 
-  Widget _createVSInPageMiniOnFinishedLoading({Color themeColor}) {
+  Widget _buildVSInPageMiniOnFinishedLoading({Color themeColor}) {
     return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
       Flexible(
           child: Container(
@@ -171,7 +171,7 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
     ]);
   }
 
-  Widget _createVSInPageMiniOnError() {
+  Widget _buildVSInPageMiniOnError() {
     return Row(children: [
       Container(
           margin: EdgeInsets.only(left: 6),

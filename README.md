@@ -1,4 +1,4 @@
-# virtusize_flutter_plugin
+# virtusize_flutter_sdk
 
 Virtusize integration in Flutter
 

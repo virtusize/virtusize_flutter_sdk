@@ -1,4 +1,4 @@
-group 'com.virtusize.virtusize_flutter_plugin'
+group 'com.virtusize.virtusize_flutter_sdk'
 version '1.0-SNAPSHOT'
 
 buildscript {

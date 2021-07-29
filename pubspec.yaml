@@ -1,4 +1,4 @@
-name: virtusize_flutter_plugin
+name: virtusize_flutter_sdk
 description: Virtusize integration in Flutter
 version: 0.0.1
 author:
@@ -29,7 +29,7 @@ flutter:
   plugin:
     platforms:
       android:
-        package: com.virtusize.virtusize_flutter_plugin
+        package: com.virtusize.virtusize_flutter_sdk
         pluginClass: VirtusizeFlutterPlugin
       ios:
         pluginClass: VirtusizeFlutterPlugin
@@ -49,7 +49,7 @@ flutter:
   # To add custom fonts to your plugin package, add a fonts section here,
   # in this "flutter" section. Each entry in this list should have a
   # "family" key with the font family name, and a "fonts" key with a
-  # list giving the asset and other descriptors for the font. For
+  # list giving the asset and other descriptors for the font.
   fonts:
     - family: ProximaNova
       fonts:
