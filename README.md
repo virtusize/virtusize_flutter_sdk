@@ -45,9 +45,9 @@ Virtusize helps retailers to illustrate the size and fit of clothing, shoes and 
 
 Read more about Virtusize at https://www.virtusize.com
 
-You need a unique API key and an Admin account, only available to Virtusize customers. Contact our sales team to become a customer.
+You will need a unique API key and an Admin account, only available to Virtusize customers. Contact our sales team to become a customer.
 
-This is the integration for Flutter apps only. For web integration, refer to the developer documentation on https://developers.virtusize.com
+**This is the integration for Flutter apps only.** For web integration, refer to the developer documentation on https://developers.virtusize.com
 
 
 
@@ -70,6 +70,7 @@ This is the integration for Flutter apps only. For web integration, refer to the
     }
   }
   ```
+
 
 
 ## Usage 
@@ -103,8 +104,8 @@ This is the integration for Flutter apps only. For web integration, refer to the
     </queries>
     ```
 
-2. To able to open the Virtusize webview in Fragment for the SDK, inherit from **FlutterFragmentActivity** instead of FlutterActivity in the `android/app/src/main/MainActivity`.
-    
+2. To be able to open the Virtusize webview in a Fragment for the SDK, inherit from **FlutterFragmentActivity** instead of FlutterActivity in the `android/app/src/main/MainActivity`.
+   
     ```diff
     - import io.flutter.embedding.android.FlutterActivity
     + import io.flutter.embedding.android.FlutterFragmentActivity
@@ -113,6 +114,7 @@ This is the integration for Flutter apps only. For web integration, refer to the
     + class MainActivity: FlutterFragmentActivity() {
     }
     ```
+
 
 
 ### 2. Flutter
@@ -149,8 +151,8 @@ Future<void> main() async {
 
 Possible argument configuration is shown in the following table:
 
-| Argument          | Argument Type          | Example                                                 | Description                                                  | Requirement                                                  |
-| ----------------- | --------------------   | ------------------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| Argument          | Type                   | Example                                                 | Description                                                  | Required                                                     |
+| ----------------- | ---------------------- | ------------------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
 | apiKey            | String                 | "api_key"                                               | A unique API key is provided to each Virtusize client.       | Yes                                                          |
 | userId            | String                 | "123"                                                   | Passed from the client if the user is logged into the client's app. | Yes, if the Order API is used.                               |
 | env               | VSEnvironment          | VSEnvironment.staging                                   | The environment is the region you are running the integration from, either `VSEnvironment.staging`,  `VSEnvironment.global`, `VSEnvironment.japan` or `VSEnvironment.korea`. | No. By default, the Virtusize environment will be set to `VSEnvironment.global`. |
@@ -165,46 +167,50 @@ Possible argument configuration is shown in the following table:
 
 In the `initState` of your product page widget, you will need to set up the product details:
 
-- pass an `exernalId` that will be used to reference the product in the Virtusize server
-- pass an `imageURL` in order to populate the Virtusize widgets
+- Pass an `exernalId` that will be used to reference the product in the Virtusize server
+- Pass an `imageURL`  for the product image
 
 ```dart
 @override
-  void initState() {
+void initState() {
     super.initState();
 
     VirtusizeSDK.instance.setProduct(
         // Set the product's external ID
         externalId: 'vs_dress',
         // Set the product image URL
-        imageURL: 'http://www.image.com/goods/12345.jpg');
-  }
+        imageURL: 'http://www.image.com/goods/12345.jpg'
+    );
+}
 ```
 
 
 
 #### (3) Implement VirtusizeMessageHandler (Optional)
 
-You can register a `VirtusizeMessageListener` to listen for events or the [ProductDataCheck] result from Virtusize. 
+You can register a `VirtusizeMessageListener` to listen for events and the `ProductDataCheck` result from Virtusize. 
 
-All the arugments of the `VirtusizeSDK.instance.setVirtusizeMessageListener` function are optional.
+All the arugments for the `VirtusizeSDK.instance.setVirtusizeMessageListener` function are optional.
 
 ```dart
 @override
-  void initState() {
+void initState() {
     super.initState();
 
     VirtusizeSDK.instance.setVirtusizeMessageListener(
-        VirtusizeMessageListener(vsEvent: (eventName) {
-      print("Virtusize event: $eventName");
-    }, vsError: (error) {
-      print("Virtusize error: $error");
-    }, productDataCheckSuccess: (productDataCheck) {
-      print('ProductDataCheck success: $productDataCheck');
-    }, productDataCheckError: (error) {
-      print('ProductDataCheck error: $error');
-    }));
-  }
+        VirtusizeMessageListener(
+            vsEvent: (eventName) {
+        				print("Virtusize event: $eventName");
+      			}, vsError: (error) {
+        				print("Virtusize error: $error");
+      			}, productDataCheckSuccess: (productDataCheck) {
+        				print('ProductDataCheck success: $productDataCheck');
+      			}, productDataCheckError: (error) {
+        				print('ProductDataCheck error: $error');
+      			}
+       )
+    );
+}
 ```
 
 
@@ -213,15 +219,13 @@ All the arugments of the `VirtusizeSDK.instance.setVirtusizeMessageListener` fun
 
 After setting up the SDK, add a `Virtusize` widget to allow your customers to find their ideal size.
 
-Virtusize Flutter SDK provides two main UI widgets for clients to use:
-
-
+Virtusize's Flutter SDK provides two main UI widgets for clients to use:
 
 ### 1. Virtusize Button
 
 #### (1) Introduction
 
-VirtusizeButton is the simplest UI Button for our SDK. It opens our application in the web view to support customers finding the right size.
+VirtusizeButton is the simplest UI Button for our SDK. It opens our application in a web view to support customers finding the right size.
 
 
 
@@ -246,10 +250,6 @@ If you like, you can also customize the button style.
   ```dart
   // A `VirtusizeButton` widget with default `Black` style
   VirtusizeButton.vsStyle()
-  // The above is same as the below
-  VirtusizeButton.vsStyle(
-      style: VirtusizeStyle.Black
-  )
     
   // A `VirtusizeButton` widget with `Teal` style and a custom `Text` widget
   VirtusizeButton.vsStyle(
@@ -257,15 +257,15 @@ If you like, you can also customize the button style.
       child: Text("Custom Text")
   )
   ```
-
   
+  
+  
+  <u>or</u> create a `VirtusizeButton` widget with your custom button widget:
 
 - **VirtusizeButton**({required Widget child})
 
-  Create a `VirtusizeButton` widget with your custom widget
-
   ```dart
-  // A `VirtusizeButton` widget with a custom `ElevatedButton` widget
+// A `VirtusizeButton` widget with a custom `ElevatedButton` widget
   VirtusizeButton(
       child: ElevatedButton(
         child: Text('Custom Button'), 
@@ -296,9 +296,47 @@ There are two types of InPage in our Virtusize SDK.
 1. InPage cannot be implemented together with the Virtusize button. Please pick either InPage or Virtusize button for your online shop.
 2. InPage Mini must always be used in combination with InPage Standard.
 
+
+
 #### (2) InPage Standard
 
-##### A. Design Guidelines
+##### A. Usage
+
+- **VirtusizeInPageStandard.vsStyle**({VirtusizeStyle style = VirtusizeStyle.Black, double horizontalMargin = 16})
+
+  Create a `VirtusizeInPageStandard` widget with the default Virtusize style and with the ability to change the horizontal margin.
+
+  ```dart
+  // A `VirtusizeInPageStandard` widget with default `Black` style and a default horizontal margin of `16` 
+  VirtusizeInPageStandard.vsStyle()
+    
+  // A `VirtusizeInPageStandard` widget with `Teal` style and a horizontal margin of `32`
+  VirtusizeInPageStandard.vsStyle(
+      style: VirtusizeStyle.Teal,
+      horizontalMargin: 32
+  )
+  ```
+
+  
+
+  <u>or</u> create a `VirtusizeInPageStandard` widget with the ability to change the button background color and the horizontal margin:
+
+- **VirtusizeInPageStandard**({Color buttonBackgroundColor = VSColors.vsGray900, double horizontalMargin = 16})
+
+  ```dart
+  // A `VirtusizeInPageStandard` widget with a default `VSColors.vsGray900` button background color and a default horizontal margin of `16`
+  VirtusizeInPageStandard()
+  
+  // A `VirtusizeInPageStandard` widget with a `Colors.amber` button background color and a horizontal margin of `32`
+  VirtusizeInPageStandard(
+      buttonBackgroundColor: Colors.amber, 
+      horizontalMargin: 32
+  )
+  ```
+
+
+
+##### B. Design Guidelines
 
 - ##### Default Designs
 
@@ -338,51 +376,49 @@ There are two types of InPage in our Virtusize SDK.
     - change or hide the box shadow.
     - hide the footer that contains VIRTUSIZE logo and Privacy Policy text link.
 
-##### B. Usage
-
-- **VirtusizeInPageStandard.vsStyle**({VirtusizeStyle style = VirtusizeStyle.Black, double horizontalMargin = 16})
-
-  Create a `VirtusizeInPageStandard` widget with the default Virtusize style and with an ablitiy to change the horizontal margin.
-
-  ```dart
-  // A `VirtusizeInPageStandard` widget with default `Black` style and a default horizontal margin of `16` 
-  VirtusizeInPageStandard.vsStyle()
-  // The above is same as the below
-  VirtusizeInPageStandard.vsStyle(
-      style: VirtusizeStyle.Black
-  )
-    
-  // A `VirtusizeInPageStandard` widget with `Teal` style and a horizontal margin of `32`
-  VirtusizeInPageStandard.vsStyle(
-      style: VirtusizeStyle.Teal,
-      horizontalMargin: 32
-  )
-  ```
-
-  
-
-- **VirtusizeInPageStandard**({Color buttonBackgroundColor = VSColors.vsGray900, double horizontalMargin = 16})
-
-  Create a `VirtusizeInPageStandard` widget with an ablitiy to change the button background color and the horizontal margin.
-
-  ```dart
-  // A `VirtusizeInPageStandard` widget with a default `VSColors.vsGray900` button background color and a default horizontal margin of `16`
-  VirtusizeInPageStandard()
-  
-  // A `VirtusizeInPageStandard` widget with a `Colors.amber` button background color and a horizontal margin of `32`
-  VirtusizeInPageStandard(
-      buttonBackgroundColor: Colors.amber, 
-      horizontalMargin: 32
-  )
-  ```
-
 
 
 #### (3) InPage Mini
 
-This is a mini version of InPage you can place in your application. The discreet design is suitable for layouts where customers are browsing product images and size tables.
+This is a mini version of InPage that you can place in your application. The discreet design is suitable for layouts where customers are browsing product images and size tables.
 
-#### A. Design Guidelines
+
+
+##### A. Usage
+
+- **VirtusizeInPageMini.vsStyle**({VirtusizeStyle style = VirtusizeStyle.Black, double horizontalMargin = 16})
+
+  Create a `VirtusizeInPageMini` widget with the default Virtusize style and with the ability to change the horizontal margin.
+
+  ```dart
+  // A `VirtusizeInPageMini` widget with default `Black` style and a default horizontal margin of `16` 
+  VirtusizeInPageMini.vsStyle()
+    
+  // A `VirtusizeInPageMini` widget with `Teal` style and a default horizontal margin of `16`
+  VirtusizeInPageMini.vsStyle(
+      style: VirtusizeStyle.Teal
+  )
+  ```
+  
+  
+  
+  <u>or</u> create a `VirtusizeInPageMini` widget with the ability to change the background color and the horizontal margin:
+
+- **VirtusizeInPageMini**({Color backgroundColor = VSColors.vsGray900, double horizontalMargin = 16})
+
+  ```dart
+// A `VirtusizeInPageMini` widget with a default `VSColors.vsGray900` background color and a default horizontal margin of `16`
+  VirtusizeInPageMini()
+  
+  // A `VirtusizeInPageMini` widget with a `Colors.blue` background color and a default horizontal margin of `16`
+  VirtusizeInPageMini(
+      backgroundColor: Colors.blue
+  )
+  ```
+
+
+
+##### B. Design Guidelines
 
 - ##### Default designs
 
@@ -422,42 +458,6 @@ This is a mini version of InPage you can place in your application. The discreet
     - change the CTA button shape.
     - change messages.
 
-#### B. Usage
-
-- **VirtusizeInPageMini.vsStyle**({VirtusizeStyle style = VirtusizeStyle.Black, double horizontalMargin = 16})
-
-  Create a `VirtusizeInPageMini` widget with the default Virtusize style and with an ablitiy to change the horizontal margin.
-
-  ```dart
-  // A `VirtusizeInPageMini` widget with default `Black` style and a default horizontal margin of `16` 
-  VirtusizeInPageMini.vsStyle()
-  // The above is same as the below
-  VirtusizeInPageMini.vsStyle(
-      style: VirtusizeStyle.Black
-  )
-    
-  // A `VirtusizeInPageMini` widget with `Teal` style and a default horizontal margin of `16`
-  VirtusizeInPageMini.vsStyle(
-      style: VirtusizeStyle.Teal
-  )
-  ```
-
-  
-
-- **VirtusizeInPageMini**({Color backgroundColor = VSColors.vsGray900, double horizontalMargin = 16})
-
-  Create a `VirtusizeInPageMini` widget with an ablitiy to change the background color and the horizontal margin.
-
-  ```dart
-  // A `VirtusizeInPageMini` widget with a default `VSColors.vsGray900` background color and a default horizontal margin of `16`
-  VirtusizeInPageMini()
-  
-  // A `VirtusizeInPageMini` widget with a `Colors.blue` background color and a default horizontal margin of `16`
-  VirtusizeInPageMini(
-      backgroundColor: Colors.blue
-  )
-  ```
-
 
 
 ## The Order API
@@ -466,7 +466,7 @@ The order API enables Virtusize to show your customers the items they have recen
 
 #### 1. Initialization
 
-Make sure to set up the **user ID** before sending orders to Virtusize. You can set up the user ID either:
+Ensure that the **user ID** is set before sending orders to Virtusize. You can set up the user ID:
 
 while setting the Virtusize parameters using `VirtusizeSDK.instance.setVirtusizeParams`
 
@@ -492,30 +492,30 @@ VirtusizeSDK.instance.setUserId("123456");
 
 The ***VirtusizeOrder*** object gets passed to the `VirtusizeSDK.instance.sendOrder` function, and has the following attributes:
 
-***\*Note:\**** * means the argument is required
+***Note:*** * means the argument is required
 
 **VirtusizeOrder**
 
-| Argument         | Data Type                | Example             | Description                         |
+| Argument         | Type                | Example             | Description                         |
 | ---------------- | ------------------------ | ------------------- | ----------------------------------- |
 | externalOrderId* | String                   | "20200601586"       | The order ID provided by the client |
 | items*           | List<`VirtusizeOrderItem`> | See the table below | A list of the order items.          |
 
 **VirtusizeOrderItem**
 
-| Argument           | Data Type | Example                              | Description                                                  |
-| ------------------ | --------- | ------------------------------------ | ------------------------------------------------------------ |
-| externalProductId* | String    | "A001"                               | The external product ID provided by the client. It must be unique for each product. |
-| size*              | String    | "S", "M", etc.                       | The name of the size                                         |
-| sizeAlias          | String    | "Small", "Large", etc.               | The alias of the size is added if the size name is not identical to the one from the product page |
-| variantId          | String    | "A001_SIZES_RED"                     | The variant ID is set on the product SKU, color, or size (if there are several options) |
-| imageURL*          | String    | "http://images.example.com/coat.jpg" | The image URL of the item                                    |
-| color              | String    | "RED", "R', etc.                     | The color of the item                                        |
-| gender             | String    | "W", "Women", etc.                   | An identifier for the gender                                 |
-| unitPrice*         | double    | 5100.00                              | The product price that is a double number with a maximum of 12 digits and 2 decimals (12, 2) |
-| currency*          | String    | "JPY", "KRW", "USD", etc.            | Currency code                                                |
-| quantity*          | int       | 1                                    | The number of items purchased. If it's not passed, it will default to 1 |
-| url                | String    | "http://example.com/products/A001"   | The URL of the product page. Please make sure this is a URL that users can access |
+| Argument           | Type   | Example                              | Description                                                  |
+| ------------------ | ------ | ------------------------------------ | ------------------------------------------------------------ |
+| externalProductId* | String | "A001"                               | The external product ID provided by the client. It must be unique for each product. |
+| size*              | String | "S", "M", etc.                       | The name of the size                                         |
+| sizeAlias          | String | "Small", "Large", etc.               | The alias of the size is added if the size name is not identical to the one from the product page |
+| variantId          | String | "A001_SIZES_RED"                     | The variant ID is set on the product SKU, color, or size (if there are several options) |
+| imageURL*          | String | "http://images.example.com/coat.jpg" | The image URL of the item                                    |
+| color              | String | "RED", "R', etc.                     | The color of the item                                        |
+| gender             | String | "W", "Women", etc.                   | An identifier for the gender                                 |
+| unitPrice*         | double | 5100.00                              | The product price that is a double number with a maximum of 12 digits and 2 decimals (12, 2) |
+| currency*          | String | "JPY", "KRW", "USD", etc.            | Currency code                                                |
+| quantity*          | int    | 1                                    | The number of items purchased. If it's not passed, it will default to 1 |
+| url                | String | "http://example.com/products/A001"   | The URL of the product page. Please make sure this is a URL that users can access |
 
 **Example**
 
