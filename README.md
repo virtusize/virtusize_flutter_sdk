@@ -265,7 +265,7 @@ If you like, you can also customize the button style.
 - **VirtusizeButton**({required Widget child})
 
   ```dart
-// A `VirtusizeButton` widget with a custom `ElevatedButton` widget
+  // A `VirtusizeButton` widget with a custom `ElevatedButton` widget
   VirtusizeButton(
       child: ElevatedButton(
         child: Text('Custom Button'), 
@@ -407,7 +407,7 @@ This is a mini version of InPage that you can place in your application. The dis
 - **VirtusizeInPageMini**({Color backgroundColor = VSColors.vsGray900, double horizontalMargin = 16})
 
   ```dart
-// A `VirtusizeInPageMini` widget with a default `VSColors.vsGray900` background color and a default horizontal margin of `16`
+  // A `VirtusizeInPageMini` widget with a default `VSColors.vsGray900` background color and a default horizontal margin of `16`
   VirtusizeInPageMini()
   
   // A `VirtusizeInPageMini` widget with a `Colors.blue` background color and a default horizontal margin of `16`
