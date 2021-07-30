@@ -80,7 +80,7 @@ class VirtusizeFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
         }
         eventName?.let {
           scope.launch {
-            channel.invokeMethod(VirtusizeFlutterMethod.ON_VS_EVENT, eventName)
+            channel.invokeMethod(VirtusizeFlutterMethod.ON_VS_EVENT, event.toString())
           }
         }
 
@@ -122,7 +122,13 @@ class VirtusizeFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
           }
           VirtusizeEvents.UserAddedProduct.getEventName() -> {
             event.data?.optInt(VirtusizeEventKey.USER_PRODUCT_ID)?.let { userProductId ->
-              selectedUserProductId = userProductId
+              // User can add a product which is not comparable with the current store product
+              // Make sure that it doesn't update the selected user product ID when that happens
+              productTypes?.find { productType -> productType.id == userProductId }?.let { productType ->
+                if (productType.compatibleTypes.contains(userProductId)) {
+                  selectedUserProductId = userProductId
+                }
+              }
             }
             scope.launch {
               getRecommendation(
