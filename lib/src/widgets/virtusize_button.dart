@@ -11,12 +11,17 @@ import '../res/vs_text.dart';
 import '../../virtusize_sdk.dart';
 
 class VirtusizeButton extends StatefulWidget {
+  final VirtusizeClientProduct clientProduct;
   final Widget child;
   VirtusizeStyle style = VirtusizeStyle.None;
 
-  VirtusizeButton({@required this.child});
+  VirtusizeButton({@required this.clientProduct, @required this.child}) {
+    assert(clientProduct != null);
+  }
 
-  VirtusizeButton.vsStyle({this.style = VirtusizeStyle.Black, this.child});
+  VirtusizeButton.vsStyle({@required this.clientProduct, this.style = VirtusizeStyle.Black, this.child})  {
+    assert(clientProduct != null);
+  }
 
   @override
   _VirtusizeButtonState createState() => _VirtusizeButtonState();
@@ -40,7 +45,7 @@ class _VirtusizeButtonState extends State<VirtusizeButton> {
 
     _pdcSubscription =
         IVirtusizeSDK.instance.pdcStream.listen((productDataCheck) {
-      if (_isValidProduct != null) {
+      if (widget.clientProduct.externalProductId != productDataCheck.externalProductId) {
         return;
       }
       IVirtusizeSDK.instance

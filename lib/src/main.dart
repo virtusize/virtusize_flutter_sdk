@@ -2,9 +2,10 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:virtusize_flutter_sdk/src/models/virtusize_client_product.dart';
 
 import 'models/recommendation.dart';
-import 'models/virtusize_product.dart';
+import 'models/virtusize_server_product.dart';
 import 'models/product_data_check.dart';
 import 'models/virtusize_enums.dart';
 import 'models/virtusize_order.dart';
@@ -28,7 +29,7 @@ class VirtusizeSDK {
     IVirtusizeSDK.instance._pdcController =
     StreamController<ProductDataCheck>.broadcast();
     IVirtusizeSDK.instance._productController =
-    StreamController<VirtusizeProduct>.broadcast();
+    StreamController<VirtusizeServerProduct>.broadcast();
     IVirtusizeSDK.instance._recController =
     StreamController<Recommendation>.broadcast();
 
@@ -46,7 +47,7 @@ class VirtusizeSDK {
       },
       FlutterVirtusizeMethod.onProduct: (call) => {
         IVirtusizeSDK.instance._productController
-            .add(VirtusizeProduct(json.encode(call.arguments)))
+            .add(VirtusizeServerProduct(json.encode(call.arguments)))
       },
       FlutterVirtusizeMethod.onVSEvent: (call) => {
         if (_virtusizeMessageListener.vsEvent != null)
@@ -131,17 +132,11 @@ class VirtusizeSDK {
     }
   }
 
-  /// A function for clients to set the Product Info
-  Future<void> setProduct(
-
-      /// A string to represent an external product ID from the client's system
-      {@required String externalId,
-
-        /// The URL of the product image that is fully qualified with a domain name (FQDN) and the HTTPS protocol
-        String imageURL}) async {
-    assert(externalId != null);
+  /// A function for clients to load the Product Info
+  Future<void> loadProduct(VirtusizeClientProduct clientProduct) async {
+    assert(clientProduct.externalProductId != null);
     ProductDataCheck productDataCheck =
-    await _getProductDataCheck(externalId, imageURL);
+    await _getProductDataCheck(clientProduct.externalProductId, clientProduct.imageURL);
     IVirtusizeSDK.instance._pdcController.add(productDataCheck);
     if (productDataCheck != null && productDataCheck.isValidProduct) {
       _getRecommendationText(productDataCheck: productDataCheck);
@@ -157,7 +152,7 @@ class VirtusizeSDK {
           .invokeMethod(FlutterVirtusizeMethod.getProductDataCheck, {
         FlutterVirtusizeKey.externalProductId: externalId,
         FlutterVirtusizeKey.imageURL: imageURL
-      }).then((value) => ProductDataCheck(value, externalId));
+      }).then((value) => ProductDataCheck(externalId, value));
 
       if (_virtusizeMessageListener.productDataCheckSuccess != null) {
         _virtusizeMessageListener.productDataCheckSuccess
@@ -246,9 +241,9 @@ class IVirtusizeSDK {
   StreamController _pdcController;
   Stream<ProductDataCheck> get pdcStream => _pdcController.stream;
 
-  /// A stream controller to send the [VirtusizeProduct] data to multiple Virtusize widgets
+  /// A stream controller to send the [VirtusizeServerProduct] data to multiple Virtusize widgets
   StreamController _productController;
-  Stream<VirtusizeProduct> get productStream => _productController.stream;
+  Stream<VirtusizeServerProduct> get productStream => _productController.stream;
 
   /// A stream controller to send the [Recommendation] data to multiple Virtusize widgets
   StreamController _recController;

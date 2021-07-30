@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import '../models/virtusize_product.dart';
+import '../models/virtusize_server_product.dart';
 import '../res/vs_colors.dart';
 import '../res/vs_images.dart';
 
 class ProductImageView extends StatelessWidget {
-  final VirtusizeProduct product;
+  final VirtusizeServerProduct product;
 
   ProductImageView({@required this.product});
 

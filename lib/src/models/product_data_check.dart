@@ -5,7 +5,7 @@ class ProductDataCheck extends VirtusizeModel {
   /// A string to represent a external product ID from a client's system
   final String externalProductId;
 
-  ProductDataCheck(data, this.externalProductId) : super(data);
+  ProductDataCheck(this.externalProductId, data) : super(data);
 
   /// The data of the product data check result from Native
   Map<String, dynamic> get data => decodedData["data"] ?? {};
