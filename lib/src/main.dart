@@ -70,7 +70,7 @@ class VirtusizeSDK {
         String userId,
 
         /// The Virtusize environment (defaults to the `global` domain)
-        VSEnvironment environment = VSEnvironment.global,
+        VSEnvironment env = VSEnvironment.global,
 
         /// The [VSLanguage] that sets the initial language the Virtusize webview will load in
         VSLanguage language,
@@ -93,7 +93,7 @@ class VirtusizeSDK {
           .invokeMethod(FlutterVirtusizeMethod.setVirtusizeParams, {
         FlutterVirtusizeKey.apiKey: apiKey,
         FlutterVirtusizeKey.externalUserId: userId,
-        FlutterVirtusizeKey.environment: environment.value,
+        FlutterVirtusizeKey.environment: env.value,
         FlutterVirtusizeKey.language: language != null ? language.value : null,
         FlutterVirtusizeKey.showSGI: showSGI,
         FlutterVirtusizeKey.allowedLanguages: allowedLanguages.map((language) {
