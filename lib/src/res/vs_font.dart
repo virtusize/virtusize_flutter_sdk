@@ -25,8 +25,9 @@ class VSFont {
     String fontFamilyName;
     switch(language) {
       case VSLanguage.en:
-        // TODO: Proxima Nova is not a open source font. Need to find an alternative
-        fontFamilyName = "ProximaNova";
+        // Use the default font in Flutter
+        // Android: Roboto
+        // iOS: San Francisco
         break;
       case VSLanguage.jp:
         fontFamilyName = "NotoSansJP";
