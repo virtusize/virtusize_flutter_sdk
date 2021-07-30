@@ -53,11 +53,33 @@ class VirtusizeSDK {
       }
     };
 
-    // Set the method call handler to receive data from Native
-    IVirtusizeSDK.instance._channel.setMethodCallHandler((call) {
-      methodCallExectuionMap[call.method](call);
-      return null;
-    });
+    // Sets the method call handler
+    IVirtusizeSDK.instance._channel.setMethodCallHandler(_methodCallHandler);
+  }
+
+  /// Returns the method call handler that receives data from Native
+  Future<dynamic> _methodCallHandler(MethodCall call) {
+    // A map to match each method call from Native with its corresponding exectuion
+    Map<String, Function> methodCallExecutionMap = {
+      FlutterVirtusizeMethod.onRecChange: (call) => {
+        IVirtusizeSDK.instance._recController
+            .add(Recommendation(json.encode(call.arguments)))
+      },
+      FlutterVirtusizeMethod.onProduct: (call) => {
+        IVirtusizeSDK.instance._productController
+            .add(VirtusizeProduct(json.encode(call.arguments)))
+      },
+      FlutterVirtusizeMethod.onVSEvent: (call) => {
+        if (_virtusizeMessageListener != null)
+          {_virtusizeMessageListener.vsEvent.call(call.arguments)
+          }
+      },
+      FlutterVirtusizeMethod.onVSError: (call) => {
+        if (_virtusizeMessageListener != null)
+          {_virtusizeMessageListener.vsError.call(call.arguments)}
+      }
+    };
+    return methodCallExecutionMap[call.method](call);
   }
 
   /// A function for clients to set the Virtusize parameters
