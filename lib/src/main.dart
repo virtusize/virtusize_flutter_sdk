@@ -32,27 +32,6 @@ class VirtusizeSDK {
     IVirtusizeSDK.instance._recController =
     StreamController<Recommendation>.broadcast();
 
-    // A map to match each method call from Native with its corresponding exectuion
-    Map<String, Function> methodCallExectuionMap = {
-      FlutterVirtusizeMethod.onRecChange: (call) => {
-        IVirtusizeSDK.instance._recController
-            .add(Recommendation(json.encode(call.arguments)))
-      },
-      FlutterVirtusizeMethod.onProduct: (call) => {
-        IVirtusizeSDK.instance._productController
-            .add(VirtusizeProduct(json.encode(call.arguments)))
-      },
-      FlutterVirtusizeMethod.onVSEvent: (call) => {
-        if (_virtusizeMessageListener != null)
-          {_virtusizeMessageListener.vsEvent.call(call.arguments)
-          }
-      },
-      FlutterVirtusizeMethod.onVSError: (call) => {
-        if (_virtusizeMessageListener != null)
-          {_virtusizeMessageListener.vsError.call(call.arguments)}
-      }
-    };
-
     // Sets the method call handler
     IVirtusizeSDK.instance._channel.setMethodCallHandler(_methodCallHandler);
   }
@@ -70,12 +49,12 @@ class VirtusizeSDK {
             .add(VirtusizeProduct(json.encode(call.arguments)))
       },
       FlutterVirtusizeMethod.onVSEvent: (call) => {
-        if (_virtusizeMessageListener != null)
+        if (_virtusizeMessageListener.vsEvent != null)
           {_virtusizeMessageListener.vsEvent.call(call.arguments)
           }
       },
       FlutterVirtusizeMethod.onVSError: (call) => {
-        if (_virtusizeMessageListener != null)
+        if (_virtusizeMessageListener.vsError != null)
           {_virtusizeMessageListener.vsError.call(call.arguments)}
       }
     };
@@ -180,7 +159,7 @@ class VirtusizeSDK {
         FlutterVirtusizeKey.imageURL: imageURL
       }).then((value) => ProductDataCheck(value, externalId));
 
-      if (_virtusizeMessageListener != null) {
+      if (_virtusizeMessageListener.productDataCheckSuccess != null) {
         _virtusizeMessageListener.productDataCheckSuccess
             .call(productDataCheck);
       }
@@ -189,7 +168,7 @@ class VirtusizeSDK {
     } on PlatformException catch (error) {
       print('Failed to get product data check: $error');
 
-      if (_virtusizeMessageListener != null) {
+      if (_virtusizeMessageListener.productDataCheckError != null) {
         _virtusizeMessageListener.productDataCheckError.call(error);
       }
     }
