@@ -19,7 +19,7 @@ class VirtusizeSDK {
   static final VirtusizeSDK instance = VirtusizeSDK._();
 
   /// A listener to receive Virtusize-specific messages from Native
-  VirtusizeMessageListener _virtusizeMessageListener;
+  VirtusizeMessageListener _virtusizeMessageListener = VirtusizeMessageListener();
 
   /// Initialize the [VirtusizeSDK] instance
   VirtusizeSDK._() {
