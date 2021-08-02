@@ -47,7 +47,7 @@ Read more about Virtusize at https://www.virtusize.com
 
 You will need a unique API key and an Admin account, only available to Virtusize customers. Contact our sales team to become a customer.
 
-**This is the integration for Flutter apps only.** For web integration, refer to the developer documentation on https://developers.virtusize.com
+> **This is the integration for Flutter apps only.** For web integration, refer to the developer documentation on https://developers.virtusize.com
 
 
 
