@@ -10,7 +10,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  /// Create a global [VirtusizeClientProduct] variable, so that you can pass it to the `Virtusize` widgets
+  /// Declare a global [VirtusizeClientProduct] variable, which will be passed to the `Virtusize` widgets in order to bind the product info
   VirtusizeClientProduct _product;
 
   @override
@@ -21,16 +21,17 @@ class _HomeScreenState extends State<HomeScreen> {
     _product = VirtusizeClientProduct(
         externalProductId: 'vs_dress',
         imageURL: 'https://www.image.com/goods/12345.jpg');
-    /// Loads the product in order to populate the Virtusize view
-    VirtusizeSDK.instance.loadProduct(_product);
 
-    /// If you want to update the product information to a different one on the same screen,
-    /// assign a different `VirtusizeClientProduct` object to [_product] and reload the product using `setState()` to re-build this widget
+    /// Loads the product in order to populate the Virtusize view
+    VirtusizeSDK.instance.loadVirtusize(_product);
+
+    /// If you want to update the product to a different one while the user is on the same screen,
+    /// assign a different `VirtusizeClientProduct` object to [_product] and reload the product using [VirtusizeSDK.instance.loadVirtusize] inside of `setState()` to re-build this widget
     setState(() {
       _product = VirtusizeClientProduct(
           externalProductId: 'vs_pants',
           imageURL: 'https://www.image.com/goods/12345.jpg');
-      VirtusizeSDK.instance.loadProduct(_product);
+      VirtusizeSDK.instance.loadVirtusize(_product);
     });
 
     /// Optional: Set a [VirtusizeMessageListener] to listen for events or the [ProductDataCheck] result from Virtusize
@@ -60,14 +61,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   child:
 
                       /// A [VirtusizeButton] widget with the default VirtusizeStyle
-                      VirtusizeButton.vsStyle(clientProduct: _product)),
+                      VirtusizeButton.vsStyle(product: _product)),
               Container(height: 16),
               Center(
                   child:
 
                       /// A [VirtusizeButton] widget with `Teal` style and a custom text
                       VirtusizeButton.vsStyle(
-                          clientProduct: _product,
+                          product: _product,
                           style: VirtusizeStyle.Teal,
                           child: Text("Custom Text"))),
               Container(height: 16),
@@ -76,7 +77,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                       /// A [VirtusizeButton] widget with a custom style
                       VirtusizeButton(
-                clientProduct: _product,
+                product: _product,
                 child: ElevatedButton.icon(
                     label:
                         Text('Custom Button', style: TextStyle(fontSize: 12)),
@@ -96,24 +97,24 @@ class _HomeScreenState extends State<HomeScreen> {
 
               /// A [VirtusizeInPageMini] widget with `Teal` style and a default horizontal margin of `16`
               VirtusizeInPageMini.vsStyle(
-                  clientProduct: _product, style: VirtusizeStyle.Teal),
+                  product: _product, style: VirtusizeStyle.Teal),
               Container(height: 16),
 
               /// A [VirtusizeInPageMini] widget with a `blue` background color and a horizontal margin of `32`
               VirtusizeInPageMini(
-                  clientProduct: _product,
+                  product: _product,
                   backgroundColor: Colors.blue,
                   horizontalMargin: 32),
               Container(height: 16),
 
               /// A [VirtusizeInPageStandard] widget with `Black` style and a default horizontal margin of `16`
               VirtusizeInPageStandard.vsStyle(
-                  clientProduct: _product, style: VirtusizeStyle.Black),
+                  product: _product, style: VirtusizeStyle.Black),
               Container(height: 16),
 
               /// A [VirtusizeInPageStandard] widget with a `amber` background color and a horizontal margin of `32`
               VirtusizeInPageStandard(
-                  clientProduct: _product,
+                  product: _product,
                   buttonBackgroundColor: Colors.amber,
                   horizontalMargin: 32),
               Container(height: 16),

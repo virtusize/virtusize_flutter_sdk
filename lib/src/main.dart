@@ -118,22 +118,8 @@ class VirtusizeSDK {
     }
   }
 
-  /// A function for clients to set the user ID
-  Future<void> setUserId(String userId) async {
-    if (userId == null || userId.isEmpty) {
-      print('Failed to set the external user ID: userId is null or empty');
-      return;
-    }
-    try {
-      await IVirtusizeSDK.instance._channel
-          .invokeMethod(FlutterVirtusizeMethod.setUserId, userId);
-    } on PlatformException catch (error) {
-      print('Failed to set the external user ID: $error');
-    }
-  }
-
-  /// A function for clients to load the Product Info
-  Future<void> loadProduct(VirtusizeClientProduct clientProduct) async {
+  /// A function for clients to populate the Virtusize widgets by passing the product info
+  Future<void> loadVirtusize(VirtusizeClientProduct clientProduct) async {
     assert(clientProduct.externalProductId != null);
     ProductDataCheck productDataCheck =
     await _getProductDataCheck(clientProduct.externalProductId, clientProduct.imageURL);
@@ -181,6 +167,20 @@ class VirtusizeSDK {
       print('Failed to get the recommendation text: $error');
       IVirtusizeSDK.instance._recController.add(Recommendation(
           "{\"${FlutterVirtusizeKey.externalProductId}\": \"${productDataCheck.externalProductId}\"}"));
+    }
+  }
+
+  /// A function for clients to set the user ID
+  Future<void> setUserId(String userId) async {
+    if (userId == null || userId.isEmpty) {
+      print('Failed to set the external user ID: userId is null or empty');
+      return;
+    }
+    try {
+      await IVirtusizeSDK.instance._channel
+          .invokeMethod(FlutterVirtusizeMethod.setUserId, userId);
+    } on PlatformException catch (error) {
+      print('Failed to set the external user ID: $error');
     }
   }
 

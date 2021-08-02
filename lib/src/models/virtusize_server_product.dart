@@ -26,7 +26,7 @@ class VirtusizeServerProduct extends VirtusizeModel {
   }
 
   /// A string to represent a external product ID from a client's system
-  String get externalProductId => decodedData[FlutterVirtusizeKey.externalProductId];
+  String get externalProductId => decodedData[FlutterVirtusizeKey.externalProductId] ?? "";
 
   /// The product image URL
   String get imageURL  => decodedData[FlutterVirtusizeKey.imageURL];

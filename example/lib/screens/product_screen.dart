@@ -39,7 +39,7 @@ class _ProductScreenState extends State<ProductScreen> {
         externalProductId: _externalID,
         imageURL: 'https://www.image.com/goods/12345.jpg');
 
-    VirtusizeSDK.instance.loadProduct(_product);
+    VirtusizeSDK.instance.loadVirtusize(_product);
   }
 
   @override
@@ -52,12 +52,12 @@ class _ProductScreenState extends State<ProductScreen> {
             child:
                 Column(mainAxisAlignment: MainAxisAlignment.center, children: [
           VirtusizeInPageStandard.vsStyle(
-              clientProduct: _product, style: VirtusizeStyle.Black),
+              product: _product, style: VirtusizeStyle.Black),
           Container(height: 16),
           VirtusizeInPageMini.vsStyle(
-              clientProduct: _product, style: VirtusizeStyle.Teal),
+              product: _product, style: VirtusizeStyle.Teal),
           Container(height: 16),
-          VirtusizeButton.vsStyle(clientProduct: _product),
+          VirtusizeButton.vsStyle(product: _product),
           Container(height: 16),
           ElevatedButton(
               onPressed: () {
