@@ -15,11 +15,12 @@ Virtusize integration in Flutter
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'
+  s.dependency 'Virtusize', '~> 2.2.4'
 
-#	s.dependency 'Virtusize', '~> 2.2.1'
-  s.preserve_paths = 'Virtusize.framework'
-  s.xcconfig = { 'OTHER_LDFLAGS' => '-framework Virtusize' }
-  s.vendored_frameworks = 'Virtusize.framework'
+# For debugging only
+# s.preserve_paths = 'Virtusize.framework'
+# s.xcconfig = { 'OTHER_LDFLAGS' => '-framework Virtusize' }
+# s.vendored_frameworks = 'Virtusize.framework'
 
   s.platform = :ios, '10.3'
 
