@@ -17,11 +17,6 @@ This SDK helps clients to integrate Virtusize’s size and fit service into thei
   s.dependency 'Flutter'
   s.dependency 'Virtusize', '~> 2.2.4'
 
-# For debugging only
-# s.preserve_paths = 'Virtusize.framework'
-# s.xcconfig = { 'OTHER_LDFLAGS' => '-framework Virtusize' }
-# s.vendored_frameworks = 'Virtusize.framework'
-
   s.platform = :ios, '10.3'
   s.swift_version = '5.0'
 
