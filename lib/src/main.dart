@@ -162,12 +162,11 @@ class VirtusizeSDK {
       return productDataCheck;
     } on PlatformException catch (error) {
       print('Failed to get product data check: $error');
-
       if (_virtusizeMessageListener.productDataCheckError != null) {
         _virtusizeMessageListener.productDataCheckError.call(error);
       }
+      return null;
     }
-    return null;
   }
 
   /// A private function to get the recommendation text from Native
