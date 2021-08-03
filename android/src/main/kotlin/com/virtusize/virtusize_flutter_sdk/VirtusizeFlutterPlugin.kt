@@ -80,7 +80,7 @@ class VirtusizeFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
         }
         eventName?.let {
           scope.launch {
-            channel.invokeMethod(VirtusizeFlutterMethod.ON_VS_EVENT, eventName)
+            channel.invokeMethod(VirtusizeFlutterMethod.ON_VS_EVENT, event.toString())
           }
         }
 
@@ -121,9 +121,6 @@ class VirtusizeFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
             }
           }
           VirtusizeEvents.UserAddedProduct.getEventName() -> {
-            event.data?.optInt(VirtusizeEventKey.USER_PRODUCT_ID)?.let { userProductId ->
-              selectedUserProductId = userProductId
-            }
             scope.launch {
               getRecommendation(
                 this,
@@ -348,7 +345,7 @@ class VirtusizeFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
     channel.invokeMethod(
       VirtusizeFlutterMethod.ON_PRODUCT,
       mutableMapOf(
-        VirtusizeFlutterKey.STORE_PRODUCT_ID to storeProduct.id,
+        VirtusizeFlutterKey.EXTERNAL_PRODUCT_ID to storeProduct.externalId,
         VirtusizeFlutterKey.IMAGE_TYPE to "store",
         VirtusizeFlutterKey.IMAGE_URL to storeProduct.getProductImageURL(),
         VirtusizeFlutterKey.PRODUCT_TYPE to storeProduct.productType,
@@ -459,7 +456,7 @@ class VirtusizeFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
     channel.invokeMethod(
       VirtusizeFlutterMethod.ON_PRODUCT,
       mutableMapOf(
-        VirtusizeFlutterKey.STORE_PRODUCT_ID to storeProduct!!.id,
+        VirtusizeFlutterKey.EXTERNAL_PRODUCT_ID to storeProduct!!.externalId,
         VirtusizeFlutterKey.IMAGE_TYPE to "user",
         VirtusizeFlutterKey.IMAGE_URL to userProductRecommendedSize?.bestUserProduct?.getProductImageURL(),
         VirtusizeFlutterKey.PRODUCT_TYPE to userProductRecommendedSize?.bestUserProduct?.productType,

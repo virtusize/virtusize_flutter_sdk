@@ -6,8 +6,8 @@ import 'virtusize_model.dart';
 /// This enum contains the two possible product image types
 enum ProductImageType { store, user }
 
-class VirtusizeProduct extends VirtusizeModel {
-  VirtusizeProduct(data) : super(data);
+class VirtusizeServerProduct extends VirtusizeModel {
+  VirtusizeServerProduct(data) : super(data);
 
   /// The image loaded from the [imageURL]
   Image networkProductImage;
@@ -25,8 +25,8 @@ class VirtusizeProduct extends VirtusizeModel {
     return null;
   }
 
-  /// An integer to represent the internal product ID in the Virtusize server
-  int get productId => decodedData[FlutterVirtusizeKey.productId];
+  /// A string to represent a external product ID from a client's system
+  String get externalProductId => decodedData[FlutterVirtusizeKey.externalProductId] ?? "";
 
   /// The product image URL
   String get imageURL  => decodedData[FlutterVirtusizeKey.imageURL];

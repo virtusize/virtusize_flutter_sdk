@@ -51,11 +51,6 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font.
   fonts:
-    - family: ProximaNova
-      fonts:
-        - asset: assets/fonts/ProximaNova-Regular.otf
-        - asset: assets/fonts/ProximaNova-Bold.otf
-          weight: 700
     - family: NotoSansJP
       fonts:
         - asset: assets/fonts/NotoSansJP-Regular.otf

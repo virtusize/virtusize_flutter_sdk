@@ -1,6 +1,7 @@
 library flutter_virtusize_sdk;
 
 export 'src/main.dart' hide IVirtusizeSDK;
+export 'src/models/virtusize_client_product.dart';
 export 'src/models/virtusize_enums.dart';
 export 'src/models/virtusize_order.dart';
 export 'src/models/virtusize_order_item.dart';

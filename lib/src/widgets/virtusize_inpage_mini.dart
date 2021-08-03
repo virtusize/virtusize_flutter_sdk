@@ -14,15 +14,16 @@ import 'cta_button.dart';
 import 'animated_dots.dart';
 
 class VirtusizeInPageMini extends StatefulWidget {
+  final VirtusizeClientProduct product;
   VirtusizeStyle style = VirtusizeStyle.None;
   Color backgroundColor;
   final double horizontalMargin;
 
   VirtusizeInPageMini(
-      {this.backgroundColor = VSColors.vsGray900, this.horizontalMargin = 16});
+      {@required this.product, this.backgroundColor = VSColors.vsGray900, this.horizontalMargin = 16});
 
   VirtusizeInPageMini.vsStyle(
-      {this.style = VirtusizeStyle.Black, this.horizontalMargin = 16});
+      {@required this.product, this.style = VirtusizeStyle.Black, this.horizontalMargin = 16});
 
   @override
   _VirtusizeInPageMiniState createState() => _VirtusizeInPageMiniState();
@@ -50,7 +51,7 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
     });
 
     _pdcSubscription = IVirtusizeSDK.instance.pdcStream.listen((pdc) {
-      if (_productDataCheck != null) {
+      if (widget.product.externalProductId != pdc.externalProductId) {
         return;
       }
       IVirtusizeSDK.instance

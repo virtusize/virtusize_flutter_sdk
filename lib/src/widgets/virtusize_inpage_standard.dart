@@ -5,7 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../main.dart';
 import '../models/recommendation.dart';
-import '../models/virtusize_product.dart';
+import '../models/virtusize_server_product.dart';
 import '../models/product_data_check.dart';
 import '../res/vs_colors.dart';
 import '../res/vs_font.dart';
@@ -18,16 +18,17 @@ import 'cta_button.dart';
 import 'product_image_view.dart';
 
 class VirtusizeInPageStandard extends StatefulWidget {
+  final VirtusizeClientProduct product;
   VirtusizeStyle style = VirtusizeStyle.None;
   Color buttonBackgroundColor;
   final double horizontalMargin;
 
   VirtusizeInPageStandard(
-      {this.buttonBackgroundColor = VSColors.vsGray900,
+      {@required this.product, this.buttonBackgroundColor = VSColors.vsGray900,
       this.horizontalMargin = 16});
 
   VirtusizeInPageStandard.vsStyle(
-      {this.style = VirtusizeStyle.Black, this.horizontalMargin = 16});
+      {@required this.product, this.style = VirtusizeStyle.Black, this.horizontalMargin = 16});
 
   @override
   _VirtusizeInPageStandardState createState() =>
@@ -38,15 +39,15 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
   StreamSubscription<VSText> _vsTextSubscription;
   StreamSubscription<ProductDataCheck> _pdcSubscription;
   StreamSubscription<Recommendation> _recSubscription;
-  StreamSubscription<VirtusizeProduct> _productSubscription;
+  StreamSubscription<VirtusizeServerProduct> _productSubscription;
 
   VSText _vsText = IVirtusizeSDK.instance.vsText;
   ProductDataCheck _productDataCheck;
   bool _hasError;
   bool _isLoading;
   bool _showUserProductImage = false;
-  VirtusizeProduct _storeProduct;
-  VirtusizeProduct _userProduct;
+  VirtusizeServerProduct _storeProduct;
+  VirtusizeServerProduct _userProduct;
   String _topRecText;
   String _bottomRecText;
 
@@ -60,7 +61,7 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
     });
 
     _pdcSubscription = IVirtusizeSDK.instance.pdcStream.listen((pdc) {
-      if (_productDataCheck != null) {
+      if (widget.product.externalProductId != pdc.externalProductId) {
         return;
       }
       IVirtusizeSDK.instance
@@ -74,7 +75,7 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
 
     _productSubscription =
         IVirtusizeSDK.instance.productStream.listen((product) {
-      if (_productDataCheck.productId != product.productId ||
+      if (_productDataCheck.externalProductId != product.externalProductId ||
           (!compareProduct(widgetProduct: _storeProduct, serverProduct: product) &&
               !compareProduct(widgetProduct: _userProduct, serverProduct: product))) {
         return;
@@ -123,7 +124,7 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
     });
   }
 
-  bool compareProduct({@required VirtusizeProduct widgetProduct, @required VirtusizeProduct serverProduct}) {
+  bool compareProduct({@required VirtusizeServerProduct widgetProduct, @required VirtusizeServerProduct serverProduct}) {
     return widgetProduct == null ||
         (widgetProduct != null && widgetProduct.imageType == serverProduct.imageType);
   }

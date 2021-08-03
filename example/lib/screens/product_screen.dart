@@ -25,18 +25,21 @@ class _ProductScreenState extends State<ProductScreen> {
     "vs_pants"
   ];
 
-
+  VirtusizeClientProduct _product;
   String _externalID;
 
   @override
   void initState() {
     super.initState();
 
-    _externalID = widget.externalID ?? _externalIDList[Random().nextInt(_externalIDList.length)];
+    _externalID = widget.externalID ??
+        _externalIDList[Random().nextInt(_externalIDList.length)];
 
-    VirtusizeSDK.instance.setProduct(
-        externalId: _externalID,
-        imageURL: 'http://www.image.com/goods/12345.jpg');
+    _product = VirtusizeClientProduct(
+        externalProductId: _externalID,
+        imageURL: 'https://www.image.com/goods/12345.jpg');
+
+    VirtusizeSDK.instance.loadVirtusize(_product);
   }
 
   @override
@@ -48,11 +51,13 @@ class _ProductScreenState extends State<ProductScreen> {
         body: Center(
             child:
                 Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-          VirtusizeInPageStandard.vsStyle(style: VirtusizeStyle.Black),
+          VirtusizeInPageStandard.vsStyle(
+              product: _product, style: VirtusizeStyle.Black),
           Container(height: 16),
-          VirtusizeInPageMini.vsStyle(style: VirtusizeStyle.Teal),
+          VirtusizeInPageMini.vsStyle(
+              product: _product, style: VirtusizeStyle.Teal),
           Container(height: 16),
-          VirtusizeButton.vsStyle(),
+          VirtusizeButton.vsStyle(product: _product),
           Container(height: 16),
           ElevatedButton(
               onPressed: () {

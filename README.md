@@ -19,7 +19,7 @@ A Flutter [plugin](https://flutter.dev/developing-packages/) that wraps Virtusiz
   - [Android](#1-android)
   - [Flutter](#2-flutter)
     - [Initialization](#1-initialization)
-    - [Set Up Product Details](#2-set-up-product-details)
+    - [Load Virtusize with the Product Details](#2-load-virtusize-with-the-product-details)
     - [Implement VirtusizeMessageHandler (Optional)](#3-implement-virtusizemessagehandler-optional)
 
 - [Implement Virtusize Widgets](#implement-virtusize-widgets)
@@ -163,34 +163,53 @@ Possible argument configuration is shown in the following table:
 
 
 
-#### (2) Set Up Product Details
+#### (2) Load Virtusize with the Product Details
 
-In the `initState` of your product page widget, you will need to set up the product details:
+In the `initState` of your product page widget, you will need to use `VirtusizeSDK.instance.loadVirtusize` to populate the Virtusize widgets:
 
-- Pass an `exernalId` that will be used to reference the product in the Virtusize server
-- Pass an `imageURL`  for the product image
+- Create a `VirtusizeClientProduct` object with:
+  - An `exernalId` that will be used to reference the product in the Virtusize server
+  - An `imageURL`  for the product image
+- Pass the `VirtusizeClientProduct` object to the `VirtusizeSDK.instance.loadVirtusize` function
 
 ```dart
+/// Declare a global `VirtusizeClientProduct` variable, 
+/// which will be passed to the `Virtusize` widgets in order to bind the product info
+VirtusizeClientProduct _product;
+
 @override
 void initState() {
     super.initState();
 
-    VirtusizeSDK.instance.setProduct(
+    _product = VirtusizeClientProduct(
         // Set the product's external ID
-        externalId: 'vs_dress',
+        externalProductId: 'vs_dress',
         // Set the product image URL
-        imageURL: 'http://www.image.com/goods/12345.jpg'
+        imageURL: 'https://www.image.com/goods/12345.jpg'
     );
+
+    VirtusizeSDK.instance.loadVirtusize(_product);
 }
 ```
 
+If you want to update the product to a different one while the user is on the same screen, assign a different `VirtusizeClientProduct` object to `_product` and reload the product using `VirtusizeSDK.instance.loadVirtusize` inside of `setState()` to re-build the widgets
+
+```dart
+setState(() {
+    _product = VirtusizeClientProduct(
+        externalProductId: 'vs_pants',
+        imageURL: 'https://www.image.com/goods/12345.jpg'
+    );
+    VirtusizeSDK.instance.loadVirtusize(_product);
+});
+```
 
 
 #### (3) Implement VirtusizeMessageHandler (Optional)
 
 You can register a `VirtusizeMessageListener` to listen for events and the `ProductDataCheck` result from Virtusize. 
 
-All the arugments for the `VirtusizeSDK.instance.setVirtusizeMessageListener` function are optional.
+All the arguments for the `VirtusizeSDK.instance.setVirtusizeMessageListener` function are optional.
 
 ```dart
 @override
@@ -246,16 +265,17 @@ If you like, you can also customize the button style.
 
 #### (3) Usage
 
-- **VirtusizeButton.vsStyle**({VirtusizeStyle style = VirtusizeStyle.Black, Widget child})
+- **VirtusizeButton.vsStyle**({required VirtusizeClientProduct product, VirtusizeStyle style = VirtusizeStyle.Black, Widget child})
 
-  Create a `VirtusizeButton` widget with the default Virtusize style
+  Create a `VirtusizeButton` widget with default Virtusize style and with the same `VirtusizeClientProduct` object that you have passed to the `VirtusizeSDK.instance.loadVirtusize` function 
 
   ```dart
   // A `VirtusizeButton` widget with default `Black` style
-  VirtusizeButton.vsStyle()
+  VirtusizeButton.vsStyle(product: _product)
     
   // A `VirtusizeButton` widget with `Teal` style and a custom `Text` widget
   VirtusizeButton.vsStyle(
+      product: _product,
       style: VirtusizeStyle.Teal,
       child: Text("Custom Text")
   )
@@ -265,11 +285,12 @@ If you like, you can also customize the button style.
   
   <u>or</u> create a `VirtusizeButton` widget with your custom button widget:
 
-- **VirtusizeButton**({required Widget child})
+- **VirtusizeButton**({required VirtusizeClientProduct product, required Widget child})
 
   ```dart
   // A `VirtusizeButton` widget with a custom `ElevatedButton` widget
   VirtusizeButton(
+      product: _product,
       child: ElevatedButton(
         child: Text('Custom Button'), 
         // Implement the `OnPressed` callback with the `VirtusizePlugin.instance.openVirtusizeWebView` function if you have customized the button
@@ -305,16 +326,17 @@ There are two types of InPage in our Virtusize SDK.
 
 ##### A. Usage
 
-- **VirtusizeInPageStandard.vsStyle**({VirtusizeStyle style = VirtusizeStyle.Black, double horizontalMargin = 16})
+- **VirtusizeInPageStandard.vsStyle**({required VirtusizeClientProduct product, VirtusizeStyle style = VirtusizeStyle.Black, double horizontalMargin = 16})
 
-  Create a `VirtusizeInPageStandard` widget with the default Virtusize style and with the ability to change the horizontal margin.
+  Create a `VirtusizeInPageStandard` widget with the default Virtusize style and the ability to change the horizontal margin, using the same `VirtusizeClientProduct` object that you have passed to the `VirtusizeSDK.instance.loadVirtusize` function
 
   ```dart
   // A `VirtusizeInPageStandard` widget with default `Black` style and a default horizontal margin of `16` 
-  VirtusizeInPageStandard.vsStyle()
+  VirtusizeInPageStandard.vsStyle(product: _product)
     
   // A `VirtusizeInPageStandard` widget with `Teal` style and a horizontal margin of `32`
   VirtusizeInPageStandard.vsStyle(
+      product: _product,
       style: VirtusizeStyle.Teal,
       horizontalMargin: 32
   )
@@ -324,14 +346,15 @@ There are two types of InPage in our Virtusize SDK.
 
   <u>or</u> create a `VirtusizeInPageStandard` widget with the ability to change the button background color and the horizontal margin:
 
-- **VirtusizeInPageStandard**({Color buttonBackgroundColor = VSColors.vsGray900, double horizontalMargin = 16})
+- **VirtusizeInPageStandard**({required VirtusizeClientProduct product, Color buttonBackgroundColor = VSColors.vsGray900, double horizontalMargin = 16})
 
   ```dart
   // A `VirtusizeInPageStandard` widget with a default `VSColors.vsGray900` button background color and a default horizontal margin of `16`
-  VirtusizeInPageStandard()
+  VirtusizeInPageStandard(product: _product)
   
   // A `VirtusizeInPageStandard` widget with a `Colors.amber` button background color and a horizontal margin of `32`
   VirtusizeInPageStandard(
+      product: _product,
       buttonBackgroundColor: Colors.amber, 
       horizontalMargin: 32
   )
@@ -370,7 +393,7 @@ There are two types of InPage in our Virtusize SDK.
 
   - **You can:**
     - change the background color of the CTA button as long as it passes **[WebAIM contrast test](https://webaim.org/resources/contrastchecker/)**.
-    - change the width of InPage so it fits your application width.
+    - change the width of InPage, so it fits your application width.
   - **You cannot:**
     - change interface components such as shapes and spacing.
     - change the font.
@@ -389,16 +412,17 @@ This is a mini version of InPage that you can place in your application. The dis
 
 ##### A. Usage
 
-- **VirtusizeInPageMini.vsStyle**({VirtusizeStyle style = VirtusizeStyle.Black, double horizontalMargin = 16})
+- **VirtusizeInPageMini.vsStyle**({required VirtusizeClientProduct product, VirtusizeStyle style = VirtusizeStyle.Black, double horizontalMargin = 16})
 
-  Create a `VirtusizeInPageMini` widget with the default Virtusize style and with the ability to change the horizontal margin.
+  Create a `VirtusizeInPageMini` widget with the default Virtusize style and the ability to change the horizontal margin, using the same `VirtusizeClientProduct` object that you have passed to the `VirtusizeSDK.instance.loadVirtusize` function
 
   ```dart
   // A `VirtusizeInPageMini` widget with default `Black` style and a default horizontal margin of `16` 
-  VirtusizeInPageMini.vsStyle()
+  VirtusizeInPageMini.vsStyle(product: _product)
     
   // A `VirtusizeInPageMini` widget with `Teal` style and a default horizontal margin of `16`
   VirtusizeInPageMini.vsStyle(
+      product: _product,
       style: VirtusizeStyle.Teal
   )
   ```
@@ -407,14 +431,15 @@ This is a mini version of InPage that you can place in your application. The dis
   
   <u>or</u> create a `VirtusizeInPageMini` widget with the ability to change the background color and the horizontal margin:
 
-- **VirtusizeInPageMini**({Color backgroundColor = VSColors.vsGray900, double horizontalMargin = 16})
+- **VirtusizeInPageMini**({required VirtusizeClientProduct product, Color backgroundColor = VSColors.vsGray900, double horizontalMargin = 16})
 
   ```dart
   // A `VirtusizeInPageMini` widget with a default `VSColors.vsGray900` background color and a default horizontal margin of `16`
-  VirtusizeInPageMini()
+  VirtusizeInPageMini(product: _product)
   
   // A `VirtusizeInPageMini` widget with a `Colors.blue` background color and a default horizontal margin of `16`
   VirtusizeInPageMini(
+      product: _product,
       backgroundColor: Colors.blue
   )
   ```
@@ -448,7 +473,7 @@ This is a mini version of InPage that you can place in your application. The dis
     - (Message) Text size: 12
     - (Button) Text size: 10
   - **English**
-    - Proxima Nova
+    - Roboto for Android and San Francisco for iOS
     - (Message) Text size: 14
     - (Button) Text size: 12
 

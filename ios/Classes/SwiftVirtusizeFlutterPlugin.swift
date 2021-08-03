@@ -220,7 +220,7 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 		flutterChannel?.invokeMethod(
 			VirtusizeFlutterMethod.onProduct,
 			arguments: [
-				VirtusizeFlutterKey.storeProductId: storeProduct!.id,
+				VirtusizeFlutterKey.externalProductId: storeProduct!.externalId,
 				VirtusizeFlutterKey.imageType: "store",
 				VirtusizeFlutterKey.imageURL: storeProduct!.cloudinaryImageUrlString,
 				VirtusizeFlutterKey.productType: storeProduct!.productType,
@@ -335,7 +335,7 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 		flutterChannel?.invokeMethod(
 			VirtusizeFlutterMethod.onProduct,
 			arguments:  [
-				VirtusizeFlutterKey.storeProductId: storeProduct!.id,
+				VirtusizeFlutterKey.externalProductId: storeProduct!.externalId,
 				VirtusizeFlutterKey.imageType: "user",
 				VirtusizeFlutterKey.imageURL : userProductRecommendedSize?.bestUserProduct?.cloudinaryImageUrlString,
 				VirtusizeFlutterKey.productType: userProductRecommendedSize?.bestUserProduct?.productType,
@@ -427,9 +427,6 @@ extension SwiftVirtusizeFlutterPlugin: VirtusizeMessageHandler {
 					)
 				}
 			case .userAddedProduct:
-				if let userProductId = (event.data as? [String: Any])?[VirtusizeEventKey.userProductID] as? Int {
-					selectedUserProductId = userProductId
-				}
 				recommendationWorkItem = DispatchWorkItem { [weak self] in
 					self?.getRecommendation(
 						self?.currentWorkItem,
