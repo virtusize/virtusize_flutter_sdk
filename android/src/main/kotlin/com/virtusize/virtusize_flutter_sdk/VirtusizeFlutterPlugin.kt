@@ -80,7 +80,7 @@ class VirtusizeFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
         }
         eventName?.let {
           scope.launch {
-            channel.invokeMethod(VirtusizeFlutterMethod.ON_VS_EVENT, event.toString())
+            channel.invokeMethod(VirtusizeFlutterMethod.ON_VS_EVENT, eventName)
           }
         }
 
