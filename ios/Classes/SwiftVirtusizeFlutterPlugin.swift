@@ -394,6 +394,7 @@ extension SwiftVirtusizeFlutterPlugin: VirtusizeMessageHandler {
 		
 		var userDataWorkItem: DispatchWorkItem = DispatchWorkItem { }
 		var recommendationWorkItem: DispatchWorkItem? = nil
+		var executionDeadline: DispatchTime = .now()
 		switch VirtusizeEventName.init(rawValue: event.name) {
 			case .userOpenedWidget:
 				// Unset the selected user product ID
@@ -431,6 +432,17 @@ extension SwiftVirtusizeFlutterPlugin: VirtusizeMessageHandler {
 					self?.getRecommendation(
 						self?.currentWorkItem,
 						selectedRecommendedType: SizeRecommendationType.compareProduct,
+						shouldUpdateUserBodyProfile: false
+					)
+				}
+			case .userDeletedProduct:
+				// Delay for 0.5 second because the deletion is executed after the event is fired,
+				// which means the API call to get user products could be made before the deletion is completed
+				executionDeadline = .now() + 0.5
+				recommendationWorkItem = DispatchWorkItem { [weak self] in
+					self?.getRecommendation(
+						self?.currentWorkItem,
+						shouldUpdateUserProducts: true,
 						shouldUpdateUserBodyProfile: false
 					)
 				}
@@ -481,7 +493,7 @@ extension SwiftVirtusizeFlutterPlugin: VirtusizeMessageHandler {
 		}
 
 		currentWorkItem = eventsWorkItem
-		DispatchQueue.global().async(execute: eventsWorkItem)
+		DispatchQueue.global().asyncAfter(deadline: executionDeadline, execute: eventsWorkItem)
 		
 		eventsWorkItem.notify(queue: .global()) { [weak self] in
 			if self?.currentWorkItem?.isCancelled != true {

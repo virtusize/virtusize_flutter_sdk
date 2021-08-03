@@ -129,6 +129,18 @@ class VirtusizeFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
               )
             }
           }
+          VirtusizeEvents.UserDeletedProduct.getEventName() -> {
+            scope.launch {
+              // Delay for 0.5 second because the deletion is executed after the event is fired,
+              // which means the API call to get user products could be made before the deletion is completed
+              delay(500L)
+              getRecommendation(
+                this,
+                shouldUpdateUserProducts = true,
+                shouldUpdateUserBodyProfile = false
+              )
+            }
+          }
           VirtusizeEvents.UserChangedRecommendationType.getEventName() -> {
             var recommendationType: SizeRecommendationType? = null
             event.data?.optString(VirtusizeEventKey.REC_TYPE)?.let {
