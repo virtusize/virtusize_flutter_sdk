@@ -427,9 +427,6 @@ extension SwiftVirtusizeFlutterPlugin: VirtusizeMessageHandler {
 					)
 				}
 			case .userAddedProduct:
-				if let userProductId = (event.data as? [String: Any])?[VirtusizeEventKey.userProductID] as? Int {
-					selectedUserProductId = userProductId
-				}
 				recommendationWorkItem = DispatchWorkItem { [weak self] in
 					self?.getRecommendation(
 						self?.currentWorkItem,
