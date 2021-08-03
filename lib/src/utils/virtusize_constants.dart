@@ -1,38 +1,38 @@
 class FlutterVirtusizeMethod {
   // Flutter to Native
-  static String setVirtusizeParams = "setVirtusizeParams";
-  static String setUserId = "setUserId";
-  static String getProductDataCheck = "getProductDataCheck";
-  static String openVirtusizeWebView = "openVirtusizeWebView";
-  static String getRecommendationText = "getRecommendationText";
-  static String getPrivacyPolicyLink = "getPrivacyPolicyLink";
-  static String sendOrder = "sendOrder";
-  static String addProduct = "addProduct";
-  static String removeProduct = "removeProduct";
+  static const String setVirtusizeParams = "setVirtusizeParams";
+  static const String setUserId = "setUserId";
+  static const String getProductDataCheck = "getProductDataCheck";
+  static const String openVirtusizeWebView = "openVirtusizeWebView";
+  static const String getRecommendationText = "getRecommendationText";
+  static const String getPrivacyPolicyLink = "getPrivacyPolicyLink";
+  static const String sendOrder = "sendOrder";
+  static const String addProduct = "addProduct";
+  static const String removeProduct = "removeProduct";
 
   // Native to Flutter
-  static String onVSEvent = "onVSEvent";
-  static String onVSError = "onVSError";
-  static String onProduct = "onProduct";
-  static String onRecChange = "onRecChange";
+  static const String onVSEvent = "onVSEvent";
+  static const String onVSError = "onVSError";
+  static const String onProduct = "onProduct";
+  static const String onRecChange = "onRecChange";
 }
 
 class FlutterVirtusizeKey {
-  static String apiKey = "apiKey";
-  static String externalUserId = "externalUserId";
-  static String environment = "env";
-  static String language = "language";
-  static String showSGI = "showSGI";
-  static String allowedLanguages = "allowedLanguages";
-  static String detailsPanelCards = "detailsPanelCards";
-  static String externalProductId = "externalProductId";
-  static String imageURL = "imageURL";
-  static String productId = "storeProductId";
-  static String virtusizeParams = "virtusizeParams";
-  static String displayLanguage = "displayLanguage";
-  static String imageType = "imageType";
-  static String productType = "productType";
-  static String productStyle = "productStyle";
-  static String recText = "recText";
-  static String showUserProductImage = "showUserProductImage";
+  static const String apiKey = "apiKey";
+  static const String externalUserId = "externalUserId";
+  static const String environment = "env";
+  static const String language = "language";
+  static const String showSGI = "showSGI";
+  static const String allowedLanguages = "allowedLanguages";
+  static const String detailsPanelCards = "detailsPanelCards";
+  static const String externalProductId = "externalProductId";
+  static const String imageURL = "imageURL";
+  static const String productId = "storeProductId";
+  static const String virtusizeParams = "virtusizeParams";
+  static const String displayLanguage = "displayLanguage";
+  static const String imageType = "imageType";
+  static const String productType = "productType";
+  static const String productStyle = "productStyle";
+  static const String recText = "recText";
+  static const String showUserProductImage = "showUserProductImage";
 }
