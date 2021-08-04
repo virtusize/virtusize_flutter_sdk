@@ -91,7 +91,17 @@ You will need a unique API key and an Admin account, only available to Virtusize
 
 ### 1. Android
 
-1. Starting from API 30, Android requires package visibility in your AndroidManifest.xml to open URLs in an app.
+1. Update the Kotlin version in `android/build.gradle` to at least `1.4.32`:
+
+    ```diff
+    buildscript {
+        - ext.kotlin_version = '1.3.50'
+        + ext.kotlin_version = '1.4.32'
+        ...
+    }
+    ```
+
+2. Starting from API 30, Android requires package visibility in your AndroidManifest.xml to open URLs in an app.
 
     To be able to open URLs for the SDK, add the required `<queries>` element to the `AndroidManifest.xml`.
     
@@ -104,7 +114,7 @@ You will need a unique API key and an Admin account, only available to Virtusize
     </queries>
     ```
 
-2. To be able to open the Virtusize webview in a Fragment for the SDK, inherit from **FlutterFragmentActivity** instead of FlutterActivity in the `android/app/src/main/MainActivity`.
+3. To be able to open the Virtusize webview in a Fragment for the SDK, inherit from **FlutterFragmentActivity** instead of FlutterActivity in the `android/app/src/main/MainActivity`.
    
     ```diff
     - import io.flutter.embedding.android.FlutterActivity
