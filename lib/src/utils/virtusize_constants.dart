@@ -7,8 +7,6 @@ class FlutterVirtusizeMethod {
   static const String getRecommendationText = "getRecommendationText";
   static const String getPrivacyPolicyLink = "getPrivacyPolicyLink";
   static const String sendOrder = "sendOrder";
-  static const String addProduct = "addProduct";
-  static const String removeProduct = "removeProduct";
 
   // Native to Flutter
   static const String onVSEvent = "onVSEvent";

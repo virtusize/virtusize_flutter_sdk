@@ -36,15 +36,11 @@ class VirtusizeFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
   // A set to cache the product data check data of all the visited products
   private val virtusizeProductSet = mutableSetOf<VirtusizeProduct>()
 
-  // A stack implemented by a list to record the visited order of the external product IDs that are tied with the Virtusize widgets created on a client's app
-  private val externalProductIDStack = mutableListOf<String>()
-
   // A set to cache the store product information of all the visited products
   private val storeProductSet = mutableSetOf<Product>()
 
-  // The most recent visited store product on a client's app
-  private val storeProduct: Product?
-    get() = storeProductSet.firstOrNull { product -> product.externalId == externalProductIDStack.last() }
+  /// The last visited store product on the Virtusize webview
+  private var lastProductOnVirtusizeWebView: Product? = null
 
   private var selectedUserProductId: Int? = null
   private var productTypes: List<ProductType>? = null
@@ -92,7 +88,7 @@ class VirtusizeFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
             // If the store product that is associated with the current body profile recommended size is different from the most recent one,
             // we should update the data for the body profile recommended size
             val shouldUpdateBodyProfileRecommendedSize =
-              bodyProfileRecommendedSize?.product?.externalId != storeProduct?.externalId
+              bodyProfileRecommendedSize?.product?.externalId != lastProductOnVirtusizeWebView?.externalId
 
             scope.launch {
               getRecommendation(
@@ -159,7 +155,7 @@ class VirtusizeFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
             scope.launch {
               event.data?.optString(VirtusizeEventKey.SIZE_REC_NAME)?.let { sizeRecName ->
                 bodyProfileRecommendedSize =
-                  BodyProfileRecommendedSize(storeProduct!!, sizeRecName)
+                  BodyProfileRecommendedSize(lastProductOnVirtusizeWebView!!, sizeRecName)
                 getRecommendation(
                   this,
                   selectedRecommendedType = SizeRecommendationType.body,
@@ -278,8 +274,10 @@ class VirtusizeFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
         }
       }
       VirtusizeFlutterMethod.OPEN_VIRTUSIZE_WEB_VIEW -> {
+        val externalProductId = call.arguments as? String
+        lastProductOnVirtusizeWebView = storeProductSet.firstOrNull { product -> product.externalId == externalProductId }
         val virtusizeProduct =
-          virtusizeProductSet.firstOrNull { product -> product.externalId == externalProductIDStack.last() }
+          virtusizeProductSet.firstOrNull { product -> product.externalId == externalProductId }
         if (virtusizeProduct?.productCheckData == null) {
           throw IllegalArgumentException("Please call the VirtusizePlugin.instance.setProduct function")
         }
@@ -319,18 +317,6 @@ class VirtusizeFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
               result.error(error.errorCode, error.errorMessage, null)
             })
         }
-      }
-      VirtusizeFlutterMethod.ADD_PRODUCT -> {
-        val externalId = call.arguments as? String
-        if (externalId == null) {
-          val error = VirtusizeFlutterErrors.argumentNotSet(VirtusizeFlutterKey.EXTERNAL_PRODUCT_ID)
-          result.error(error.errorCode, error.errorMessage, null)
-          return
-        }
-        externalProductIDStack.add(externalId)
-      }
-      VirtusizeFlutterMethod.REMOVE_PRODUCT -> {
-        externalProductIDStack.removeLast()
       }
       else -> {
         result.notImplemented()
@@ -390,7 +376,7 @@ class VirtusizeFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
         channel.invokeMethod(
           VirtusizeFlutterMethod.ON_REC_CHANGE,
           mutableMapOf(
-            VirtusizeFlutterKey.EXTERNAL_PRODUCT_ID to storeProduct!!.externalId,
+            VirtusizeFlutterKey.EXTERNAL_PRODUCT_ID to lastProductOnVirtusizeWebView!!.externalId,
             VirtusizeFlutterKey.REC_TEXT to null,
             VirtusizeFlutterKey.SHOW_USER_PRODUCT_IMAGE to false
           )
@@ -411,7 +397,7 @@ class VirtusizeFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
   ) {
     // The default store product to use for the recommendation is the most recent one
     // But if the store product ID is not null, we update the store product value
-    var storeProduct = storeProduct
+    var storeProduct = lastProductOnVirtusizeWebView
     storeProductId?.let { productId ->
       storeProductSet.firstOrNull { product -> product.id == productId }?.let { product ->
         storeProduct = product

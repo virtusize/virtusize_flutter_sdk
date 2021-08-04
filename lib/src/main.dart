@@ -185,10 +185,10 @@ class VirtusizeSDK {
   }
 
   /// A function for clients to open the Virtusize webview (only when they customize their own button using the [VirtusizeButton] widget)
-  Future<void> openVirtusizeWebView() async {
+  Future<void> openVirtusizeWebView(VirtusizeClientProduct product) async {
     try {
       await IVirtusizeSDK.instance._channel
-          .invokeMethod(FlutterVirtusizeMethod.openVirtusizeWebView);
+          .invokeMethod(FlutterVirtusizeMethod.openVirtusizeWebView, product.externalProductId);
     } on PlatformException catch (error) {
       print('Failed to open the VirtusizeWebView: $error');
     }
@@ -257,29 +257,6 @@ class IVirtusizeSDK {
     } on PlatformException catch (error) {
       print('Failed to get the privacy policy link: $error');
       return null;
-    }
-  }
-
-  /// A function to add a product ID to the (external) Product ID stack in Native.
-  /// The most recently visited product will be at the top of the stack.
-  Future<void> addProduct({@required String externalProductId}) async {
-    if (externalProductId == null) {
-      return;
-    }
-    try {
-      await _channel.invokeMethod(
-          FlutterVirtusizeMethod.addProduct, externalProductId);
-    } on PlatformException catch (error) {
-      print('Failed to add the product $externalProductId: $error');
-    }
-  }
-
-  /// A function to remove the most recent visited external product ID from the stack in Native
-  Future<void> removeProduct() async {
-    try {
-      await _channel.invokeMethod(FlutterVirtusizeMethod.removeProduct);
-    } on PlatformException catch (error) {
-      print('Failed to remove a product $error');
     }
   }
 }
