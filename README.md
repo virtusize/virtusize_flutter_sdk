@@ -95,8 +95,8 @@ You will need a unique API key and an Admin account, only available to Virtusize
 
     ```diff
     buildscript {
-        - ext.kotlin_version = '1.3.50'
-        + ext.kotlin_version = '1.4.32'
+    -    ext.kotlin_version = '1.3.50'
+    +    ext.kotlin_version = '1.4.32'
         ...
     }
     ```
