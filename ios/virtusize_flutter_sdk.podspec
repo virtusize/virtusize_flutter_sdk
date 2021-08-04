@@ -15,7 +15,7 @@ This SDK helps clients to integrate Virtusize’s size and fit service into thei
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'
-  s.dependency 'Virtusize', '~> 2.2.4'
+  s.dependency 'Virtusize', '~> 2.2.5'
 
   s.platform = :ios, '10.3'
   s.swift_version = '5.0'
