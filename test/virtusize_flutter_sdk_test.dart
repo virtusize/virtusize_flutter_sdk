@@ -1,6 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import '../lib/virtusize_sdk.dart';
+import '../lib/src/main.dart';
 import '../lib/src/utils/virtusize_constants.dart';
 
 void main() {
@@ -10,7 +10,21 @@ void main() {
 
   setUp(() {
     channel.setMockMethodCallHandler((MethodCall methodCall) async {
-      return '42';
+      switch (methodCall.method) {
+        case FlutterVirtusizeMethod.setVirtusizeParams:
+          return {
+            "virtusizeParams": {
+              "showSGI": false,
+              "apiKey": "apiKey",
+              "allowedLanguages": ["EN", "JP", "KR"],
+              "externalUserId": null,
+              "detailsPanelCards": ["MODEL_INFO", "GENERAL_FIT", "BRAND_SIZING", "MATERIAL"],
+              "language": null,
+              "env": "GLOBAL"
+            },
+            "displayLanguage": "en"
+          };
+      }
     });
   });
 
@@ -18,7 +32,10 @@ void main() {
     channel.setMockMethodCallHandler(null);
   });
 
-  test(FlutterVirtusizeMethod.setVirtusizeParams, () async {
-    expect(await VirtusizeSDK.instance.setVirtusizeParams, '42');
+  test("Set the Virtusize parameters", () async {
+    await VirtusizeSDK.instance.setVirtusizeParams(
+      apiKey: "apiKey"
+    );
   });
+
 }

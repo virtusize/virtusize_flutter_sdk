@@ -4,26 +4,22 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'virtusize_flutter_sdk'
-  s.version          = '0.0.1'
-  s.summary          = 'Virtusize integration in Flutter'
+  s.version          = '1.0.0'
+  s.summary          = 'Virtusize SDK for Flutter.'
   s.description      = <<-DESC
-Virtusize integration in Flutter
+This SDK helps clients to integrate Virtusize’s size and fit service into their Flutter applications for Android & iOS.
                        DESC
-  s.homepage         = 'https://www.virtusize.com/'
+  s.homepage         = 'https://github.com/virtusize/virtusize_flutter_sdk'
   s.license          = { :file => '../LICENSE' }
   s.author           = { 'Virtusize' => 'client.support@virtusize.com' }
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'
-
-#	s.dependency 'Virtusize', '~> 2.2.1'
-  s.preserve_paths = 'Virtusize.framework'
-  s.xcconfig = { 'OTHER_LDFLAGS' => '-framework Virtusize' }
-  s.vendored_frameworks = 'Virtusize.framework'
+  s.dependency 'Virtusize', '~> 2.2.5'
 
   s.platform = :ios, '10.3'
+  s.swift_version = '5.0'
 
   # Flutter.framework does not contain a i386 slice.
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386' }
-  s.swift_version = '5.0'
 end

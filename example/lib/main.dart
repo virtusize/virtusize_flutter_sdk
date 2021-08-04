@@ -9,7 +9,6 @@ Future<void> main() async {
   /// Add the following code before calling runApp
   WidgetsFlutterBinding.ensureInitialized();
   VirtusizeSDK.instance.setVirtusizeParams(
-
       // Only the API key is required
       apiKey: '15cc36e1d7dad62b8e11722ce1a245cb6c5e6692',
       // For using the Order API, a user ID is also required. (can be set later)
