@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'package:virtusize_flutter_sdk/virtusize_flutter_sdk.dart';
 
-import 'package:virtusize_flutter_sdk/virtusize_sdk.dart';
 import 'screens/home_screen.dart';
 
 Future<void> main() async {
