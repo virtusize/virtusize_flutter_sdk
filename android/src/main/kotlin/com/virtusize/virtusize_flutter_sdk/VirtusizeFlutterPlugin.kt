@@ -130,13 +130,13 @@ class VirtusizeFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
             }
           }
           VirtusizeEvents.UserDeletedProduct.getEventName() -> {
+            event.data?.optInt(VirtusizeEventKey.USER_PRODUCT_ID)?.let { deletedUserProductId ->
+              userProducts = userProducts?.filter { userProduct -> userProduct.id != deletedUserProductId }
+            }
             scope.launch {
-              // Delay for 0.5 second because the deletion is executed after the event is fired,
-              // which means the API call to get user products could be made before the deletion is completed
-              delay(500L)
               getRecommendation(
                 this,
-                shouldUpdateUserProducts = true,
+                shouldUpdateUserProducts = false,
                 shouldUpdateUserBodyProfile = false
               )
             }
