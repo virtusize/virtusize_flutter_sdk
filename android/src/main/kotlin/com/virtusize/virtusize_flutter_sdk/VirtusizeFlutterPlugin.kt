@@ -80,7 +80,7 @@ class VirtusizeFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
         }
         eventName?.let {
           scope.launch {
-            channel.invokeMethod(VirtusizeFlutterMethod.ON_VS_EVENT, event.toString())
+            channel.invokeMethod(VirtusizeFlutterMethod.ON_VS_EVENT, eventName)
           }
         }
 
@@ -125,6 +125,18 @@ class VirtusizeFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
               getRecommendation(
                 this,
                 selectedRecommendedType = SizeRecommendationType.compareProduct,
+                shouldUpdateUserBodyProfile = false
+              )
+            }
+          }
+          VirtusizeEvents.UserDeletedProduct.getEventName() -> {
+            event.data?.optInt(VirtusizeEventKey.USER_PRODUCT_ID)?.let { deletedUserProductId ->
+              userProducts = userProducts?.filter { userProduct -> userProduct.id != deletedUserProductId }
+            }
+            scope.launch {
+              getRecommendation(
+                this,
+                shouldUpdateUserProducts = false,
                 shouldUpdateUserBodyProfile = false
               )
             }

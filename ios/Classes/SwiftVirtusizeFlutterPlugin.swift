@@ -385,8 +385,9 @@ extension SwiftVirtusizeFlutterPlugin: VirtusizeMessageHandler {
 	}
 	
 	public func virtusizeController(_ controller: VirtusizeWebViewController?, didReceiveEvent event: VirtusizeEvent) {
+	    let eventData = event.data as? [String: Any]
 		let eventsWorkItem = DispatchWorkItem { [weak self] in
-			if let eventData = event.data as? [String: Any],
+			if let eventData = eventData,
 			   let eventName = eventData[VirtusizeEventKey.shortEventName] ?? eventData[VirtusizeEventKey.eventName] {
 				self?.flutterChannel?.invokeMethod(VirtusizeFlutterMethod.onVSEvent, arguments: eventName)
 			}
@@ -412,11 +413,11 @@ extension SwiftVirtusizeFlutterPlugin: VirtusizeMessageHandler {
 					)
 				}
 			case .userAuthData:
-				if let data = event.data as? [String: Any] {
+				if let data = eventData {
 					repository.updateUserAuthData(bid: data["x-vs-bid"] as? String, auth: data["x-vs-auth"] as? String)
 				}
 			case .userSelectedProduct:
-				if let userProductId = (event.data as? [String: Any])?[VirtusizeEventKey.userProductID] as? Int {
+				if let userProductId = eventData?[VirtusizeEventKey.userProductID] as? Int {
 					selectedUserProductId = userProductId
 				}
 				recommendationWorkItem = DispatchWorkItem { [weak self] in
@@ -434,8 +435,19 @@ extension SwiftVirtusizeFlutterPlugin: VirtusizeMessageHandler {
 						shouldUpdateUserBodyProfile: false
 					)
 				}
+			case .userDeletedProduct:
+			    if let deletedUserProductId = eventData?[VirtusizeEventKey.userProductID] as? Int {
+					userProducts = userProducts?.filter { userProduct in userProduct.id != deletedUserProductId }
+                }
+				recommendationWorkItem = DispatchWorkItem { [weak self] in
+					self?.getRecommendation(
+						self?.currentWorkItem,
+						shouldUpdateUserProducts: false,
+						shouldUpdateUserBodyProfile: false
+					)
+				}
 			case .userChangedRecommendationType:
-				let recommendationType = (event.data as? [String: Any])?[VirtusizeEventKey.recType] as? String
+				let recommendationType = eventData?[VirtusizeEventKey.recType] as? String
 				let changedType = (recommendationType != nil) ? SizeRecommendationType.init(rawValue: recommendationType!) : nil
 				recommendationWorkItem = DispatchWorkItem { [weak self] in
 					self?.getRecommendation(
@@ -446,7 +458,7 @@ extension SwiftVirtusizeFlutterPlugin: VirtusizeMessageHandler {
 					)
 				}
 			case .userUpdatedBodyMeasurements:
-				if let sizeRecName = (event.data as? [String: Any])?[VirtusizeEventKey.sizeRecName] as? String {
+				if let sizeRecName = eventData?[VirtusizeEventKey.sizeRecName] as? String {
 					bodyProfileRecommendedSize = BodyProfileRecommendedSize(sizeName: sizeRecName, product: storeProduct)
 					recommendationWorkItem = DispatchWorkItem { [weak self] in
 						self?.getRecommendation(
