@@ -395,7 +395,6 @@ extension SwiftVirtusizeFlutterPlugin: VirtusizeMessageHandler {
 		
 		var userDataWorkItem: DispatchWorkItem = DispatchWorkItem { }
 		var recommendationWorkItem: DispatchWorkItem? = nil
-		var executionDeadline: DispatchTime = .now()
 		switch VirtusizeEventName.init(rawValue: event.name) {
 			case .userOpenedWidget:
 				// Unset the selected user product ID
@@ -494,7 +493,7 @@ extension SwiftVirtusizeFlutterPlugin: VirtusizeMessageHandler {
 		}
 
 		currentWorkItem = eventsWorkItem
-		DispatchQueue.global().asyncAfter(deadline: executionDeadline, execute: eventsWorkItem)
+		DispatchQueue.global().async(execute: eventsWorkItem)
 		
 		eventsWorkItem.notify(queue: .global()) { [weak self] in
 			if self?.currentWorkItem?.isCancelled != true {
