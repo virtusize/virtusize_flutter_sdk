@@ -2,7 +2,6 @@ name: virtusize_flutter_sdk
 description: Virtusize SDK for Flutter. This SDK helps clients to integrate Virtusize’s size and fit service into their Flutter applications for Android & iOS.
 version: 1.0.0
 repository: https://github.com/virtusize/virtusize_flutter_sdk
-author: Virtusize K.K.
 homepage: https://www.virtusize.com/
 
 environment:
