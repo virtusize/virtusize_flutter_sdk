@@ -7,8 +7,6 @@ struct VirtusizeFlutterMethod {
 	static let getRecommendationText = "getRecommendationText"
 	static let getPrivacyPolicyLink = "getPrivacyPolicyLink"
 	static let sendOrder = "sendOrder"
-	static let addProduct = "addProduct"
-	static let removeProduct = "removeProduct"
 	
 	/// iOS to Flutter
 	static let onVSEvent = "onVSEvent"

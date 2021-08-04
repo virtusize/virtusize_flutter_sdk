@@ -7,8 +7,6 @@ internal object VirtusizeFlutterMethod {
     const val GET_RECOMMENDATION_TEXT = "getRecommendationText"
     const val GET_PRIVACY_POLICY_LINK = "getPrivacyPolicyLink"
     const val SEND_ORDER = "sendOrder"
-    const val ADD_PRODUCT = "addProduct"
-    const val REMOVE_PRODUCT = "removeProduct"
 
     // Android to Flutter
     const val ON_VS_EVENT = "onVSEvent"

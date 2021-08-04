@@ -64,8 +64,6 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
       if (widget.product.externalProductId != pdc.externalProductId) {
         return;
       }
-      IVirtusizeSDK.instance
-          .addProduct(externalProductId: pdc.externalProductId);
       setState(() {
         _isLoading = true;
         _hasError = false;
@@ -142,7 +140,6 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
 
   @override
   void dispose() {
-    IVirtusizeSDK.instance.removeProduct();
     _vsTextSubscription.cancel();
     _pdcSubscription.cancel();
     _productSubscription.cancel();
@@ -159,7 +156,7 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
   }
 
   Future<void> _openVirtusizeWebview() async {
-    await VirtusizeSDK.instance.openVirtusizeWebView();
+    await VirtusizeSDK.instance.openVirtusizeWebView(widget.product);
   }
 
   Future<void> _openPrivacyPolicyLink() async {

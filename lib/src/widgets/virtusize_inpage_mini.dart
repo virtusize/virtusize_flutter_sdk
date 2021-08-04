@@ -54,8 +54,6 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
       if (widget.product.externalProductId != pdc.externalProductId) {
         return;
       }
-      IVirtusizeSDK.instance
-          .addProduct(externalProductId: pdc.externalProductId);
       setState(() {
         _isLoading = true;
         _hasError = false;
@@ -82,7 +80,6 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
 
   @override
   void dispose() {
-    IVirtusizeSDK.instance.removeProduct();
     _vsTextSubscription.cancel();
     _pdcSubscription.cancel();
     _recSubscription.cancel();
@@ -101,7 +98,7 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
   }
 
   Future<void> _openVirtusizeWebview() async {
-    await VirtusizeSDK.instance.openVirtusizeWebView();
+    await VirtusizeSDK.instance.openVirtusizeWebView(widget.product);
   }
 
   Widget _buildVSInPageMini() {

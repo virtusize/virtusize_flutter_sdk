@@ -90,8 +90,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             borderRadius:
                                 BorderRadius.all(Radius.circular(32.0)))),
 
-                    /// Implement the [OnPressed] callback with the [VirtusizePlugin.instance.openVirtusizeWebView] function if you have customized the button
-                    onPressed: VirtusizeSDK.instance.openVirtusizeWebView),
+                    /// Implement the [onPressed] callback with the [VirtusizePlugin.instance.openVirtusizeWebView] function if you have customized the button
+                    onPressed: () => VirtusizeSDK.instance.openVirtusizeWebView(_product))
               )),
               Container(height: 16),
 

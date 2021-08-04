@@ -13,18 +13,11 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 	/// A set to cache the product data check data of all the visited products
 	private var storeProductSet: Set<VirtusizeProduct> = []
 
-	/// A stack implemented by a list to record the visited order of the external product IDs that are tied with the Virtusize widgets created on a client's app
-	private var externalProductIDStack: [String] = []
-
 	/// A set to cache the store product information of all the visited products
 	private var serverStoreProductSet: Set<VirtusizeServerProduct> = []
 
-	/// The most recent visited store product on a client's app
-	private var storeProduct: VirtusizeServerProduct? {
-		get {
-			serverStoreProductSet.filter({ $0.externalId == externalProductIDStack.last }).first
-		}
-	}
+	/// The last visited store product on the Virtusize webview
+	private var lastProductOnVirtusizeWebView: VirtusizeServerProduct?
 
 	private var productTypes: [VirtusizeProductType]? = nil
 	private var i18nLocalization: VirtusizeI18nLocalization? = nil
@@ -136,7 +129,12 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 					result(pdcJsonString)
 				}
 			case VirtusizeFlutterMethod.openVirtusizeWebView:
-				let product = storeProductSet.first { $0.externalId == externalProductIDStack.last }
+				guard let externalProductId = call.arguments as? String else {
+					result(FlutterError.noArguments)
+					return
+				}
+				lastProductOnVirtusizeWebView = serverStoreProductSet.first { $0.externalId == externalProductId}
+				let product = storeProductSet.first { $0.externalId == externalProductId }
 				if let viewController = VirtusizeWebViewController(
 					product: product,
 					userSessionResponse: userSessionResponse,
@@ -191,15 +189,6 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 				},onError: { error in
 					result(FlutterError.sendOrder(error.localizedDescription))
 				})
-			case VirtusizeFlutterMethod.addProduct:
-				guard let externalProductId = call.arguments as? String else {
-					result(FlutterError.argumentNotSet(VirtusizeFlutterKey.externalProductId))
-					return
-				}
-				
-				externalProductIDStack.append(externalProductId)
-			case VirtusizeFlutterMethod.removeProduct:
-				externalProductIDStack.removeLast()
 			default:
 				result(FlutterMethodNotImplemented)
 		}
@@ -252,7 +241,7 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 				flutterChannel?.invokeMethod(
 					VirtusizeFlutterMethod.onRecChange,
 					arguments: [
-						VirtusizeFlutterKey.externalProductId: storeProduct!.externalId,
+						VirtusizeFlutterKey.externalProductId: lastProductOnVirtusizeWebView!.externalId,
 						VirtusizeFlutterKey.recText: nil,
 						VirtusizeFlutterKey.showUserProductImage: false
 					]
@@ -274,7 +263,7 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 	) {
 		// The default store product to use for the recommendation is the most recent one
 		// But if the store product ID is not null, we update the store product value
-		var storeProduct = storeProduct
+		var storeProduct = lastProductOnVirtusizeWebView
 		if let productId = storeProductId,
 		   let product = serverStoreProductSet.filter({ product in
 			product.id == productId
@@ -402,7 +391,7 @@ extension SwiftVirtusizeFlutterPlugin: VirtusizeMessageHandler {
 				
 				// If the store product that is associated with the current body profile recommended size is different from the most recent one,
 				// we should update the data for the body profile recommended size
-				let shouldUpdateBodyProfileRecommendedSize = bodyProfileRecommendedSize?.product?.externalId != storeProduct?.externalId
+				let shouldUpdateBodyProfileRecommendedSize = bodyProfileRecommendedSize?.product?.externalId != lastProductOnVirtusizeWebView?.externalId
 
 				recommendationWorkItem = DispatchWorkItem { [weak self] in
 					self?.getRecommendation(
@@ -459,7 +448,7 @@ extension SwiftVirtusizeFlutterPlugin: VirtusizeMessageHandler {
 				}
 			case .userUpdatedBodyMeasurements:
 				if let sizeRecName = eventData?[VirtusizeEventKey.sizeRecName] as? String {
-					bodyProfileRecommendedSize = BodyProfileRecommendedSize(sizeName: sizeRecName, product: storeProduct)
+					bodyProfileRecommendedSize = BodyProfileRecommendedSize(sizeName: sizeRecName, product: lastProductOnVirtusizeWebView)
 					recommendationWorkItem = DispatchWorkItem { [weak self] in
 						self?.getRecommendation(
 							self?.currentWorkItem,

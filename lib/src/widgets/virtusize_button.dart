@@ -48,8 +48,6 @@ class _VirtusizeButtonState extends State<VirtusizeButton> {
       if (widget.product.externalProductId != productDataCheck.externalProductId) {
         return;
       }
-      IVirtusizeSDK.instance
-          .addProduct(externalProductId: productDataCheck.externalProductId);
       setState(() {
         _isValidProduct = productDataCheck.isValidProduct;
       });
@@ -58,7 +56,6 @@ class _VirtusizeButtonState extends State<VirtusizeButton> {
 
   @override
   void dispose() {
-    IVirtusizeSDK.instance.removeProduct();
     _vsTextSubscription.cancel();
     _pdcSubscription.cancel();
     super.dispose();
@@ -85,7 +82,7 @@ class _VirtusizeButtonState extends State<VirtusizeButton> {
   }
 
   Future<void> _openVirtusizeWebview() async {
-    await VirtusizeSDK.instance.openVirtusizeWebView();
+    await VirtusizeSDK.instance.openVirtusizeWebView(widget.product);
   }
 
   ElevatedButton _buildVSButton(Color color, Widget child) {

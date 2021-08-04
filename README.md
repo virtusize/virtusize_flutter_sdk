@@ -293,8 +293,8 @@ If you like, you can also customize the button style.
       product: _product,
       child: ElevatedButton(
         child: Text('Custom Button'), 
-        // Implement the `OnPressed` callback with the `VirtusizePlugin.instance.openVirtusizeWebView` function if you have customized the button
-        onPressed: VirtusizeSDK.instance.openVirtusizeWebView
+        // Implement the `onPressed` callback with the `VirtusizePlugin.instance.openVirtusizeWebView` function if you have customized the button
+        onPressed: () => VirtusizeSDK.instance.openVirtusizeWebView(_product))
       )
   )
   ```
