@@ -385,7 +385,7 @@ extension SwiftVirtusizeFlutterPlugin: VirtusizeMessageHandler {
 	}
 	
 	public func virtusizeController(_ controller: VirtusizeWebViewController?, didReceiveEvent event: VirtusizeEvent) {
-	    var eventData = event.data as? [String: Any]
+	    let eventData = event.data as? [String: Any]
 		let eventsWorkItem = DispatchWorkItem { [weak self] in
 			if let eventData = eventData,
 			   let eventName = eventData[VirtusizeEventKey.shortEventName] ?? eventData[VirtusizeEventKey.eventName] {
