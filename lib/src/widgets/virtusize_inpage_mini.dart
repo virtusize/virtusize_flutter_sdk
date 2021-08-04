@@ -9,7 +9,7 @@ import '../res/vs_colors.dart';
 import '../res/vs_font.dart';
 import '../res/vs_images.dart';
 import '../res/vs_text.dart';
-import '../../virtusize_sdk.dart';
+import '../../virtusize_flutter_sdk.dart';
 import 'cta_button.dart';
 import 'animated_dots.dart';
 

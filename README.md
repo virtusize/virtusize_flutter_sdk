@@ -124,7 +124,7 @@ You will need a unique API key and an Admin account, only available to Virtusize
 Use the `VirtusizeSDK.instance.setVirtusizeParams` function to set up the Virtusize parameters before calling runApp.
 
 ```dart
-import 'package:virtusize_flutter_sdk/virtusize_sdk.dart';
+import 'package:virtusize_flutter_sdk/virtusize_flutter_sdk.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
