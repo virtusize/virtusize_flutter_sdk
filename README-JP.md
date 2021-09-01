@@ -20,17 +20,17 @@ A Flutter [plugin](https://flutter.dev/developing-packages/) that wraps Virtusiz
     - [Flutter](#2-flutter)
         - [はじめに](#1-はじめに)
         - [商品詳細をロードする](#2-商品詳細をロードする)
-        - [VirtusizeMessageHandlerの実装する（オプション）](#3-VirtusizeMessageHandlerの実装する-オプション)
+        - [VirtusizeMessageHandlerの実装する（オプション）](#3-virtusizemessagehandlerを実装するオプション)
     
-- [バーチャサイズ・ウィジェット実装](#バーチャサイズ・ウィジェット実装)
-    - [Virtusizeボタン](#1-Virtusizeボタン)
+- [バーチャサイズ・ウィジェット実装](#バーチャサイズウィジェット実装)
+    - [Virtusizeボタン](#1-virtusizeボタン)
     - [Virtusizeインページ](#2-virtusizeインページ)
-        - [InPage Standard](#2-inpage-standard)
-        - [InPage Mini](#3-inpage-mini)
+        - [InPage スタンダード](#2-inpage-スタンダード)
+        - [InPage ミニ](#3-inpage-ミニ)
 
 - [Order API](#order-api)
     - [はじめに](#1-はじめに-1)
-    - [注文データのVirtusizeOrder オブジェクトを作成](#2-注文データのVirtusizeOrder オブジェクトを作成)
+    - [注文データのVirtusizeOrder オブジェクトを作成](#2-注文データのvirtusizeorder-オブジェクトを作成)
     - [注文情報の送信](#3-注文情報の送信)
 
 - [Example](#example)
@@ -249,13 +249,13 @@ void initState() {
 
 
 
-## Virtusize ウィジェット実装
+## バーチャサイズ・ウィジェット実装
 
 SDKをセットアップした後、`Virtusize`ウィジェットを追加して、顧客が理想的なサイズを見つけられるようにします。
 
 Virtusize SDKはユーザーが使用するために2つの主要なUIコンポーネントを提供します。:
 
-### 1. バーチャサイズ・ボタン（Virtusize Button）
+### 1. Virtusizeボタン
 
 #### (1) はじめに
 
@@ -313,7 +313,7 @@ SDKのVirtusizeボタンには2つのデフォルトスタイルがあります�
 
 
 
-### 2. Virtusize InPage
+### 2. Virtusizeインページ
 
 #### (1) はじめに
 
@@ -334,7 +334,7 @@ Virtusize SDKには2種類のInPageがあります。
 
 
 
-#### (2) InPage Standard
+#### (2) InPage スタンダード
 
 ##### A. 使用方法
 
@@ -416,7 +416,7 @@ Virtusize SDKには2種類のInPageがあります。
 
 
 
-#### (3) InPage Mini
+#### (3) InPage ミニ
 
 これは、アプリケーションに配置できるInPageのミニバージョンです。目立たないデザインは、顧客が商品の画像やサイズ表を閲覧しているレイアウトに適しています。
 
