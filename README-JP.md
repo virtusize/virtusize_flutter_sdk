@@ -1,0 +1,615 @@
+# Virtusize Flutter SDK
+
+[![pub package](https://img.shields.io/pub/v/virtusize_flutter_sdk.svg)](https://pub.dev/packages/virtusize_flutter_sdk)
+
+[English](README.md)
+
+A Flutter [plugin](https://flutter.dev/developing-packages/) that wraps Virtusize Native SDKs for [Android](https://github.com/virtusize/integration_android) & [iOS](https://github.com/virtusize/integration_ios).
+
+
+## Table of Contents
+
+- [はじめに](#はじめに)
+
+- [対応バージョン](#対応バージョン)
+
+- [使用方法](#使用方法)
+
+- [セットアップ](#セットアップ)
+    - [Android](#1-android)
+    - [Flutter](#2-flutter)
+        - [はじめに](#1-はじめに)
+        - [商品詳細をロードする](#2-商品詳細をロードする)
+        - [VirtusizeMessageHandlerの実装する（オプション）](#3-VirtusizeMessageHandlerの実装する-オプション)
+    
+- [バーチャサイズ・ウィジェット実装](#バーチャサイズ・ウィジェット実装)
+    - [Virtusizeボタン](#1-Virtusizeボタン)
+    - [Virtusizeインページ](#2-virtusizeインページ)
+        - [InPage Standard](#2-inpage-standard)
+        - [InPage Mini](#3-inpage-mini)
+
+- [Order API](#order-api)
+    - [はじめに](#1-はじめに-1)
+    - [注文データのVirtusizeOrder オブジェクトを作成](#2-注文データのVirtusizeOrder オブジェクトを作成)
+    - [注文情報の送信](#3-注文情報の送信)
+
+- [Example](#example)
+
+- [License](#license)
+
+
+
+## はじめに
+
+バーチャサイズは商品詳細ページにあるサイズ情報を元に、アイテムのサイズ感をシルエット化しお客様が購入されたい商品をオンライン上で比較しやすいようサポートをしてます。
+
+詳しくはこちらをご確認ください。[https://www.virtusize.com](https://www.virtusize.com/)
+
+実装作業を始められる前にバーチャサイズの御社ご担当者に「API キー」と「ストア名」をお訊ねください。
+
+> **こちらは Flutter用実装ガイドです。** Webの実装は[https://developers.virtusize.com](https://developers.virtusize.com/)をご確認ください。
+
+
+
+## 対応バージョン
+
+- **iOS 10.3+**
+
+  Specify the iOS version at least `10.3` in `ios/Podfile`:
+
+  iOS バージョン`10.3`以上をご利用されているか`ios/Podfile`にてご確認ください。
+
+  ```
+  platform :ios, '10.3'
+  ```
+
+- **Android 5.0+ (API Level 21+)**
+
+  `android/app/build.gradle` を `21`以上をご利用されているかご確認の上、`minSdkVersion` を設定ください。
+  
+  ```gradle
+  android {
+    defaultConfig {
+        minSdkVersion 21
+    }
+  }
+  ```
+
+
+
+## 使用方法
+
+1. [pubspec.yaml file](https://flutter.dev/docs/development/packages-and-plugins/using-packages)に`virtusize_flutter_sdk`を追加。
+
+    ```yaml
+    dependencies:
+      virtusize_flutter_sdk: ^1.0.1
+    ```
+
+
+2. `flutter pub get` をターミナルで実行始動またはIntelliJ/ Android Studio 内`Pub get`をクリックください。
+
+
+
+## セットアップ
+
+### 1. Android
+
+1. `android/build.gradle`のKotlinバージョン`1.4.32`以上にアップデートしてください。
+
+    ```diff
+    buildscript {
+    -    ext.kotlin_version = '1.3.50'
+    +    ext.kotlin_version = '1.4.32'
+        ...
+    }
+    ```
+
+2. API30よりAndroidではアプリでURLを開くために、AndroidManifest.xmlでパッケージを表示する必要があります。SDKのURLを開くことができるようにするには、必要な`<queries>`を`AndroidManifest.xml`に追加します。
+
+    ```xml
+    <queries>
+      <intent>
+        <action android:name="android.intent.action.VIEW" />
+        <data android:scheme="https" />
+      </intent>
+    </queries>
+    ```
+
+3. SDKフラグメントでVirtusizeWebビューを開くには、`android/app/src/main/MainActivity`内のFlutterActivityではなく**FlutterFragmentActivity**から継承をお願いします。
+
+    ```diff
+    - import io.flutter.embedding.android.FlutterActivity
+    + import io.flutter.embedding.android.FlutterFragmentActivity
+    
+    - class MainActivity: FlutterActivity() {
+    + class MainActivity: FlutterFragmentActivity() {
+    }
+    ```
+
+
+
+### 2. Flutter
+
+#### (1) はじめに
+
+runAppを実行する前に、`VirtusizeSDK.instance.setVirtusizeParams`関数を使用してVirtusizeパラメーターを設定します。
+
+```dart
+import 'package:virtusize_flutter_sdk/virtusize_flutter_sdk.dart';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  VirtusizeSDK.instance.setVirtusizeParams(
+      // Only the API key is required
+      apiKey: '15cc36e1d7dad62b8e11722ce1a245cb6c5e6692',
+      // For using the Order API, a user ID is also required. (can be set later)
+      userId: '123',
+      // By default, the Virtusize environment will be set to VSEnvironment.global
+      env: VSEnvironment.staging,
+      // By default, the initial language will be set according to the Virtusize environment
+      language: VSLanguage.jp,
+      // By default, ShowSGI is false
+      showSGI: true,
+      // By default, Virtusize allows all possible languages
+      allowedLanguages: [VSLanguage.en, VSLanguage.jp],
+      // By default, Virtusize displays all possible info categories in the Product Details tab
+      detailsPanelCards: [VSInfoCategory.generalFit, VSInfoCategory.brandSizing]
+  );
+
+  runApp(MyApp());
+}
+```
+
+可能な引数構成を次の表に示します。
+
+| データ形式        | タイプ                 | 例                                                      | 説明                                                         | 必須設定                                                     |
+| ----------------- | ---------------------- | ------------------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| apiKey            | String                 | "api_key"                                               | 担当者が用意した「API キー」遠設定ください。                 | Yes                                                          |
+| userId            | String                 | "123"                                                   | ユーザーがクライアントのアプリにログインしている場合、クライアントから渡されます。 | Yes,OrderAPIが使用されている場合。                           |
+| env               | VSEnvironment          | VSEnvironment.staging                                   | 設定環境は、統合を実行している地域のいずれか<br />`VSEnvironment.staging`,  `VSEnvironment.global`, `VSEnvironment.japan` または `VSEnvironment.korea`。 | No. デフォルトでは、Virtusize環境は次のように設定されます`VSEnvironment.global`。 |
+| language          | VSLanguage             | VSLanguage.jp                                           | 統合がロードされる初期言語を設定します。可能な値は次のとおりです。<br />`VSLanguage.en`, `VSLanguage.jp` および  `VSLanguage.kr` | No. デフォルトでは、初期言語はVirtusize環境に基づいて設定されます。 |
+| showSGI           | bool                   | true                                                    | ユーザーが生成したアイテムをワードローブに追加する方法として、SGIを取得の上、SGIフローを使用するかどうかを決定します。 | No. デフォルトではShowSGIはfalseに設定されています。         |
+| allowedLanguages  | List<`VSLanguage`>     | [VSLanguage.en, VSLanguage.jp]                          | ユーザーが言語選択ボタンより選択できる言語。                 | 特になし。デフォルトでは、英語、日本語、韓国語など、表示可能なすべての言語が表示されるようになっています。 |
+| detailsPanelCards | List<`VSInfoCategory`> | [VSInfoCategory.generalFit, VSInfoCategory.brandSizing] | 商品詳細タブに表示する情報のカテゴリ。表示可能カテゴリは以下：<br />`VSInfoCategory.modelInfo`, `VSInfoCategory.generalFit`, `VSInfoCategory.brandSizing` および`VSInfoCategory.material` | No. デフォルトでは、商品詳細タブに表示可能なすべての情報カテゴリが表示されます。 |
+
+
+
+#### (2) **商品詳細をVirtusizeにロードする**
+
+Virtusizeウィジェットにデータを入力するには、商品詳細ページウィジェット内`initState`にて`VirtusizeSDK.instance.loadVirtusize` を使用する必要があります。
+
+- 次のコマンドを使用して`VirtusizeClientProduct`オブジェクトを作成します。
+    - Virtusizeサーバーで製品を参照するために使用される`exernalId`
+    - 商品画像の`imageURL`
+- `VirtusizeClientProduct`オブジェクトを`VirtusizeSDK.instance.loadVirtusize`関数に渡します。
+
+```dart
+/// Declare a global `VirtusizeClientProduct` variable, 
+/// which will be passed to the `Virtusize` widgets in order to bind the product info
+VirtusizeClientProduct _product;
+
+@override
+void initState() {
+    super.initState();
+
+    _product = VirtusizeClientProduct(
+        // Set the product's external ID
+        externalProductId: 'vs_dress',
+        // Set the product image URL
+        imageURL: 'https://www.image.com/goods/12345.jpg'
+    );
+
+    VirtusizeSDK.instance.loadVirtusize(_product);
+}
+```
+
+ユーザーが同じ画面を表示しているときに製品を別の製品に更新する場合は、別の`VirtusizeClientProduct`オブジェクトを`_product`に割り当て、`setState()`内の`VirtusizeSDK.instance.loadVirtusize`を使用して製品を再読み込みし、ウィジェットを再構築します。
+
+```dart
+setState(() {
+    _product = VirtusizeClientProduct(
+        externalProductId: 'vs_pants',
+        imageURL: 'https://www.image.com/goods/12345.jpg'
+    );
+    VirtusizeSDK.instance.loadVirtusize(_product);
+});
+```
+
+
+#### (3) VirtusizeMessageHandlerを実装する（オプション）
+
+`VirtusizeMessageListener`を登録して、Virtusizeからのイベントと`ProductDataCheck`の結果を確認できます。
+
+`VirtusizeSDK.instance.setVirtusizeMessageListener`関数のすべての引数はオプションです。
+
+```dart
+@override
+void initState() {
+    super.initState();
+
+    VirtusizeSDK.instance.setVirtusizeMessageListener(
+        VirtusizeMessageListener(
+            vsEvent: (eventName) {
+                print("Virtusize event: $eventName");
+            }, 
+            vsError: (error) {
+                print("Virtusize error: $error");
+            }, 
+            productDataCheckSuccess: (productDataCheck) {
+                print('ProductDataCheck success: $productDataCheck');
+            }, 
+            productDataCheckError: (error) {
+                print('ProductDataCheck error: $error');
+            }
+       )
+    );
+}
+```
+
+
+
+## Virtusize ウィジェット実装
+
+SDKをセットアップした後、`Virtusize`ウィジェットを追加して、顧客が理想的なサイズを見つけられるようにします。
+
+Virtusize SDKはユーザーが使用するために2つの主要なUIコンポーネントを提供します。:
+
+### 1. バーチャサイズ・ボタン（Virtusize Button）
+
+#### (1) はじめに
+
+VirtusizeButtonはこのSDKの中でもっとシンプルなUIのボタンです。ユーザーが正しいサイズを見つけられるように、ウェブビューでアプリケーションを開きます。
+
+
+
+#### (2) デフォルトスタイル
+
+SDKのVirtusizeボタンには2つのデフォルトスタイルがあります。
+
+| Teal Theme                                                   | Black Theme                                                  |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| [![img](https://user-images.githubusercontent.com/7802052/92671785-22817a00-f352-11ea-8ce9-6b4f7fcb43c4.png)](https://user-images.githubusercontent.com/7802052/92671785-22817a00-f352-11ea-8ce9-6b4f7fcb43c4.png) | [![img](https://user-images.githubusercontent.com/7802052/92671771-172e4e80-f352-11ea-8443-dcb8b05f5a07.png)](https://user-images.githubusercontent.com/7802052/92671771-172e4e80-f352-11ea-8443-dcb8b05f5a07.png) |
+
+もしご希望であれば、ボタンのスタイルもカスタマイズすることができます。
+
+
+
+#### (3) 使用方法
+
+- **VirtusizeButton.vsStyle**({required VirtusizeClientProduct product, VirtusizeStyle style = VirtusizeStyle.Black, Widget child})
+
+  デフォルトのVirtusizeスタイルで、`VirtusizeSDK.instance.loadVirtusize`関数に渡したものと同じ`VirtusizeClientProduct`オブジェクトを使用して`VirtusizeButton`ウィジェットを作成します。
+
+  ```dart
+  // A `VirtusizeButton` widget with default `Black` style
+  VirtusizeButton.vsStyle(product: _product)
+    
+  // A `VirtusizeButton` widget with `Teal` style and a custom `Text` widget
+  VirtusizeButton.vsStyle(
+      product: _product,
+      style: VirtusizeStyle.Teal,
+      child: Text("Custom Text")
+  )
+  ```
+
+
+
+<u>または</u>、カスタムボタンウィジェットを使用して`VirtusizeButton`ウィジェットを作成します。
+
+- **VirtusizeButton**({required VirtusizeClientProduct product, required Widget child})
+
+  ```dart
+  // A `VirtusizeButton` widget with a custom `ElevatedButton` widget
+  VirtusizeButton(
+      product: _product,
+      child: ElevatedButton(
+        child: Text('Custom Button'), 
+        // Implement the `onPressed` callback with the `VirtusizePlugin.instance.openVirtusizeWebView` function if you have customized the button
+        onPressed: () => VirtusizeSDK.instance.openVirtusizeWebView(_product))
+      )
+  )
+  ```
+
+
+
+### 2. Virtusize InPage
+
+#### (1) はじめに
+
+Virtusize InPageは、サービスのスタートボタンのように動作するボタンです。ボタンは、人々が適切なサイズを見つけるのをサポートするフィッティングガイドとしても機能します。
+
+##### InPage types
+
+Virtusize SDKには2種類のInPageがあります。
+
+| InPage Standard                                              | InPage Mini                                                  |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| [![InPageStandard](https://user-images.githubusercontent.com/7802052/92671977-9cb1fe80-f352-11ea-803b-5e3cb3469be4.png)](https://user-images.githubusercontent.com/7802052/92671977-9cb1fe80-f352-11ea-803b-5e3cb3469be4.png) | [![InPageMini](https://user-images.githubusercontent.com/7802052/92671979-9e7bc200-f352-11ea-8594-ed441649855c.png)](https://user-images.githubusercontent.com/7802052/92671979-9e7bc200-f352-11ea-8594-ed441649855c.png) |
+
+⚠️**注意**⚠️
+
+1. InPageをVirtusizeボタンと一緒に実装することはできません。オンラインショップのInPageまたはVirtusizeボタンを選択してください。
+2. InPage Miniは、常にInPageStandardと組み合わせて使用する必要があります。
+
+
+
+#### (2) InPage Standard
+
+##### A. 使用方法
+
+- **VirtusizeInPageStandard.vsStyle**({required VirtusizeClientProduct product, VirtusizeStyle style = VirtusizeStyle.Black, double horizontalMargin = 16})
+
+  `VirtusizeSDK.instance.loadVirtusize`関数に渡したものと同じ`VirtusizeClientProduct`オブジェクトを使用して、デフォルトのVirtusizeスタイルと水平マージンを変更する機能を備えた`VirtusizeInPageStandard`ウィジェットを作成します。
+
+  ```dart
+  // A `VirtusizeInPageStandard` widget with default `Black` style and a default horizontal margin of `16` 
+  VirtusizeInPageStandard.vsStyle(product: _product)
+    
+  // A `VirtusizeInPageStandard` widget with `Teal` style and a horizontal margin of `32`
+  VirtusizeInPageStandard.vsStyle(
+      product: _product,
+      style: VirtusizeStyle.Teal,
+      horizontalMargin: 32
+  )
+  ```
+
+
+
+<u>または</u>、ボタンの背景色と水平マージンを変更する機能を備えた`VirtusizeInPageStandard`ウィジェットを作成します。
+
+- **VirtusizeInPageStandard**({required VirtusizeClientProduct product, Color buttonBackgroundColor = VSColors.vsGray900, double horizontalMargin = 16})
+
+  ```dart
+  // A `VirtusizeInPageStandard` widget with a default `VSColors.vsGray900` button background color and a default horizontal margin of `16`
+  VirtusizeInPageStandard(product: _product)
+  
+  // A `VirtusizeInPageStandard` widget with a `Colors.amber` button background color and a horizontal margin of `32`
+  VirtusizeInPageStandard(
+      product: _product,
+      buttonBackgroundColor: Colors.amber, 
+      horizontalMargin: 32
+  )
+  ```
+
+
+
+##### B. 設計ガイドライン
+
+- ##### デフォルトのデザイン
+
+  デフォルトのデザインバリエーションは2つあります。
+
+  | Teal Theme                                                   | Black Theme                                                  |
+    | ------------------------------------------------------------ | ------------------------------------------------------------ |
+  | [![InPageStandardTeal](https://user-images.githubusercontent.com/7802052/92672035-b9e6cd00-f352-11ea-9e9e-5385a19e96da.png)](https://user-images.githubusercontent.com/7802052/92672035-b9e6cd00-f352-11ea-9e9e-5385a19e96da.png) | [![InPageStandardBlack](https://user-images.githubusercontent.com/7802052/92672031-b81d0980-f352-11ea-8b7a-564dd6c2a7f1.png)](https://user-images.githubusercontent.com/7802052/92672031-b81d0980-f352-11ea-8b7a-564dd6c2a7f1.png) |
+
+- ##### レイアウトのバリエーション
+
+  考えられるレイアウトは次のとおりです。
+
+  | 1 thumbnail + 2 lines of message                             | 2 thumbnails + 2 lines of message                            |
+    | ------------------------------------------------------------ | ------------------------------------------------------------ |
+  | [![1 thumbnail + 2 lines of message](https://user-images.githubusercontent.com/7802052/97399368-5e879300-1930-11eb-8b77-b49e06813550.png)](https://user-images.githubusercontent.com/7802052/97399368-5e879300-1930-11eb-8b77-b49e06813550.png) | [![2 thumbnails + 2 lines of message](https://user-images.githubusercontent.com/7802052/97399370-5f202980-1930-11eb-9a2d-7b71714aa7b4.png)](https://user-images.githubusercontent.com/7802052/97399370-5f202980-1930-11eb-9a2d-7b71714aa7b4.png) |
+  | **1 thumbnail + 1 line of message**                          | **2 animated thumbnails + 2 lines of message**               |
+  | [![1 thumbnail + 1 line of message](https://user-images.githubusercontent.com/7802052/97399373-5f202980-1930-11eb-81fe-9946b656eb4c.png)](https://user-images.githubusercontent.com/7802052/97399373-5f202980-1930-11eb-81fe-9946b656eb4c.png) | [![2 animated thumbnails + 2 lines of message](https://user-images.githubusercontent.com/7802052/97399355-59c2df00-1930-11eb-8a52-292956b8762d.gif)](https://user-images.githubusercontent.com/7802052/97399355-59c2df00-1930-11eb-8a52-292956b8762d.gif) |
+
+- ##### 推奨される配置
+
+    - サイズテーブルの近く
+    - サイズ情報掲載箇所
+
+  ![img](https://user-images.githubusercontent.com/7802052/92672185-15b15600-f353-11ea-921d-397f207cf616.png)
+
+- ##### UIのカスタマイズ
+
+    - **できる事**
+        - [**WebAIMコントラストテスト**](https://webaim.org/resources/contrastchecker/)をパスした色に限り、CTAボタンの背景色を変更できます。
+        - InPageの幅を変更して、アプリケーションの幅に合わせます。
+    - **できない事**
+        - 形状や間隔などのインターフェイスコンポーネントの変更。
+        - フォントの変更。
+        - CTAボタンの形状変更。
+        - メッセージの変更。
+        - インページボックス影デザインの変更または非表示切り替え。
+        - VIRTUSIZEロゴとプライバシーポリシーのテキストリンクを含むフッター非表示切り替え。
+
+
+
+#### (3) InPage Mini
+
+これは、アプリケーションに配置できるInPageのミニバージョンです。目立たないデザインは、顧客が商品の画像やサイズ表を閲覧しているレイアウトに適しています。
+
+
+
+##### A. 使用方法
+
+- **VirtusizeInPageMini.vsStyle**({required VirtusizeClientProduct product, VirtusizeStyle style = VirtusizeStyle.Black, double horizontalMargin = 16})
+
+  `VirtusizeSDK.instance.loadVirtusize`関数に渡したものと同じ`VirtusizeClientProduct`オブジェクトを使用して、デフォルトのVirtusizeスタイルと水平マージンを変更する機能を備えた`VirtusizeInPageMini`ウィジェットを作成します。
+
+  ```dart
+  // A `VirtusizeInPageMini` widget with default `Black` style and a default horizontal margin of `16` 
+  VirtusizeInPageMini.vsStyle(product: _product)
+    
+  // A `VirtusizeInPageMini` widget with `Teal` style and a default horizontal margin of `16`
+  VirtusizeInPageMini.vsStyle(
+      product: _product,
+      style: VirtusizeStyle.Teal
+  )
+  ```
+
+
+
+<u>または</u>、背景色と水平マージンを変更する機能を備えた`VirtusizeInPageMini`ウィジェットを作成します。
+
+- **VirtusizeInPageMini**({required VirtusizeClientProduct product, Color backgroundColor = VSColors.vsGray900, double horizontalMargin = 16})
+
+  ```dart
+  // A `VirtusizeInPageMini` widget with a default `VSColors.vsGray900` background color and a default horizontal margin of `16`
+  VirtusizeInPageMini(product: _product)
+  
+  // A `VirtusizeInPageMini` widget with a `Colors.blue` background color and a default horizontal margin of `16`
+  VirtusizeInPageMini(
+      product: _product,
+      backgroundColor: Colors.blue
+  )
+  ```
+
+
+
+##### B. 設計ガイドライン
+
+- ##### デフォルトのデザイン
+
+  デフォルトのデザインバリエーションは2つあります。
+
+  | Teal Theme                                                   | Black Theme                                                  |
+    | ------------------------------------------------------------ | ------------------------------------------------------------ |
+  | [![InPageMiniTeal](https://user-images.githubusercontent.com/7802052/92672234-2d88da00-f353-11ea-99d9-b9e9b6aa5620.png)](https://user-images.githubusercontent.com/7802052/92672234-2d88da00-f353-11ea-99d9-b9e9b6aa5620.png) | [![InPageMiniBlack](https://user-images.githubusercontent.com/7802052/92672232-2c57ad00-f353-11ea-80f6-55a9c72fb0b5.png)](https://user-images.githubusercontent.com/7802052/92672232-2c57ad00-f353-11ea-80f6-55a9c72fb0b5.png) |
+
+- ##### Recommended Placements推奨される配置
+
+  | Underneath the product image                                 | Underneath or near the size table                            |
+    | ------------------------------------------------------------ | ------------------------------------------------------------ |
+  | [![img](https://user-images.githubusercontent.com/7802052/92672261-3c6f8c80-f353-11ea-995c-ede56e0aacc3.png)](https://user-images.githubusercontent.com/7802052/92672261-3c6f8c80-f353-11ea-995c-ede56e0aacc3.png) | [![img](https://user-images.githubusercontent.com/7802052/92672266-40031380-f353-11ea-8f63-a67c9cf46c68.png)](https://user-images.githubusercontent.com/7802052/92672266-40031380-f353-11ea-8f63-a67c9cf46c68.png) |
+
+- ##### Default Fontsデフォルトのフォント
+
+    - **日本語**
+        - Noto Sans CJK JP
+        - (Message) Text size: 12
+        - (Button) Text size: 10
+    - **韓国語**
+        - Noto Sans CJK KR
+        - (Message) Text size: 12
+        - (Button) Text size: 10
+    - **英語**
+        - Roboto for Android and San Francisco for iOS
+        - (Message) Text size: 14
+        - (Button) Text size: 12
+
+- ##### UIのカスタマイズ
+
+    - **できる事**
+        - [**WebAIMコントラストテスト**](https://webaim.org/resources/contrastchecker/)をパスした色に限り、CTAボタンの背景色を変更できます。
+    - **できない事**
+        - フォントの変更。
+        - CTAボタンの形変更。
+        - メッセージの変更。
+
+
+
+## Order API
+
+注文APIを使用すると、Virtusizeは、`購入履歴`の一部として最近購入したアイテムを顧客に表示し、それらのアイテムを使用して、購入したい新しいアイテムと比較することができます。
+
+#### 1. はじめに
+
+Virtusizeに注文を送信する前に、**ユーザーID**が設定されていることを確認してください。ユーザーIDを設定できます。
+
+`VirtusizeSDK.instance.setVirtusizeParams`を使用してVirtusizeパラメーターを設定している間
+
+または
+
+`VirtusizeSDK.instance.sendOrder`関数を呼び出す前の任意の場所
+
+```dart
+// Use the `VirtusizeSDK.instance.setVirtusizeParams` to set the user ID
+VirtusizeSDK.instance.setVirtusizeParams(
+    apiKey: '15cc36e1d7dad62b8e11722ce1a245cb6c5e6692',
+    userId: '123',
+    ...
+);
+
+// Use the `VirtusizeSDK.instance.setUserId` before sending an order
+VirtusizeSDK.instance.setUserId("123456");
+```
+
+
+
+#### 2. 注文データのVirtusizeOrder オブジェクトを作成
+
+***VirtusizeOrder***オブジェクトは`VirtusizeSDK.instance.sendOrder`関数に渡され、次の属性があります。
+
+***注：***\*は引数が必要であることを意味します。
+
+**VirtusizeOrder**
+
+| データ形式 | タイプ        | 例        | 説明                   |
+| ---------------- | ------------------------ | ------------------- | ----------------------------------- |
+| externalOrderId* | String                   | "20200601586"       | 御社にてご用意いただいたオーダーID |
+| items*           | List<`VirtusizeOrderItem`> | See the table below | オーダー商品リスト |
+
+**VirtusizeOrderItem**
+
+| データ形式         | タイプ | 例                                   | 説明                                                         |
+| ------------------ | ------ | ------------------------------------ | ------------------------------------------------------------ |
+| externalProductId* | String | "A001"                               | 各商品ユニークIDをご利用ください                             |
+| size*              | String | "S", "M", etc.                       | サイズ名称                                                   |
+| sizeAlias          | String | "Small", "Large", etc.               | サイズ名が商品ページのものと同一でない場合は、サイズのエイリアスが追加されます |
+| variantId          | String | "A001_SIZES_RED"                     | バリアントIDは、製品のSKU、色、またはサイズに設定されます（複数のオプションがある場合） |
+| imageURL*          | String | "http://images.example.com/coat.jpg" | 商品画像URL                                                  |
+| color              | String | "RED", "R', etc.                     | 色                                                           |
+| gender             | String | "W", "Women", etc.                   | 性別                                                         |
+| unitPrice*         | double | 5100.00                              | 最大12桁と小数点以下2桁の2桁の製品価格（12、2）              |
+| currency*          | String | "JPY", "KRW", "USD", etc.            | 通貨コード                                                   |
+| quantity*          | int    | 1                                    | 購入したアイテム数。共有がなかった場合、デフォルトで1になります。 |
+| url                | String | "http://example.com/products/A001"   | 商品ページのURL。これがユーザーがアクセスできるURLであることを確認してください。 |
+
+**サンプル例**
+
+```dart
+VirtusizeOrder order = VirtusizeOrder(
+    externalOrderId: "20200601586",
+    items: [
+        VirtusizeOrderItem(
+            externalProductId: "A001",
+            size: "L",
+            sizeAlias: "Large",
+            variantId: "A001_SIZEL_RED",
+            imageURL: "http://images.example.com/products/A001/red/image1xl.jpg",
+            color: "Red",
+            gender: "W",
+            unitPrice: 5100.00,
+            currency: "JPY",
+            quantity: 1,
+            url: "http://example.com/products/A001"
+        )
+    ]
+);
+```
+
+
+
+#### 3. 注文情報の送信
+
+ユーザーが注文するときに、`VirtusizeSDK.instance.sendOrder`関数を呼び出します。
+
+`onSuccess`および`onError`コールバックはオプションです。
+
+```dart
+VirtusizeSDK.instance.sendOrder(
+    order: order,
+    // The `onSuccess` callback is optional and is called when the app has successfully sent the order
+    onSuccess: (sentOrder) {
+        print("Successfully sent the order $sentOrder");
+    },
+    // The `onError` callback is optional and gets called when an error occurs while the app is sending the order
+    onError: (error) {
+        print(error);
+    }
+);
+```
+
+
+
+## Example
+
+https://github.com/virtusize/virtusize_flutter_sdk/tree/main/example
+
+
+
+## License
+
+Copyright (c) 2021-present Virtusize CO LTD ([https://www.virtusize.jp](https://www.virtusize.jp/))
