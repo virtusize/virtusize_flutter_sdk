@@ -468,13 +468,13 @@ Virtusize SDKには2種類のInPageがあります。
     | ------------------------------------------------------------ | ------------------------------------------------------------ |
   | [![InPageMiniTeal](https://user-images.githubusercontent.com/7802052/92672234-2d88da00-f353-11ea-99d9-b9e9b6aa5620.png)](https://user-images.githubusercontent.com/7802052/92672234-2d88da00-f353-11ea-99d9-b9e9b6aa5620.png) | [![InPageMiniBlack](https://user-images.githubusercontent.com/7802052/92672232-2c57ad00-f353-11ea-80f6-55a9c72fb0b5.png)](https://user-images.githubusercontent.com/7802052/92672232-2c57ad00-f353-11ea-80f6-55a9c72fb0b5.png) |
 
-- ##### Recommended Placements推奨される配置
+- ##### 推奨される配置
 
   | Underneath the product image                                 | Underneath or near the size table                            |
     | ------------------------------------------------------------ | ------------------------------------------------------------ |
   | [![img](https://user-images.githubusercontent.com/7802052/92672261-3c6f8c80-f353-11ea-995c-ede56e0aacc3.png)](https://user-images.githubusercontent.com/7802052/92672261-3c6f8c80-f353-11ea-995c-ede56e0aacc3.png) | [![img](https://user-images.githubusercontent.com/7802052/92672266-40031380-f353-11ea-8f63-a67c9cf46c68.png)](https://user-images.githubusercontent.com/7802052/92672266-40031380-f353-11ea-8f63-a67c9cf46c68.png) |
 
-- ##### Default Fontsデフォルトのフォント
+- ##### デフォルトのフォント
 
     - **日本語**
         - Noto Sans CJK JP
