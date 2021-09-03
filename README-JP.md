@@ -19,14 +19,14 @@ A Flutter [plugin](https://flutter.dev/developing-packages/) that wraps Virtusiz
     - [Android](#1-android)
     - [Flutter](#2-flutter)
         - [はじめに](#1-はじめに)
-        - [商品詳細をロードする](#2-商品詳細をロードする)
+        - [Virtusizeにて商品詳細をロードする](#2-virtusizeにて商品詳細をロードする)
         - [VirtusizeMessageHandlerの実装する（オプション）](#3-virtusizemessagehandlerを実装するオプション)
     
-- [バーチャサイズ・ウィジェット実装](#バーチャサイズウィジェット実装)
-    - [Virtusizeボタン](#1-virtusizeボタン)
-    - [Virtusizeインページ](#2-virtusizeインページ)
-        - [InPage スタンダード](#2-inpage-スタンダード)
-        - [InPage ミニ](#3-inpage-ミニ)
+- [Virtusizeウィジェット実装](#virtusizeウィジェット実装)
+    - [バーチャサイズ・ボタン（Virtusize Button）](#1-バーチャサイズボタンvirtusize-button)
+    - [バーチャサイズ・インページ（Virtuzie InPage）](#2-バーチャサイズインページvirtuzie-inpage)
+        - [インページ・スタンダード（InPage Standard）](#2-インページスタンダードinage-standard)
+        - [インページ・ミニ（InPage Mini）](#3-インページミニinpage-mini)
 
 - [Order API](#order-api)
     - [はじめに](#1-はじめに-1)
@@ -55,14 +55,12 @@ A Flutter [plugin](https://flutter.dev/developing-packages/) that wraps Virtusiz
 
 - **iOS 10.3+**
 
-  Specify the iOS version at least `10.3` in `ios/Podfile`:
-
   iOS バージョン`10.3`以上をご利用されているか`ios/Podfile`にてご確認ください。
 
   ```
   platform :ios, '10.3'
   ```
-
+  
 - **Android 5.0+ (API Level 21+)**
 
   `android/app/build.gradle` を `21`以上をご利用されているかご確認の上、`minSdkVersion` を設定ください。
@@ -87,7 +85,7 @@ A Flutter [plugin](https://flutter.dev/developing-packages/) that wraps Virtusiz
     ```
 
 
-2. `flutter pub get` をターミナルで実行始動またはIntelliJ/ Android Studio 内`Pub get`をクリックください。
+2. `flutter pub get` をターミナルで実行または IntelliJ / Android Studio 内`Pub get`をクリックください。
 
 
 
@@ -175,12 +173,12 @@ Future<void> main() async {
 
 
 
-#### (2) **商品詳細をVirtusizeにロードする**
+#### (2) Virtusizeにて商品詳細をロードする
 
-Virtusizeウィジェットにデータを入力するには、商品詳細ページウィジェット内`initState`にて`VirtusizeSDK.instance.loadVirtusize` を使用する必要があります。
+商品詳細ページウィジェットの`initState`で、`VirtusizeSDK.instance.loadVirtusize`を使用してVirtusizeウィジェットにデータを入力する必要があります。
 
-- 次のコマンドを使用して`VirtusizeClientProduct`オブジェクトを作成します。
-    - Virtusizeサーバーで製品を参照するために使用される`exernalId`
+- `VirtusizeClientProduct`オブジェクトを作成して以下情報を設定してください。
+    - Virtusizeサーバーで商品詳細をロードするために使用される`exernalId`
     - 商品画像の`imageURL`
 - `VirtusizeClientProduct`オブジェクトを`VirtusizeSDK.instance.loadVirtusize`関数に渡します。
 
@@ -249,13 +247,13 @@ void initState() {
 
 
 
-## バーチャサイズ・ウィジェット実装
+## Virtusizeウィジェット実装
 
 SDKをセットアップした後、`Virtusize`ウィジェットを追加して、顧客が理想的なサイズを見つけられるようにします。
 
 Virtusize SDKはユーザーが使用するために2つの主要なUIコンポーネントを提供します。:
 
-### 1. Virtusizeボタン
+### 1. バーチャサイズ・ボタン（Virtusize Button）
 
 #### (1) はじめに
 
@@ -313,11 +311,11 @@ SDKのVirtusizeボタンには2つのデフォルトスタイルがあります�
 
 
 
-### 2. Virtusizeインページ
+### 2. バーチャサイズ・インページ（Virtuzie InPage）
 
 #### (1) はじめに
 
-Virtusize InPageは、サービスのスタートボタンのように動作するボタンです。ボタンは、人々が適切なサイズを見つけるのをサポートするフィッティングガイドとしても機能します。
+Virtusize InPageは、サービスのスタートボタンのように動作するボタンです。こちらは、ユーザーが一目で適切なサイズがわかるフィッティングガイドとしても機能します。
 
 ##### InPage types
 
@@ -334,13 +332,13 @@ Virtusize SDKには2種類のInPageがあります。
 
 
 
-#### (2) InPage スタンダード
+#### (2) インページ・スタンダード（InPage Standard）
 
 ##### A. 使用方法
 
 - **VirtusizeInPageStandard.vsStyle**({required VirtusizeClientProduct product, VirtusizeStyle style = VirtusizeStyle.Black, double horizontalMargin = 16})
 
-  `VirtusizeSDK.instance.loadVirtusize`関数に渡したものと同じ`VirtusizeClientProduct`オブジェクトを使用して、デフォルトのVirtusizeスタイルと水平マージンを変更する機能を備えた`VirtusizeInPageStandard`ウィジェットを作成します。
+  `VirtusizeSDK.instance.loadVirtusize`関数に渡した同じ`VirtusizeClientProduct`オブジェクトを使用して、デフォルトのVirtusizeスタイルとhorizontal marginを変更する機能を備えた`VirtusizeInPageStandard`ウィジェットを作成します。
 
   ```dart
   // A `VirtusizeInPageStandard` widget with default `Black` style and a default horizontal margin of `16` 
@@ -356,7 +354,7 @@ Virtusize SDKには2種類のInPageがあります。
 
 
 
-<u>または</u>、ボタンの背景色と水平マージンを変更する機能を備えた`VirtusizeInPageStandard`ウィジェットを作成します。
+<u>または</u>、ボタンのbackground colorとhorizontal marginを変更する機能を備えた`VirtusizeInPageStandard`ウィジェットを作成します。
 
 - **VirtusizeInPageStandard**({required VirtusizeClientProduct product, Color buttonBackgroundColor = VSColors.vsGray900, double horizontalMargin = 16})
 
@@ -374,7 +372,7 @@ Virtusize SDKには2種類のInPageがあります。
 
 
 
-##### B. 設計ガイドライン
+##### B. デザインガイドライン
 
 - ##### デフォルトのデザイン
 
@@ -397,26 +395,26 @@ Virtusize SDKには2種類のInPageがあります。
 - ##### 推奨される配置
 
     - サイズテーブルの近く
-    - サイズ情報掲載箇所
+    - サイズ情報内
 
   ![img](https://user-images.githubusercontent.com/7802052/92672185-15b15600-f353-11ea-921d-397f207cf616.png)
 
 - ##### UIのカスタマイズ
 
     - **できる事**
-        - [**WebAIMコントラストテスト**](https://webaim.org/resources/contrastchecker/)をパスした色に限り、CTAボタンの背景色を変更できます。
-        - InPageの幅を変更して、アプリケーションの幅に合わせます。
+        - [**WebAIMコントラストテスト**](https://webaim.org/resources/contrastchecker/)を合格した色に限り、CTAボタンの背景色を変更できます。
+        - アプリケーションの幅と一致するようInPageの幅を変更できます。
     - **できない事**
-        - 形状や間隔などのインターフェイスコンポーネントの変更。
+        - 形やスペーシングなどのインターフェイスコンポーネントの変更。
         - フォントの変更。
-        - CTAボタンの形状変更。
+        - CTAボタンの形の変更。
         - メッセージの変更。
         - インページボックス影デザインの変更または非表示切り替え。
         - VIRTUSIZEロゴとプライバシーポリシーのテキストリンクを含むフッター非表示切り替え。
 
 
 
-#### (3) InPage ミニ
+#### (3) インページ・ミニ（InPage Mini）
 
 これは、アプリケーションに配置できるInPageのミニバージョンです。目立たないデザインは、顧客が商品の画像やサイズ表を閲覧しているレイアウトに適しています。
 
@@ -426,7 +424,7 @@ Virtusize SDKには2種類のInPageがあります。
 
 - **VirtusizeInPageMini.vsStyle**({required VirtusizeClientProduct product, VirtusizeStyle style = VirtusizeStyle.Black, double horizontalMargin = 16})
 
-  `VirtusizeSDK.instance.loadVirtusize`関数に渡したものと同じ`VirtusizeClientProduct`オブジェクトを使用して、デフォルトのVirtusizeスタイルと水平マージンを変更する機能を備えた`VirtusizeInPageMini`ウィジェットを作成します。
+  `VirtusizeSDK.instance.loadVirtusize`関数に渡したものと同じ`VirtusizeClientProduct`オブジェクトを使用して、デフォルトのVirtusizeスタイルとhorizontal marginを変更する機能を備えた`VirtusizeInPageMini`ウィジェットを作成します。
 
   ```dart
   // A `VirtusizeInPageMini` widget with default `Black` style and a default horizontal margin of `16` 
@@ -441,7 +439,7 @@ Virtusize SDKには2種類のInPageがあります。
 
 
 
-<u>または</u>、背景色と水平マージンを変更する機能を備えた`VirtusizeInPageMini`ウィジェットを作成します。
+<u>または</u>、background colorとhorizontal marginを変更する機能を備えた`VirtusizeInPageMini`ウィジェットを作成します。
 
 - **VirtusizeInPageMini**({required VirtusizeClientProduct product, Color backgroundColor = VSColors.vsGray900, double horizontalMargin = 16})
 
@@ -458,7 +456,7 @@ Virtusize SDKには2種類のInPageがあります。
 
 
 
-##### B. 設計ガイドライン
+##### B. デザインガイドライン
 
 - ##### デフォルトのデザイン
 
@@ -492,7 +490,7 @@ Virtusize SDKには2種類のInPageがあります。
 - ##### UIのカスタマイズ
 
     - **できる事**
-        - [**WebAIMコントラストテスト**](https://webaim.org/resources/contrastchecker/)をパスした色に限り、CTAボタンの背景色を変更できます。
+        - [**WebAIMコントラストテスト**](https://webaim.org/resources/contrastchecker/)を合格した色に限り、CTAボタンの背景色を変更できます。
     - **できない事**
         - フォントの変更。
         - CTAボタンの形変更。
@@ -506,11 +504,11 @@ Virtusize SDKには2種類のInPageがあります。
 
 #### 1. はじめに
 
-Virtusizeに注文を送信する前に、**ユーザーID**が設定されていることを確認してください。ユーザーIDを設定できます。
+Virtusizeに注文を送信する前に、**ユーザーID**が設定されていることを確認してください。以下にてユーザーIDを設定できます：
 
 `VirtusizeSDK.instance.setVirtusizeParams`を使用してVirtusizeパラメーターを設定している間
 
-または
+<u>または</u>
 
 `VirtusizeSDK.instance.sendOrder`関数を呼び出す前の任意の場所
 
