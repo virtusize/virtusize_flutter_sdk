@@ -25,7 +25,7 @@ A Flutter [plugin](https://flutter.dev/developing-packages/) that wraps Virtusiz
 - [Virtusizeウィジェット実装](#virtusizeウィジェット実装)
     - [バーチャサイズ・ボタン（Virtusize Button）](#1-バーチャサイズボタンvirtusize-button)
     - [バーチャサイズ・インページ（Virtuzie InPage）](#2-バーチャサイズインページvirtuzie-inpage)
-        - [インページ・スタンダード（InPage Standard）](#2-インページスタンダードinage-standard)
+        - [インページ・スタンダード（InPage Standard）](#2-インページスタンダードinpage-standard)
         - [インページ・ミニ（InPage Mini）](#3-インページミニinpage-mini)
 
 - [Order API](#order-api)
