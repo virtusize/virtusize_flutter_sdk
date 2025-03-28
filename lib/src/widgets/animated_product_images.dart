@@ -3,17 +3,23 @@ import 'package:flutter/material.dart';
 import 'product_image_view.dart';
 
 class AnimatedProductImages extends StatefulWidget {
-  final ProductImageView userProductImageView;
-  final ProductImageView storeProductImageView;
+  final ProductImageView? userProductImageView;
+  final ProductImageView? storeProductImageView;
 
-  const AnimatedProductImages({this.userProductImageView, this.storeProductImageView});
+  const AnimatedProductImages({
+    super.key,
+    this.userProductImageView,
+    this.storeProductImageView,
+  });
 
   @override
-  _AnimatedProductImagesState createState() => new _AnimatedProductImagesState();
+  // ignore: library_private_types_in_public_api
+  _AnimatedProductImagesState createState() => _AnimatedProductImagesState();
 }
 
-class _AnimatedProductImagesState extends State<AnimatedProductImages> with TickerProviderStateMixin {
-  AnimationController _controller;
+class _AnimatedProductImagesState extends State<AnimatedProductImages>
+    with TickerProviderStateMixin {
+  late final AnimationController _controller;
   bool _storeProductImageVisible = true;
 
   @override
@@ -45,11 +51,10 @@ class _AnimatedProductImagesState extends State<AnimatedProductImages> with Tick
           child: widget.userProductImageView,
         ),
         AnimatedOpacity(
-            opacity: _storeProductImageVisible ? 1.0 : 0.0,
-            duration: Duration(milliseconds: 750),
-            child:  widget.storeProductImageView
-        )
-
+          opacity: _storeProductImageVisible ? 1.0 : 0.0,
+          duration: Duration(milliseconds: 750),
+          child: widget.storeProductImageView,
+        ),
       ],
     );
   }

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import '../../src/models/virtusize_enums.dart';
+import 'package:virtusize_flutter_sdk/src/models/virtusize_enums.dart';
 
 /// All the available font sizes based on the Virtusize design system
 enum VSFontSize { xsmall, small, normal, large, xlarge, xxlarge }
@@ -11,19 +10,23 @@ class VSFont {
   VSFont(this.language);
 
   /// Gets the [TextStyle]
-  TextStyle getTextStyle(
-      {@required VSFontSize fontSize, FontWeight fontWeight, Color color}) {
+  TextStyle getTextStyle({
+    required VSFontSize fontSize,
+    FontWeight? fontWeight,
+    Color? color,
+  }) {
     return TextStyle(
-        fontSize: _getFontSize(language, fontSize),
-        fontFamily: _getFontFamily(language),
-        fontWeight: fontWeight,
-        color: color);
+      fontSize: _getFontSize(language, fontSize),
+      fontFamily: _getFontFamily(language),
+      fontWeight: fontWeight,
+      color: color,
+    );
   }
 
   /// Gets the font family based on the [VSLanguage] value
-  String _getFontFamily(VSLanguage language) {
-    String fontFamilyName;
-    switch(language) {
+  String? _getFontFamily(VSLanguage language) {
+    String? fontFamilyName;
+    switch (language) {
       case VSLanguage.en:
         // Use the default font in Flutter
         // Android: Roboto
@@ -48,7 +51,7 @@ class VSFont {
         VSFontSize.normal: 16.0,
         VSFontSize.large: 18.0,
         VSFontSize.xlarge: 22.0,
-        VSFontSize.xxlarge: 28.0
+        VSFontSize.xxlarge: 28.0,
       },
       [VSLanguage.jp, VSLanguage.kr]: {
         VSFontSize.xsmall: 10.0,
@@ -56,12 +59,13 @@ class VSFont {
         VSFontSize.normal: 14.0,
         VSFontSize.large: 16.0,
         VSFontSize.xlarge: 20.0,
-        VSFontSize.xxlarge: 24.0
-      }
+        VSFontSize.xxlarge: 24.0,
+      },
     };
-    Map<VSFontSize, double> fontSizeMap = langFontSizeMap.entries
-        .firstWhere((entry) => entry.key.contains(language))
-        .value;
+    Map<VSFontSize, double> fontSizeMap =
+        langFontSizeMap.entries
+            .firstWhere((entry) => entry.key.contains(language))
+            .value;
     return fontSizeMap.entries
         .firstWhere((entry) => entry.key == fontSize)
         .value;
