@@ -206,16 +206,18 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 		
 		self.serverStoreProductSet.insert(storeProduct!)
 
-		flutterChannel?.invokeMethod(
-			VirtusizeFlutterMethod.onProduct,
-			arguments: [
-				VirtusizeFlutterKey.externalProductId: storeProduct!.externalId,
-				VirtusizeFlutterKey.imageType: "store",
-				VirtusizeFlutterKey.imageURL: storeProduct!.cloudinaryImageUrlString,
-				VirtusizeFlutterKey.productType: storeProduct!.productType,
-				VirtusizeFlutterKey.productStyle: storeProduct!.productStyle
-			]
-		)
+		DispatchQueue.main.async {
+			self.flutterChannel?.invokeMethod(
+				VirtusizeFlutterMethod.onProduct,
+				arguments: [
+					VirtusizeFlutterKey.externalProductId: storeProduct!.externalId,
+					VirtusizeFlutterKey.imageType: "store",
+					VirtusizeFlutterKey.imageURL: storeProduct!.cloudinaryImageUrlString,
+					VirtusizeFlutterKey.productType: storeProduct!.productType,
+					VirtusizeFlutterKey.productStyle: storeProduct!.productStyle
+				]
+			)
+		}
 
 		productTypes = repository.getProductTypes()
 		if productTypes == nil {
@@ -238,14 +240,16 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 			if let result = result {
 				result(FlutterError.nullAPIResult("userSessionResponse"))
 			} else {
-				flutterChannel?.invokeMethod(
-					VirtusizeFlutterMethod.onRecChange,
-					arguments: [
-						VirtusizeFlutterKey.externalProductId: lastProductOnVirtusizeWebView!.externalId,
-						VirtusizeFlutterKey.recText: nil,
-						VirtusizeFlutterKey.showUserProductImage: false
-					]
-				)
+				DispatchQueue.main.async {
+					self.flutterChannel?.invokeMethod(
+						VirtusizeFlutterMethod.onRecChange,
+						arguments: [
+							VirtusizeFlutterKey.externalProductId: self.lastProductOnVirtusizeWebView!.externalId,
+							VirtusizeFlutterKey.recText: nil,
+							VirtusizeFlutterKey.showUserProductImage: false
+						]
+					)
+				}
 			}
 			workItem?.cancel()
 			return
@@ -277,14 +281,16 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 				if let result = result {
 					result(FlutterError.nullAPIResult("userProducts"))
 				} else {
-					flutterChannel?.invokeMethod(
-						VirtusizeFlutterMethod.onRecChange,
-						arguments: [
-							VirtusizeFlutterKey.externalProductId: storeProduct!.externalId,
-							VirtusizeFlutterKey.recText: nil,
-							VirtusizeFlutterKey.showUserProductImage: false
-						]
-					)
+					DispatchQueue.main.async {
+						self.flutterChannel?.invokeMethod(
+							VirtusizeFlutterMethod.onRecChange,
+							arguments: [
+								VirtusizeFlutterKey.externalProductId: storeProduct!.externalId,
+								VirtusizeFlutterKey.recText: nil,
+								VirtusizeFlutterKey.showUserProductImage: false
+							]
+						)
+					}
 				}
 				workItem?.cancel()
 				return
@@ -320,17 +326,19 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 			storeProduct: storeProduct!,
 			productTypes: productTypes!
 		)
-
-		flutterChannel?.invokeMethod(
-			VirtusizeFlutterMethod.onProduct,
-			arguments:  [
-				VirtusizeFlutterKey.externalProductId: storeProduct!.externalId,
-				VirtusizeFlutterKey.imageType: "user",
-				VirtusizeFlutterKey.imageURL : userProductRecommendedSize?.bestUserProduct?.cloudinaryImageUrlString,
-				VirtusizeFlutterKey.productType: userProductRecommendedSize?.bestUserProduct?.productType,
-				VirtusizeFlutterKey.productStyle: userProductRecommendedSize?.bestUserProduct?.productStyle
-			]
-		)
+		
+		DispatchQueue.main.async {
+			self.flutterChannel?.invokeMethod(
+				VirtusizeFlutterMethod.onProduct,
+				arguments:  [
+					VirtusizeFlutterKey.externalProductId: storeProduct!.externalId,
+					VirtusizeFlutterKey.imageType: "user",
+					VirtusizeFlutterKey.imageURL : userProductRecommendedSize?.bestUserProduct?.cloudinaryImageUrlString,
+					VirtusizeFlutterKey.productType: userProductRecommendedSize?.bestUserProduct?.productType,
+					VirtusizeFlutterKey.productStyle: userProductRecommendedSize?.bestUserProduct?.productStyle
+				]
+			)
+		}
 		
 		let recText = repository.getRecommendationText(
 			selectedRecType: selectedRecommendedType,
@@ -349,10 +357,12 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 		if let result = result {
 			result(arguments)
 		} else {
-			flutterChannel?.invokeMethod(
-				VirtusizeFlutterMethod.onRecChange,
-				arguments: arguments
-			)
+			DispatchQueue.main.async {
+				self.flutterChannel?.invokeMethod(
+					VirtusizeFlutterMethod.onRecChange,
+					arguments: arguments
+				)
+			}
 		}
 	}
 	
@@ -368,7 +378,9 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 extension SwiftVirtusizeFlutterPlugin: VirtusizeMessageHandler {
 	public func virtusizeController(_ controller: VirtusizeWebViewController?, didReceiveError error: VirtusizeError) {
 		currentWorkItem = DispatchWorkItem { [weak self] in
-			self?.flutterChannel?.invokeMethod(VirtusizeFlutterMethod.onVSError, arguments: error.debugDescription)
+			DispatchQueue.main.async {
+				self?.self.flutterChannel?.invokeMethod(VirtusizeFlutterMethod.onVSError, arguments: error.debugDescription)
+			}
 		}
 		DispatchQueue.global().async(execute: currentWorkItem!)
 	}
@@ -378,7 +390,9 @@ extension SwiftVirtusizeFlutterPlugin: VirtusizeMessageHandler {
 		let eventsWorkItem = DispatchWorkItem { [weak self] in
 			if let eventData = eventData,
 			   let eventName = eventData[VirtusizeEventKey.shortEventName] ?? eventData[VirtusizeEventKey.eventName] {
-				self?.flutterChannel?.invokeMethod(VirtusizeFlutterMethod.onVSEvent, arguments: eventName)
+				DispatchQueue.main.async {
+					self?.self.flutterChannel?.invokeMethod(VirtusizeFlutterMethod.onVSEvent, arguments: eventName)
+				}
 			}
 		}
 		
