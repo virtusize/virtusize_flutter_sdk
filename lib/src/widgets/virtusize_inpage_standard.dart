@@ -48,6 +48,7 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
   late final StreamSubscription<ProductDataCheck> _pdcSubscription;
   late final StreamSubscription<Recommendation> _recSubscription;
   late final StreamSubscription<VirtusizeServerProduct> _productSubscription;
+  late final StreamSubscription<String> _errorSubscription;
 
   VSText _vsText = IVirtusizeSDK.instance.vsText;
   ProductDataCheck? _productDataCheck;
@@ -140,6 +141,18 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
         _isLoading = false;
       });
     });
+
+    _errorSubscription = IVirtusizeSDK.instance.productErrorStream.listen((
+      externalProductId,
+    ) {
+      if (_productDataCheck?.externalProductId != externalProductId) {
+        return;
+      }
+      setState(() {
+        _isLoading = false;
+        _hasError = true;
+      });
+    });
   }
 
   bool compareProduct({
@@ -167,6 +180,7 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
     _pdcSubscription.cancel();
     _productSubscription.cancel();
     _recSubscription.cancel();
+    _errorSubscription.cancel();
     super.dispose();
   }
 
