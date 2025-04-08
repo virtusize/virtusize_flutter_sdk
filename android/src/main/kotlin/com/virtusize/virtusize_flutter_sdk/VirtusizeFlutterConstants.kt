@@ -2,17 +2,18 @@ internal object VirtusizeFlutterMethod {
     // Flutter to Android
     const val SET_VIRTUSIZE_PARAMS = "setVirtusizeParams"
     const val SET_USER_ID = "setUserId"
-    const val GET_PRODUCT_DATA_CHECK = "getProductDataCheck"
     const val OPEN_VIRTUSIZE_WEB_VIEW = "openVirtusizeWebView"
-    const val GET_RECOMMENDATION_TEXT = "getRecommendationText"
     const val GET_PRIVACY_POLICY_LINK = "getPrivacyPolicyLink"
     const val SEND_ORDER = "sendOrder"
+    const val LOAD_VIRTUSIZE = "loadVirtusize"
 
     // Android to Flutter
     const val ON_VS_EVENT = "onVSEvent"
     const val ON_VS_ERROR = "onVSError"
     const val ON_PRODUCT = "onProduct"
+    const val ON_PRODUCT_DATA_CHECK = "onProductDataCheck"
     const val ON_REC_CHANGE = "onRecChange"
+    const val ON_PRODUCT_ERROR = "onProductError"
 }
 
 internal object VirtusizeFlutterKey {
@@ -23,6 +24,8 @@ internal object VirtusizeFlutterKey {
     const val SHOW_SGI = "showSGI"
     const val ALLOW_LANGUAGES = "allowedLanguages"
     const val DETAILS_PANEL_CARDS = "detailsPanelCards"
+    const val SHOW_SNS_BUTTONS = "showSNSButtons"
+    const val BRANCH = "branch"
     const val EXTERNAL_PRODUCT_ID = "externalProductId"
     const val IMAGE_URL = "imageURL"
     const val STORE_PRODUCT_ID = "storeProductId"
@@ -33,6 +36,7 @@ internal object VirtusizeFlutterKey {
     const val PRODUCT_STYLE = "productStyle"
     const val REC_TEXT = "recText"
     const val SHOW_USER_PRODUCT_IMAGE = "showUserProductImage"
+    const val IS_VALID_PRODUCT = "isValidProduct"
 }
 
 internal object VirtusizeEventKey {
