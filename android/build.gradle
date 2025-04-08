@@ -57,5 +57,9 @@ android {
         implementation("androidx.appcompat:appcompat:$appcompat_version")
         implementation("androidx.cardview:cardview:$cardview_version")
         implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version")
+        implementation("androidx.databinding:viewbinding:7.1.2")
+
+        // https://mvnrepository.com/artifact/io.flutter/flutter_embedding_debug
+        implementation("io.flutter:flutter_embedding_debug:1.0.0-dbec018f4d83ae4b7b97eb8c5a066c61832e12df")
     }
 }
