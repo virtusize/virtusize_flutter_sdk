@@ -28,7 +28,7 @@ struct VirtusizeFlutterKey {
 	static let branch = "branch"
 	static let externalProductId = "externalProductId"
 	static let imageURL = "imageURL"
-    static let cloudinaryImageURL = "cloudinaryImageURL"
+	static let cloudinaryImageURL = "cloudinaryImageURL"
 	static let storeProductId = "storeProductId"
 	static let virtusizeParams = "virtusizeParams"
 	static let displayLanguage = "displayLanguage"
