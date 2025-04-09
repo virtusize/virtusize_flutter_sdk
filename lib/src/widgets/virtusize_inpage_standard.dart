@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:virtusize_flutter_sdk/src/utils/virtusize_product_image_loader.dart';
 
 import '../main.dart';
 import '../models/recommendation.dart';
@@ -93,35 +94,15 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
               ))) {
         return;
       }
-      String imageUrl = product.imageURL ?? '';
-      Image networkImage = Image.network(imageUrl);
-      final ImageStream stream = networkImage.image.resolve(
-        ImageConfiguration.empty,
-      );
-      stream.addListener(
-        ImageStreamListener(
-          (ImageInfo image, bool synchronousCall) {
-            setState(() {
-              if (product.imageType == ProductImageType.store) {
-                product.networkProductImage = networkImage;
-                _storeProduct = product;
-              } else if (product.imageType == ProductImageType.user) {
-                product.networkProductImage = networkImage;
-                _userProduct = product;
-              }
-            });
-          },
-          onError: (Object exception, StackTrace? stackTrace) {
-            setState(() {
-              if (product.imageType == ProductImageType.store) {
-                _storeProduct = product;
-              } else if (product.imageType == ProductImageType.user) {
-                _userProduct = product;
-              }
-            });
-          },
-        ),
-      );
+
+      downloadProductImage(product).then((_) {
+        if (!mounted) return;
+        setState(() {
+          product.imageType == ProductImageType.store
+              ? _storeProduct = product
+              : _userProduct = product;
+        });
+      });
     });
 
     _recSubscription = IVirtusizeSDK.instance.recStream.listen((

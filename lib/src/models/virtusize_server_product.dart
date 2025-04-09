@@ -32,6 +32,9 @@ class VirtusizeServerProduct extends VirtusizeModel {
   /// The product image URL
   String? get imageURL => decodedData[FlutterVirtusizeKey.imageURL];
 
+  String? get croudinaryImageURL =>
+      decodedData[FlutterVirtusizeKey.cloudinaryImageURL];
+
   /// The product type
   int get productType => decodedData[FlutterVirtusizeKey.productType];
 

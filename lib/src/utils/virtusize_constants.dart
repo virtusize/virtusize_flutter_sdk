@@ -28,6 +28,7 @@ class FlutterVirtusizeKey {
   static const String branch = "branch";
   static const String externalProductId = "externalProductId";
   static const String imageURL = "imageURL";
+  static const String cloudinaryImageURL = "cloudinaryImageURL";
   static const String productId = "storeProductId";
   static const String virtusizeParams = "virtusizeParams";
   static const String displayLanguage = "displayLanguage";
