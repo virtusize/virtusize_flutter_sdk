@@ -28,6 +28,7 @@ internal object VirtusizeFlutterKey {
     const val BRANCH = "branch"
     const val EXTERNAL_PRODUCT_ID = "externalProductId"
     const val IMAGE_URL = "imageURL"
+    const val CLOUDINARY_IMAGE_URL = "cloudinaryImageURL"
     const val STORE_PRODUCT_ID = "storeProductId"
     const val VIRTUSIZE_PARAMS = "virtusizeParams"
     const val DISPLAY_LANGUAGE = "displayLanguage"

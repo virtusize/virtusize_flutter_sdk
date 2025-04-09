@@ -2,7 +2,6 @@ package com.virtusize.virtusize_flutter_sdk
 
 import android.app.Activity
 import android.content.Context
-import com.virtusize.android.flutter.VirtusizeFlutterUtils
 import com.virtusize.android.data.local.*
 import com.virtusize.android.data.remote.*
 import com.virtusize.android.flutter.VirtusizeFlutter
@@ -51,32 +50,38 @@ class VirtusizeFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
       }
 
       override fun gotSizeRecommendations(
+        externalProductId: String,
+        storeProduct: Product?,
         bestUserProduct: Product?,
         recommendationText: String?,
       ) {
-        val imageURL = bestUserProduct?.clientProductImageURL ?: bestUserProduct?.getCloudinaryProductImageURL()
+        sendOnProductResult(storeProduct, "store")
+        sendOnProductResult(bestUserProduct, "user")
 
         channel.invokeMethod(
           VirtusizeFlutterMethod.ON_REC_CHANGE,
           mutableMapOf(
-            VirtusizeFlutterKey.EXTERNAL_PRODUCT_ID to bestUserProduct?.externalId,
+            VirtusizeFlutterKey.EXTERNAL_PRODUCT_ID to externalProductId,
             VirtusizeFlutterKey.REC_TEXT to recommendationText,
-            VirtusizeFlutterKey.SHOW_USER_PRODUCT_IMAGE to (imageURL != null)
-          )
-        )
-
-        channel.invokeMethod(
-          VirtusizeFlutterMethod.ON_PRODUCT,
-          mutableMapOf(
-            VirtusizeFlutterKey.EXTERNAL_PRODUCT_ID to bestUserProduct?.externalId,
-            VirtusizeFlutterKey.IMAGE_TYPE to "store",
-            VirtusizeFlutterKey.IMAGE_URL to imageURL,
-            VirtusizeFlutterKey.PRODUCT_TYPE to bestUserProduct?.productType,
-            VirtusizeFlutterKey.PRODUCT_STYLE to bestUserProduct?.storeProductMeta?.additionalInfo?.style
+            VirtusizeFlutterKey.SHOW_USER_PRODUCT_IMAGE to true
           )
         )
       }
     }
+
+  private fun sendOnProductResult(product: Product?, imageType: String) {
+    channel.invokeMethod(
+      VirtusizeFlutterMethod.ON_PRODUCT,
+      mutableMapOf(
+        VirtusizeFlutterKey.EXTERNAL_PRODUCT_ID to product?.externalId,
+        VirtusizeFlutterKey.IMAGE_TYPE to imageType,
+        VirtusizeFlutterKey.IMAGE_URL to product?.clientProductImageURL,
+        VirtusizeFlutterKey.CLOUDINARY_IMAGE_URL to product?.getCloudinaryProductImageURL(),
+        VirtusizeFlutterKey.PRODUCT_TYPE to product?.productType,
+        VirtusizeFlutterKey.PRODUCT_STYLE to product?.storeProductMeta?.additionalInfo?.style
+      )
+    )
+  }
 
   override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
     channel = MethodChannel(
