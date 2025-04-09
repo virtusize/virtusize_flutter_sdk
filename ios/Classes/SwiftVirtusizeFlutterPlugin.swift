@@ -151,26 +151,41 @@ extension SwiftVirtusizeFlutterPlugin: VirtusizeFlutterProductEventHandler {
     }
     
     public func onSizeRecommendationData(
+        externalId: String,
+        clientProductImageURL: String?,
+        storeProduct: VirtusizeServerProduct,
         bestUserProduct: VirtusizeServerProduct?,
         recommendationText: String) {
-            DispatchQueue.main.async {
+            DispatchQueue.main.async { [self] in
                 self.flutterChannel?.invokeMethod(
                     VirtusizeFlutterMethod.onProduct,
                     arguments:  [
-                        VirtusizeFlutterKey.externalProductId: bestUserProduct?.externalId,
+                        VirtusizeFlutterKey.externalProductId: storeProduct.externalId,
                         VirtusizeFlutterKey.imageType: "store",
-                        VirtusizeFlutterKey.imageURL : bestUserProduct?.cloudinaryImageUrlString,
-                        VirtusizeFlutterKey.productType: bestUserProduct?.productType,
-                        VirtusizeFlutterKey.productStyle: bestUserProduct?.productStyle
+                        VirtusizeFlutterKey.imageURL : clientProductImageURL,
+                        VirtusizeFlutterKey.cloudinaryImageURL : storeProduct.cloudinaryImageUrlString,
+                        VirtusizeFlutterKey.productType: storeProduct.productType,
+                        VirtusizeFlutterKey.productStyle: storeProduct.productStyle
                     ]
                 )
                 
                 self.flutterChannel?.invokeMethod(
+                    VirtusizeFlutterMethod.onProduct,
+                    arguments:  [
+                        VirtusizeFlutterKey.externalProductId: bestUserProduct?.externalId,
+                        VirtusizeFlutterKey.imageType: "user",
+                        VirtusizeFlutterKey.cloudinaryImageURL : bestUserProduct?.cloudinaryImageUrlString,
+                        VirtusizeFlutterKey.productType: bestUserProduct?.productType,
+                        VirtusizeFlutterKey.productStyle: bestUserProduct?.productStyle
+                    ]
+                )
+            
+                self.flutterChannel?.invokeMethod(
                     VirtusizeFlutterMethod.onRecChange,
                     arguments: [
-                        VirtusizeFlutterKey.externalProductId: bestUserProduct?.externalId,
+                        VirtusizeFlutterKey.externalProductId: externalId,
                         VirtusizeFlutterKey.recText: recommendationText,
-                        VirtusizeFlutterKey.showUserProductImage: bestUserProduct?.cloudinaryImageUrlString != nil
+                        VirtusizeFlutterKey.showUserProductImage: true
                     ]
                 )
             }
