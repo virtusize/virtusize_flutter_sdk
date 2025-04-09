@@ -5,15 +5,15 @@ struct VirtusizeFlutterMethod {
 	static let openVirtusizeWebView = "openVirtusizeWebView"
 	static let getPrivacyPolicyLink = "getPrivacyPolicyLink"
 	static let sendOrder = "sendOrder"
-    static let loadVirtusize = "loadVirtusize"
+	static let loadVirtusize = "loadVirtusize"
 	
 	/// iOS to Flutter
 	static let onVSEvent = "onVSEvent"
 	static let onVSError = "onVSError"
 	static let onProduct = "onProduct"
-    static let onProductDataCheck = "onProductDataCheck"
+	static let onProductDataCheck = "onProductDataCheck"
 	static let onRecChange = "onRecChange"
-    static let onProductError = "onProductError"
+	static let onProductError = "onProductError"
 }
 
 struct VirtusizeFlutterKey {
@@ -23,11 +23,12 @@ struct VirtusizeFlutterKey {
 	static let language = "language"
 	static let showSGI = "showSGI"
 	static let allowedLanguages = "allowedLanguages"
-    static let detailsPanelCards = "detailsPanelCards"
-    static let showSNSButtons = "showSNSButtons"
-    static let branch = "branch"
+	static let detailsPanelCards = "detailsPanelCards"
+	static let showSNSButtons = "showSNSButtons"
+	static let branch = "branch"
 	static let externalProductId = "externalProductId"
 	static let imageURL = "imageURL"
+    static let cloudinaryImageURL = "cloudinaryImageURL"
 	static let storeProductId = "storeProductId"
 	static let virtusizeParams = "virtusizeParams"
 	static let displayLanguage = "displayLanguage"
@@ -36,7 +37,7 @@ struct VirtusizeFlutterKey {
 	static let productStyle = "productStyle"
 	static let recText = "recText"
 	static let showUserProductImage = "showUserProductImage"
-    static let isValidProduct = "isValidProduct"
+	static let isValidProduct = "isValidProduct"
 }
 
 struct VirtusizeEventKey {
