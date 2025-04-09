@@ -16,8 +16,8 @@ This SDK helps clients to integrate Virtusize’s size and fit service into thei
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'
   s.dependency 'Virtusize', '~> 2.2.5'
-
-  s.platform = :ios, '10.3'
+  
+  s.platform = :ios, '12.0'
   s.swift_version = '5.0'
 
   # Flutter.framework does not contain a i386 slice.

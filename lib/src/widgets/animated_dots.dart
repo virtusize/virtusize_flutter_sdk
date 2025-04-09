@@ -10,9 +10,10 @@ class AnimatedDots extends StatefulWidget {
   _AnimatedDotsState createState() => new _AnimatedDotsState();
 }
 
-class _AnimatedDotsState extends State<AnimatedDots> with TickerProviderStateMixin {
+class _AnimatedDotsState extends State<AnimatedDots>
+    with TickerProviderStateMixin {
   final _characters = <Animation, String>{};
-  AnimationController _controller;
+  late final AnimationController _controller;
 
   @override
   void initState() {
@@ -25,11 +26,8 @@ class _AnimatedDotsState extends State<AnimatedDots> with TickerProviderStateMix
 
     var start = 0.0;
     final duration = 1.0 / widget.dotNumbers;
-    for(int i = 0; i < widget.dotNumbers; i++) {
-      final animation = Tween(
-        begin: 0.0,
-        end: 1.0,
-      ).animate(
+    for (int i = 0; i < widget.dotNumbers; i++) {
+      final animation = Tween(begin: 0.0, end: 1.0).animate(
         CurvedAnimation(
           curve: Interval(start, start + duration, curve: Curves.easeInOut),
           parent: _controller,
@@ -53,13 +51,21 @@ class _AnimatedDotsState extends State<AnimatedDots> with TickerProviderStateMix
   Widget build(BuildContext context) {
     return Row(
       mainAxisSize: MainAxisSize.min,
-      children: _characters
-          .entries.map((entry) => FadeTransition(
-          opacity: entry.key as Animation<double>,
-          child: Text(entry.value,
-              style: TextStyle(
-                  fontWeight: FontWeight.bold, color: VSColors.vsGray900)),
-        )).toList()
+      children:
+          _characters.entries
+              .map(
+                (entry) => FadeTransition(
+                  opacity: entry.key as Animation<double>,
+                  child: Text(
+                    entry.value,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: VSColors.vsGray900,
+                    ),
+                  ),
+                ),
+              )
+              .toList(),
     );
   }
 

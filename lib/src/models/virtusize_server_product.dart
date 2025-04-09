@@ -7,16 +7,16 @@ import 'virtusize_model.dart';
 enum ProductImageType { store, user }
 
 class VirtusizeServerProduct extends VirtusizeModel {
-  VirtusizeServerProduct(data) : super(data);
+  VirtusizeServerProduct(super.data);
 
   /// The image loaded from the [imageURL]
-  Image networkProductImage;
+  Image? networkProductImage;
 
   /// The product image type as a String
   String get _imageType => decodedData[FlutterVirtusizeKey.imageType];
 
   /// The product image type as a [ProductImageType]
-  ProductImageType get imageType {
+  ProductImageType? get imageType {
     if (_imageType == "store") {
       return ProductImageType.store;
     } else if (_imageType == "user") {
@@ -26,16 +26,17 @@ class VirtusizeServerProduct extends VirtusizeModel {
   }
 
   /// A string to represent a external product ID from a client's system
-  String get externalProductId => decodedData[FlutterVirtusizeKey.externalProductId] ?? "";
+  String get externalProductId =>
+      decodedData[FlutterVirtusizeKey.externalProductId] ?? '';
 
   /// The product image URL
-  String get imageURL  => decodedData[FlutterVirtusizeKey.imageURL];
+  String? get imageURL => decodedData[FlutterVirtusizeKey.imageURL];
 
   /// The product type
   int get productType => decodedData[FlutterVirtusizeKey.productType];
 
   /// The product style
-  String get productStyle => decodedData[FlutterVirtusizeKey.productStyle];
+  String? get productStyle => decodedData[FlutterVirtusizeKey.productStyle];
 
   @override
   String toString() {

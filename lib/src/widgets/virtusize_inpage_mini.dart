@@ -1,51 +1,60 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-
-import '../main.dart';
-import '../models/recommendation.dart';
-import '../models/product_data_check.dart';
-import '../res/vs_colors.dart';
-import '../res/vs_font.dart';
-import '../res/vs_images.dart';
-import '../res/vs_text.dart';
-import '../../virtusize_flutter_sdk.dart';
-import 'cta_button.dart';
-import 'animated_dots.dart';
+import 'package:virtusize_flutter_sdk/src/main.dart';
+import 'package:virtusize_flutter_sdk/src/models/recommendation.dart';
+import 'package:virtusize_flutter_sdk/src/models/product_data_check.dart';
+import 'package:virtusize_flutter_sdk/src/res/vs_colors.dart';
+import 'package:virtusize_flutter_sdk/src/res/vs_font.dart';
+import 'package:virtusize_flutter_sdk/src/res/vs_images.dart';
+import 'package:virtusize_flutter_sdk/src/res/vs_text.dart';
+import 'package:virtusize_flutter_sdk/virtusize_flutter_sdk.dart';
+import 'package:virtusize_flutter_sdk/src/widgets/cta_button.dart';
+import 'package:virtusize_flutter_sdk/src/widgets/animated_dots.dart';
 
 class VirtusizeInPageMini extends StatefulWidget {
   final VirtusizeClientProduct product;
-  VirtusizeStyle style = VirtusizeStyle.None;
-  Color backgroundColor;
+  final VirtusizeStyle style;
+  final Color backgroundColor;
   final double horizontalMargin;
 
-  VirtusizeInPageMini(
-      {@required this.product, this.backgroundColor = VSColors.vsGray900, this.horizontalMargin = 16});
+  const VirtusizeInPageMini({
+    super.key,
+    required this.product,
+    this.backgroundColor = VSColors.vsGray900,
+    this.horizontalMargin = 16,
+  }) : style = VirtusizeStyle.None;
 
-  VirtusizeInPageMini.vsStyle(
-      {@required this.product, this.style = VirtusizeStyle.Black, this.horizontalMargin = 16});
+  const VirtusizeInPageMini.vsStyle({
+    super.key,
+    required this.product,
+    this.style = VirtusizeStyle.Black,
+    this.horizontalMargin = 16,
+  }) : backgroundColor = VSColors.vsGray900;
 
   @override
+  // ignore: library_private_types_in_public_api
   _VirtusizeInPageMiniState createState() => _VirtusizeInPageMiniState();
 }
 
 class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
-  StreamSubscription<VSText> _vsTextSubscription;
-  StreamSubscription<ProductDataCheck> _pdcSubscription;
-  StreamSubscription<Recommendation> _recSubscription;
+  late final StreamSubscription<VSText> _vsTextSubscription;
+  late final StreamSubscription<ProductDataCheck> _pdcSubscription;
+  late final StreamSubscription<Recommendation> _recSubscription;
 
   VSText _vsText = IVirtusizeSDK.instance.vsText;
-  ProductDataCheck _productDataCheck;
-  bool _isLoading;
-  bool _hasError;
-  String _recText;
+  ProductDataCheck? _productDataCheck;
+  bool _isLoading = true;
+  bool _hasError = false;
+  late String _recText;
 
   @override
   void initState() {
     super.initState();
 
-    _vsTextSubscription =
-        IVirtusizeSDK.instance.vsTextStream.listen((vsLocalization) {
+    _vsTextSubscription = IVirtusizeSDK.instance.vsTextStream.listen((
+      vsLocalization,
+    ) {
       _vsText = vsLocalization;
       _recText = _vsText.localization.vsLoadingText;
     });
@@ -61,9 +70,10 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
       });
     });
 
-    _recSubscription =
-        IVirtusizeSDK.instance.recStream.listen((recommendation) {
-      if (_productDataCheck.externalProductId !=
+    _recSubscription = IVirtusizeSDK.instance.recStream.listen((
+      recommendation,
+    ) {
+      if (_productDataCheck?.externalProductId !=
           recommendation.externalProductID) {
         return;
       }
@@ -88,10 +98,10 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
 
   @override
   Widget build(BuildContext context) {
-    if (_productDataCheck != null && _productDataCheck.isValidProduct) {
+    if (_productDataCheck?.isValidProduct == true) {
       return GestureDetector(
-        child: _buildVSInPageMini(),
         onTap: !_hasError ? _openVirtusizeWebview : () => {},
+        child: _buildVSInPageMini(),
       );
     }
     return Container();
@@ -102,90 +112,112 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
   }
 
   Widget _buildVSInPageMini() {
-    Color color;
-    switch (widget.style) {
-      case VirtusizeStyle.Black:
-        color = VSColors.vsGray900;
-        break;
-      case VirtusizeStyle.None:
-        color = widget.backgroundColor;
-        break;
-      case VirtusizeStyle.Teal:
-        color = VSColors.vsTeal;
-        break;
-    }
+    Color color =
+        widget.style == VirtusizeStyle.Teal
+            ? VSColors.vsTeal
+            : widget.backgroundColor;
+
     return Container(
-        margin: EdgeInsets.symmetric(horizontal: widget.horizontalMargin),
-        color: _isLoading || _hasError ? Colors.white : color,
-        width: double.infinity,
-        child: _hasError
-            ? _buildVSInPageMiniOnError()
-            : _isLoading
-                ? _buildVSInPageMiniOnLoading()
-                : _buildVSInPageMiniOnFinishedLoading(themeColor: color));
+      margin: EdgeInsets.symmetric(horizontal: widget.horizontalMargin),
+      color: _isLoading || _hasError ? Colors.white : color,
+      width: double.infinity,
+      child:
+          _hasError
+              ? _buildVSInPageMiniOnError()
+              : _isLoading
+              ? _buildVSInPageMiniOnLoading()
+              : _buildVSInPageMiniOnFinishedLoading(color),
+    );
   }
 
   Widget _buildVSInPageMiniOnLoading() {
-    return Row(children: [
-      Container(
+    return Row(
+      children: [
+        Container(
           margin: EdgeInsets.only(left: 6),
-          child: Container(
+          child: SizedBox(
             width: 16,
             child: Image(
-                image: VSImages.vsIcon.image,
-                fit: BoxFit.cover,
-                color: VSColors.vsGray900),
-          )),
-      Container(
-        margin: EdgeInsets.only(top: 6, bottom: 6, left: 5),
-        child: Text(_vsText.localization.vsLoadingText,
+              image: VSImages.vsIcon.image,
+              fit: BoxFit.cover,
+              color: VSColors.vsGray900,
+            ),
+          ),
+        ),
+        Container(
+          margin: EdgeInsets.only(top: 6, bottom: 6, left: 5),
+          child: Text(
+            _vsText.localization.vsLoadingText,
             style: _vsText.vsFont.getTextStyle(
-                fontSize: VSFontSize.small,
-                fontWeight: FontWeight.bold,
-                color: _isLoading ? VSColors.vsGray900 : Colors.white)),
-      ),
-      Container(width: 1.0),
-      AnimatedDots()
-    ]);
+              fontSize: VSFontSize.small,
+              fontWeight: FontWeight.bold,
+              color: _isLoading ? VSColors.vsGray900 : Colors.white,
+            ),
+          ),
+        ),
+        Container(width: 1.0),
+        AnimatedDots(),
+      ],
+    );
   }
 
-  Widget _buildVSInPageMiniOnFinishedLoading({Color themeColor}) {
-    return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-      Flexible(
+  Widget _buildVSInPageMiniOnFinishedLoading(Color themeColor) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Flexible(
           child: Container(
-        margin: EdgeInsets.only(top: 6, bottom: 6, left: 8),
-        child: Text(_recText,
-            style: _vsText.vsFont
-                .getTextStyle(fontSize: VSFontSize.small, color: Colors.white)),
-      )),
-      Container(
+            margin: EdgeInsets.only(top: 6, bottom: 6, left: 8),
+            child: Text(
+              _recText,
+              style: _vsText.vsFont.getTextStyle(
+                fontSize: VSFontSize.small,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ),
+        Container(
           margin: EdgeInsets.only(top: 5, bottom: 5, left: 4, right: 8),
           child: CTAButton(
-              text: _vsText.localization.vsButtonText,
-              textStyle: _vsText.vsFont.getTextStyle(
-                  fontSize: VSFontSize.xsmall, fontWeight: FontWeight.bold),
-              textColor: themeColor,
-              onPressed: _openVirtusizeWebview))
-    ]);
+            text: _vsText.localization.vsButtonText,
+            textStyle: _vsText.vsFont.getTextStyle(
+              fontSize: VSFontSize.xsmall,
+              fontWeight: FontWeight.bold,
+            ),
+            textColor: themeColor,
+            onPressed: _openVirtusizeWebview,
+          ),
+        ),
+      ],
+    );
   }
 
   Widget _buildVSInPageMiniOnError() {
-    return Row(children: [
-      Container(
+    return Row(
+      children: [
+        Container(
           margin: EdgeInsets.only(left: 6),
-          child: Container(
+          child: SizedBox(
             width: 20,
             child: Image(
-                image: VSImages.errorHanger.image,
-                fit: BoxFit.cover,
-                color: VSColors.vsGray700),
-          )),
-      Container(
-        margin: EdgeInsets.only(top: 6, bottom: 6, left: 5),
-        child: Text(_vsText.localization.vsShortErrorText,
+              image: VSImages.errorHanger.image,
+              fit: BoxFit.cover,
+              color: VSColors.vsGray700,
+            ),
+          ),
+        ),
+        Container(
+          margin: EdgeInsets.only(top: 6, bottom: 6, left: 5),
+          child: Text(
+            _vsText.localization.vsShortErrorText,
             style: _vsText.vsFont.getTextStyle(
-                fontSize: VSFontSize.small, color: VSColors.vsGray700)),
-      )
-    ]);
+              fontSize: VSFontSize.small,
+              color: VSColors.vsGray700,
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }
