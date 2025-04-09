@@ -164,72 +164,7 @@ class VirtusizeSDK {
         FlutterVirtusizeKey.imageURL: clientProduct.imageURL,
       },
     );
-
-    // final productDataCheck = await _getProductDataCheck(
-    //   clientProduct.externalProductId,
-    //   clientProduct.imageURL,
-    // );
-    // if (productDataCheck != null) {
-    //   IVirtusizeSDK.instance._pdcController.add(productDataCheck);
-    //   if (productDataCheck.isValidProduct) {
-    //     _getRecommendationText(productDataCheck: productDataCheck);
-    //   }
-    // }
   }
-
-  /// A private function to get the [ProductDataCheck] result from Native
-  // Future<ProductDataCheck?> _getProductDataCheck(
-  //   String externalId,
-  //   String imageURL,
-  // ) async {
-  //   try {
-  //     ProductDataCheck productDataCheck = await IVirtusizeSDK.instance._channel
-  //         .invokeMethod(FlutterVirtusizeMethod.getProductDataCheck, {
-  //           FlutterVirtusizeKey.externalProductId: externalId,
-  //           FlutterVirtusizeKey.imageURL: imageURL,
-  //         })
-  //         .then((value) => ProductDataCheck(externalId, value));
-
-  //     if (_virtusizeMessageListener.productDataCheckSuccess != null) {
-  //       _virtusizeMessageListener.productDataCheckSuccess?.call(
-  //         productDataCheck,
-  //       );
-  //     }
-
-  //     return productDataCheck;
-  //   } on PlatformException catch (error) {
-  //     print('Failed to get product data check: $error');
-  //     if (_virtusizeMessageListener.productDataCheckError != null) {
-  //       _virtusizeMessageListener.productDataCheckError?.call(error);
-  //     }
-  //     return null;
-  //   }
-  // }
-
-  /// A private function to get the recommendation text from Native
-  // Future<void> _getRecommendationText({
-  //   required ProductDataCheck productDataCheck,
-  // }) async {
-  //   try {
-  //     IVirtusizeSDK.instance._recController.add(
-  //       Recommendation(
-  //         json.encode(
-  //           await IVirtusizeSDK.instance._channel.invokeMethod(
-  //             FlutterVirtusizeMethod.getRecommendationText,
-  //             productDataCheck.productId,
-  //           ),
-  //         ),
-  //       ),
-  //     );
-  //   } on PlatformException catch (error) {
-  //     print('Failed to get the recommendation text: $error');
-  //     IVirtusizeSDK.instance._recController.add(
-  //       Recommendation(
-  //         "{\"${FlutterVirtusizeKey.externalProductId}\": \"${productDataCheck.externalProductId}\"}",
-  //       ),
-  //     );
-  //   }
-  // }
 
   /// A function for clients to set the user ID
   Future<void> setUserId(String userId) async {
