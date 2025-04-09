@@ -37,14 +37,14 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
                 }
                 
                 if let envStr = arguments[VirtusizeFlutterKey.environment] as? String,
-                   let env = VirtusizeEnvironment.allCases.first(where: { "\($0.self)" == envStr.lowercased() }) {
+                   let env = VirtusizeEnvironment.allCases.first(where: {environment in "\(environment.self)".lowercased() == envStr.lowercased() }) {
                     VirtusizeFlutter.environment = env
                 }
                 
                 var virtusizeBuilder = VirtusizeParamsBuilder()
                 
                 if let langStr = arguments[VirtusizeFlutterKey.language] as? String,
-                   let lang = VirtusizeLanguage.allCases.first(where: { $0.langStr == langStr })
+                   let lang = VirtusizeLanguage.allCases.first(where: { language in language.langStr == langStr })
                 {
                     virtusizeBuilder = virtusizeBuilder.setLanguage(lang)
                 }
