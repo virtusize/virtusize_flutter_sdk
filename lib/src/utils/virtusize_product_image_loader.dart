@@ -5,7 +5,7 @@ import 'package:virtusize_flutter_sdk/src/models/virtusize_server_product.dart';
 
 Future<void> downloadProductImage(VirtusizeServerProduct product) async {
   var image = await _downloadImage(product.imageURL ?? '');
-  image ??= await _downloadImage(product.croudinaryImageURL ?? '');
+  image ??= await _downloadImage(product.cloudinaryImageURL ?? '');
 
   if (image != null) {
     product.networkProductImage = image;
