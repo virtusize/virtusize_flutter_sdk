@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:virtusize_flutter_sdk/src/models/virtusize_client_product.dart';
@@ -33,6 +34,8 @@ class VirtusizeSDK {
         StreamController<VirtusizeServerProduct>.broadcast();
     IVirtusizeSDK.instance._recController =
         StreamController<Recommendation>.broadcast();
+    IVirtusizeSDK.instance._productErrorController =
+        StreamController<String>.broadcast();
 
     // Sets the method call handler
     IVirtusizeSDK.instance._channel.setMethodCallHandler(_methodCallHandler);
@@ -54,10 +57,24 @@ class VirtusizeSDK {
               VirtusizeServerProduct(json.encode(call.arguments)),
             ),
           },
+      FlutterVirtusizeMethod.onProductDataCheck: (call) {
+        final externalId =
+            call.arguments[FlutterVirtusizeKey.externalProductId];
+        final isValidProduct =
+            call.arguments[FlutterVirtusizeKey.isValidProduct];
+        IVirtusizeSDK.instance._pdcController.add(
+          ProductDataCheck(externalId, isValidProduct),
+        );
+      },
+      FlutterVirtusizeMethod.onProductError: (call) {
+        final externalProductId = call.arguments;
+        IVirtusizeSDK.instance._productErrorController.add(externalProductId);
+      },
       FlutterVirtusizeMethod.onVSEvent:
           (call) => {_virtusizeMessageListener.vsEvent?.call(call.arguments)},
-      FlutterVirtusizeMethod.onVSError:
-          (call) => {_virtusizeMessageListener.vsError?.call(call.arguments)},
+      FlutterVirtusizeMethod.onVSError: (call) {
+        _virtusizeMessageListener.vsError?.call(call.arguments);
+      },
     };
 
     final method = methodCallExecutionMap[call.method];
@@ -91,6 +108,12 @@ class VirtusizeSDK {
 
     /// The info categories that will be displayed in the Product Details tab
     List<VSInfoCategory> detailsPanelCards = VSInfoCategory.values,
+
+    // By default, Virtusize disables the SNS buttons
+    bool showSNSButtons = false,
+
+    /// Target the specific environment branch by its name
+    String? branch,
   }) async {
     try {
       // [paramsData] is a map with two key-value pairs to return the Virtusize parameters and the display language from Native
@@ -109,6 +132,8 @@ class VirtusizeSDK {
                 detailsPanelCards.map((infoCategory) {
                   return infoCategory.value;
                 }).toList(),
+            FlutterVirtusizeKey.showSNSButtons: showSNSButtons,
+            FlutterVirtusizeKey.branch: branch,
           });
 
       try {
@@ -121,87 +146,37 @@ class VirtusizeSDK {
         IVirtusizeSDK.instance._vsTextController.add(vsText);
         IVirtusizeSDK.instance.vsText = vsText;
       } catch (e) {
-        print(
+        log(
           'Failed to load the i18n localization data and the custom font information',
+          name: virtusizeLogLabel,
         );
       }
     } on PlatformException catch (error) {
-      print('Failed to set the Virtusize parameters: $error');
+      log(
+        'Failed to set the Virtusize parameters: $error',
+        name: virtusizeLogLabel,
+      );
     }
   }
 
   /// A function for clients to populate the Virtusize widgets by passing the product info
   Future<void> loadVirtusize(VirtusizeClientProduct clientProduct) async {
-    final productDataCheck = await _getProductDataCheck(
-      clientProduct.externalProductId,
-      clientProduct.imageURL,
+    await IVirtusizeSDK.instance._channel.invokeMethod(
+      FlutterVirtusizeMethod.loadVirtusize,
+      {
+        FlutterVirtusizeKey.externalProductId: clientProduct.externalProductId,
+        FlutterVirtusizeKey.imageURL: clientProduct.imageURL,
+      },
     );
-    if (productDataCheck != null) {
-      IVirtusizeSDK.instance._pdcController.add(productDataCheck);
-      if (productDataCheck.isValidProduct) {
-        _getRecommendationText(productDataCheck: productDataCheck);
-      }
-    }
-  }
-
-  /// A private function to get the [ProductDataCheck] result from Native
-  Future<ProductDataCheck?> _getProductDataCheck(
-    String externalId,
-    String imageURL,
-  ) async {
-    try {
-      ProductDataCheck productDataCheck = await IVirtusizeSDK.instance._channel
-          .invokeMethod(FlutterVirtusizeMethod.getProductDataCheck, {
-            FlutterVirtusizeKey.externalProductId: externalId,
-            FlutterVirtusizeKey.imageURL: imageURL,
-          })
-          .then((value) => ProductDataCheck(externalId, value));
-
-      if (_virtusizeMessageListener.productDataCheckSuccess != null) {
-        _virtusizeMessageListener.productDataCheckSuccess?.call(
-          productDataCheck,
-        );
-      }
-
-      return productDataCheck;
-    } on PlatformException catch (error) {
-      print('Failed to get product data check: $error');
-      if (_virtusizeMessageListener.productDataCheckError != null) {
-        _virtusizeMessageListener.productDataCheckError?.call(error);
-      }
-      return null;
-    }
-  }
-
-  /// A private function to get the recommendation text from Native
-  Future<void> _getRecommendationText({
-    required ProductDataCheck productDataCheck,
-  }) async {
-    try {
-      IVirtusizeSDK.instance._recController.add(
-        Recommendation(
-          json.encode(
-            await IVirtusizeSDK.instance._channel.invokeMethod(
-              FlutterVirtusizeMethod.getRecommendationText,
-              productDataCheck.productId,
-            ),
-          ),
-        ),
-      );
-    } on PlatformException catch (error) {
-      print('Failed to get the recommendation text: $error');
-      IVirtusizeSDK.instance._recController.add(
-        Recommendation(
-          "{\"${FlutterVirtusizeKey.externalProductId}\": \"${productDataCheck.externalProductId}\"}",
-        ),
-      );
-    }
   }
 
   /// A function for clients to set the user ID
   Future<void> setUserId(String userId) async {
     if (userId.isEmpty) {
-      print('Failed to set the external user ID: userId is empty');
+      log(
+        'Failed to set the external user ID: userId is empty',
+        name: virtusizeLogLabel,
+      );
       return;
     }
     try {
@@ -210,7 +185,10 @@ class VirtusizeSDK {
         userId,
       );
     } on PlatformException catch (error) {
-      print('Failed to set the external user ID: $error');
+      log(
+        'Failed to set the external user ID: $error',
+        name: virtusizeLogLabel,
+      );
     }
   }
 
@@ -222,7 +200,10 @@ class VirtusizeSDK {
         product.externalProductId,
       );
     } on PlatformException catch (error) {
-      print('Failed to open the VirtusizeWebView: $error');
+      log(
+        'Failed to open the VirtusizeWebView: $error',
+        name: virtusizeLogLabel,
+      );
     }
   }
 
@@ -248,7 +229,7 @@ class VirtusizeSDK {
           .invokeMethod(FlutterVirtusizeMethod.sendOrder, order.toJson());
       onSuccess?.call(sentOrder);
     } on PlatformException catch (error) {
-      print('Failed to send an order: $error');
+      log('Failed to send an order: $error', name: virtusizeLogLabel);
       onError?.call(error);
     }
   }
@@ -283,6 +264,10 @@ class IVirtusizeSDK {
   late StreamController<Recommendation> _recController;
   Stream<Recommendation> get recStream => _recController.stream;
 
+  /// A stream controller to send the [String] data to multiple Virtusize widgets
+  late StreamController<String> _productErrorController;
+  Stream<String> get productErrorStream => _productErrorController.stream;
+
   IVirtusizeSDK._();
 
   /// A function to get the privacy policy link from Native
@@ -292,7 +277,10 @@ class IVirtusizeSDK {
         FlutterVirtusizeMethod.getPrivacyPolicyLink,
       );
     } on PlatformException catch (error) {
-      print('Failed to get the privacy policy link: $error');
+      log(
+        'Failed to get the privacy policy link: $error',
+        name: virtusizeLogLabel,
+      );
       return null;
     }
   }

@@ -1,6 +1,7 @@
 ## Next Release
 * Add null-safety support
 * Update minimum supported SDK version to Flutter 3.3/Dart 3.7.
+* Update native Android and iOS SDK dependencies
 
 ## 1.0.1
 

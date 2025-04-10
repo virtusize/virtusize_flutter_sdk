@@ -13,15 +13,19 @@ Future<void> main() async {
     // For using the Order API, a user ID is also required. (can be set later)
     userId: '123',
     // By default, the Virtusize environment will be set to VSEnvironment.global
-    env: VSEnvironment.staging,
+    env: VSEnvironment.japan,
     // By default, the initial language will be set according to the Virtusize environment
-    language: VSLanguage.jp,
+    language: VSLanguage.en,
     // By default, ShowSGI is false
     showSGI: true,
     // By default, Virtusize allows all possible languages
     allowedLanguages: [VSLanguage.en, VSLanguage.jp],
     // By default, Virtusize displays all possible info categories in the Product Details tab
     detailsPanelCards: [VSInfoCategory.generalFit, VSInfoCategory.brandSizing],
+    // By default, Virtusize does not show SNS buttons
+    showSNSButtons: true,
+    // Target the specific environment branch by its name
+    branch: null,
   );
 
   runApp(MyApp());
