@@ -1,3 +1,5 @@
+const virtusizeLogLabel = 'VirtusizeFlutter';
+
 class FlutterVirtusizeMethod {
   // Flutter to Native
   static const String setVirtusizeParams = "setVirtusizeParams";

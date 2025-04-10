@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:virtusize_flutter_sdk/src/models/virtusize_client_product.dart';
@@ -72,7 +73,6 @@ class VirtusizeSDK {
       FlutterVirtusizeMethod.onVSEvent:
           (call) => {_virtusizeMessageListener.vsEvent?.call(call.arguments)},
       FlutterVirtusizeMethod.onVSError: (call) {
-        print(call.arguments);
         _virtusizeMessageListener.vsError?.call(call.arguments);
       },
     };
@@ -146,12 +146,16 @@ class VirtusizeSDK {
         IVirtusizeSDK.instance._vsTextController.add(vsText);
         IVirtusizeSDK.instance.vsText = vsText;
       } catch (e) {
-        print(
+        log(
           'Failed to load the i18n localization data and the custom font information',
+          name: virtusizeLogLabel,
         );
       }
     } on PlatformException catch (error) {
-      print('Failed to set the Virtusize parameters: $error');
+      log(
+        'Failed to set the Virtusize parameters: $error',
+        name: virtusizeLogLabel,
+      );
     }
   }
 
@@ -169,7 +173,10 @@ class VirtusizeSDK {
   /// A function for clients to set the user ID
   Future<void> setUserId(String userId) async {
     if (userId.isEmpty) {
-      print('Failed to set the external user ID: userId is empty');
+      log(
+        'Failed to set the external user ID: userId is empty',
+        name: virtusizeLogLabel,
+      );
       return;
     }
     try {
@@ -178,7 +185,10 @@ class VirtusizeSDK {
         userId,
       );
     } on PlatformException catch (error) {
-      print('Failed to set the external user ID: $error');
+      log(
+        'Failed to set the external user ID: $error',
+        name: virtusizeLogLabel,
+      );
     }
   }
 
@@ -190,7 +200,10 @@ class VirtusizeSDK {
         product.externalProductId,
       );
     } on PlatformException catch (error) {
-      print('Failed to open the VirtusizeWebView: $error');
+      log(
+        'Failed to open the VirtusizeWebView: $error',
+        name: virtusizeLogLabel,
+      );
     }
   }
 
@@ -216,7 +229,7 @@ class VirtusizeSDK {
           .invokeMethod(FlutterVirtusizeMethod.sendOrder, order.toJson());
       onSuccess?.call(sentOrder);
     } on PlatformException catch (error) {
-      print('Failed to send an order: $error');
+      log('Failed to send an order: $error', name: virtusizeLogLabel);
       onError?.call(error);
     }
   }
@@ -264,7 +277,10 @@ class IVirtusizeSDK {
         FlutterVirtusizeMethod.getPrivacyPolicyLink,
       );
     } on PlatformException catch (error) {
-      print('Failed to get the privacy policy link: $error');
+      log(
+        'Failed to get the privacy policy link: $error',
+        name: virtusizeLogLabel,
+      );
       return null;
     }
   }
