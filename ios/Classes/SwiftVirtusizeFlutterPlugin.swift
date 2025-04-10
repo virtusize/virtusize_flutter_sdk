@@ -55,18 +55,19 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
                 
                 if let allowedLangStrArray = arguments[VirtusizeFlutterKey.allowedLanguages] as? [String] {
                     let allowedLangs = VirtusizeLanguage.allCases
-                        .filter{ allowedLangStrArray.contains($0.langStr) }
+                        .filter{ lang in allowedLangStrArray.contains(lang.langStr) }
                     virtusizeBuilder = virtusizeBuilder.setAllowedLanguages(allowedLangs)
                 }
                 
                 if let detailsPanelCardsStrArray = arguments[VirtusizeFlutterKey.detailsPanelCards] as? [String] {
-                    let detailsPanelCards = VirtusizeInfoCategory.allCases
-                        .filter{ detailsPanelCardsStrArray
-                            .map {
-                                $0.replacingOccurrences(of: "_", with: "")
-                            }
-                            .contains("\($0.self)")
-                        }
+                    let normalizedCardNames = detailsPanelCardsStrArray.map { cardName in
+                        cardName.replacingOccurrences(of: "_", with: "")
+                    }
+
+                    let detailsPanelCards = VirtusizeInfoCategory.allCases.filter { category in
+                        let categoryName = "\(category)"
+                        return normalizedCardNames.contains(categoryName)
+                    }
                     virtusizeBuilder = virtusizeBuilder.setDetailsPanelCards(detailsPanelCards)
                 }
             
