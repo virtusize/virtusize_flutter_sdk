@@ -1,4 +1,4 @@
-import 'dart:nativewrappers/_internal/vm/lib/developer.dart';
+import 'dart:developer';
 
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:virtusize_flutter_sdk/src/utils/virtusize_constants.dart';
