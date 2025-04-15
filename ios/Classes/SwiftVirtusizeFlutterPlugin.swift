@@ -15,6 +15,16 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
         let channel = FlutterMethodChannel(name: "com.virtusize/flutter_virtusize_sdk", binaryMessenger: registrar.messenger())
         let instance = SwiftVirtusizeFlutterPlugin(channel: channel)
         registrar.addMethodCallDelegate(instance, channel: channel)
+        
+        NotificationCenter.default.addObserver(
+            forName: Notification.Name("VirtusizeFlutterHandleURL"),
+            object: nil,
+            queue: .main
+        ) { notification in
+            if let url = notification.object as? URL {
+                VirtusizeFlutter.handleUrl(url)
+            }
+        }
     }
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
