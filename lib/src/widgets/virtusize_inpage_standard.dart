@@ -4,15 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:virtusize_flutter_sdk/src/utils/virtusize_product_image_loader.dart';
 
-import '../main.dart';
-import '../models/recommendation.dart';
-import '../models/virtusize_server_product.dart';
-import '../models/product_data_check.dart';
-import '../res/vs_colors.dart';
-import '../res/vs_font.dart';
-import '../res/vs_images.dart';
-import '../res/vs_text.dart';
-import '../../virtusize_flutter_sdk.dart';
+import 'package:virtusize_flutter_sdk/src/main.dart';
+import 'package:virtusize_flutter_sdk/src/models/recommendation.dart';
+import 'package:virtusize_flutter_sdk/src/models/virtusize_server_product.dart';
+import 'package:virtusize_flutter_sdk/src/models/product_data_check.dart';
+import 'package:virtusize_flutter_sdk/src/res/vs_colors.dart';
+import 'package:virtusize_flutter_sdk/src/res/vs_font.dart';
+import 'package:virtusize_flutter_sdk/src/res/vs_images.dart';
+import 'package:virtusize_flutter_sdk/src/res/vs_text.dart';
+import 'package:virtusize_flutter_sdk/virtusize_flutter_sdk.dart';
 import 'animated_dots.dart';
 import 'animated_product_images.dart';
 import 'cta_button.dart';
@@ -29,12 +29,12 @@ class VirtusizeInPageStandard extends StatefulWidget {
     required this.product,
     this.buttonBackgroundColor = VSColors.vsGray900,
     this.horizontalMargin = 16,
-  }) : style = VirtusizeStyle.None;
+  }) : style = VirtusizeStyle.none;
 
   const VirtusizeInPageStandard.vsStyle({
     super.key,
     required this.product,
-    this.style = VirtusizeStyle.Black,
+    this.style = VirtusizeStyle.black,
     this.horizontalMargin = 16,
   }) : buttonBackgroundColor = VSColors.vsGray900;
 
@@ -225,12 +225,12 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
   }
 
   Widget _buildVSInPageCardView(BuildContext context) {
-    double _inPageCardWidth =
+    double inPageCardWidth =
         MediaQuery.of(context).size.width - widget.horizontalMargin * 2;
-    bool overlayImages = _inPageCardWidth <= 411;
+    bool overlayImages = inPageCardWidth <= 411;
 
     final color =
-        widget.style == VirtusizeStyle.Teal
+        widget.style == VirtusizeStyle.teal
             ? VSColors.vsTeal
             : widget.buttonBackgroundColor;
 

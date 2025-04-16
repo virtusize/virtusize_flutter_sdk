@@ -1,4 +1,4 @@
-import '../models/product_data_check.dart';
+import 'package:virtusize_flutter_sdk/src/models/product_data_check.dart';
 
 /// A callback type for receiving the names of events from Native
 typedef VSEventCallback = void Function(String eventName);

@@ -3,9 +3,9 @@ import 'dart:developer';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:virtusize_flutter_sdk/src/utils/virtusize_constants.dart';
 
-import '../../src/models/virtusize_enums.dart';
-import '../../src/res/vs_font.dart';
-import '../../src/models/virtusize_localization.dart';
+import 'package:virtusize_flutter_sdk/src/models/virtusize_enums.dart';
+import 'package:virtusize_flutter_sdk/src/res/vs_font.dart';
+import 'package:virtusize_flutter_sdk/src/models/virtusize_localization.dart';
 
 /// A class to cache the i18n localization data and the custom font info based on the designated language
 class VSText {

@@ -18,12 +18,12 @@ class VirtusizeButton extends StatefulWidget {
     super.key,
     required this.product,
     required Widget this.child,
-  }) : style = VirtusizeStyle.None;
+  }) : style = VirtusizeStyle.none;
 
   const VirtusizeButton.vsStyle({
     super.key,
     required this.product,
-    this.style = VirtusizeStyle.Black,
+    this.style = VirtusizeStyle.black,
     this.child,
   });
 
@@ -71,12 +71,12 @@ class _VirtusizeButtonState extends State<VirtusizeButton> {
   Widget build(BuildContext context) {
     if (_isValidProduct == true) {
       switch (widget.style) {
-        case VirtusizeStyle.None:
+        case VirtusizeStyle.none:
           return widget.child!;
-        case VirtusizeStyle.Black:
+        case VirtusizeStyle.black:
           Color color = VSColors.vsGray900;
           return _buildVSButton(color, widget.child);
-        case VirtusizeStyle.Teal:
+        case VirtusizeStyle.teal:
           Color color = VSColors.vsTeal;
           return _buildVSButton(color, widget.child);
       }

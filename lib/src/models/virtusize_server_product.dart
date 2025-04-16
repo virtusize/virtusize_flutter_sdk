@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../utils/virtusize_constants.dart';
+import 'package:virtusize_flutter_sdk/src/utils/virtusize_constants.dart';
 import 'virtusize_model.dart';
 
 /// This enum contains the two possible product image types

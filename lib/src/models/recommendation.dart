@@ -1,4 +1,4 @@
-import '../utils/virtusize_constants.dart';
+import 'package:virtusize_flutter_sdk/src/utils/virtusize_constants.dart';
 import 'virtusize_model.dart';
 
 class Recommendation extends VirtusizeModel {

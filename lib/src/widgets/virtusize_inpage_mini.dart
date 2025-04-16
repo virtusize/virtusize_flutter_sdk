@@ -23,12 +23,12 @@ class VirtusizeInPageMini extends StatefulWidget {
     required this.product,
     this.backgroundColor = VSColors.vsGray900,
     this.horizontalMargin = 16,
-  }) : style = VirtusizeStyle.None;
+  }) : style = VirtusizeStyle.none;
 
   const VirtusizeInPageMini.vsStyle({
     super.key,
     required this.product,
-    this.style = VirtusizeStyle.Black,
+    this.style = VirtusizeStyle.black,
     this.horizontalMargin = 16,
   }) : backgroundColor = VSColors.vsGray900;
 
@@ -127,7 +127,7 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
 
   Widget _buildVSInPageMini() {
     Color color =
-        widget.style == VirtusizeStyle.Teal
+        widget.style == VirtusizeStyle.teal
             ? VSColors.vsTeal
             : widget.backgroundColor;
 

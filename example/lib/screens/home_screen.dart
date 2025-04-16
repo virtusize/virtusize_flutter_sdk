@@ -80,7 +80,7 @@ class _HomeScreenState extends State<HomeScreen> {
               /// A [VirtusizeButton] widget with `Teal` style and a custom text
               VirtusizeButton.vsStyle(
                 product: _product,
-                style: VirtusizeStyle.Teal,
+                style: VirtusizeStyle.teal,
                 child: Text("Custom Text"),
               ),
             ),
@@ -113,7 +113,7 @@ class _HomeScreenState extends State<HomeScreen> {
             /// A [VirtusizeInPageMini] widget with `Teal` style and a default horizontal margin of `16`
             VirtusizeInPageMini.vsStyle(
               product: _product,
-              style: VirtusizeStyle.Teal,
+              style: VirtusizeStyle.teal,
             ),
             Container(height: 16),
 
@@ -128,7 +128,7 @@ class _HomeScreenState extends State<HomeScreen> {
             /// A [VirtusizeInPageStandard] widget with `Black` style and a default horizontal margin of `16`
             VirtusizeInPageStandard.vsStyle(
               product: _product,
-              style: VirtusizeStyle.Black,
+              style: VirtusizeStyle.black,
             ),
             Container(height: 16),
 
