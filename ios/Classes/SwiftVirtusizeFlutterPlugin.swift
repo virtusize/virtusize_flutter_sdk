@@ -21,7 +21,11 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
             object: nil,
             queue: .main
         ) { notification in
-            if let url = notification.object as? URL {
+            if let url = notification.object as? URL,
+               let appBundleId = Bundle.main.bundleIdentifier?.lowercased(),
+               url.host == "sns-auth",
+               url.scheme == "\(appBundleId).virtusize" {
+                
                 VirtusizeFlutter.handleUrl(url)
             }
         }

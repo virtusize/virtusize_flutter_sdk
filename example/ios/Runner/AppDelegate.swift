@@ -16,12 +16,10 @@ import UIKit
     open url: URL,
     options: [UIApplication.OpenURLOptionsKey : Any] = [:]
   ) -> Bool {
-      if url.host == "sns-auth" && url.scheme == "com.example.virtusizefluttersdkexample.virtusize" {
-          NotificationCenter.default.post(
-            name: Notification.Name("VirtusizeFlutterHandleURL"),
-            object: url
-          )
-      }
+      NotificationCenter.default.post(
+        name: Notification.Name("VirtusizeFlutterHandleURL"),
+        object: url
+      )
       
       return super.application(app, open: url, options: options)
   }
