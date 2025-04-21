@@ -7,7 +7,7 @@ buildscript {
     ext.cardview_version = "1.0.0"
     ext.coroutines_version = "1.5.0"
     ext.gradle_version = "8.7.0"
-    ext.virtusize_version = "2.11.1"
+    ext.virtusize_version = "2.12.0"
 
     repositories {
         google()
@@ -59,6 +59,5 @@ android {
         implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version")
         implementation("androidx.databinding:viewbinding:7.1.2")
         implementation("io.flutter:flutter_embedding_debug:1.0.0-dbec018f4d83ae4b7b97eb8c5a066c61832e12df")
-        implementation("com.github.virtusize:integration_android:$virtusize_version")
-    }
+        implementation("com.virtusize.android:virtusize:$virtusize_version")
 }
