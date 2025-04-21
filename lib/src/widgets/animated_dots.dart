@@ -7,8 +7,7 @@ class AnimatedDots extends StatefulWidget {
   const AnimatedDots({super.key, this.dotNumbers = 3});
 
   @override
-  // ignore: library_private_types_in_public_api
-  _AnimatedDotsState createState() => _AnimatedDotsState();
+  State<AnimatedDots> createState() => _AnimatedDotsState();
 }
 
 class _AnimatedDotsState extends State<AnimatedDots>
