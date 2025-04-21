@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../utils/virtusize_constants.dart';
+import 'package:virtusize_flutter_sdk/src/utils/virtusize_constants.dart';
 import 'virtusize_model.dart';
 
 /// This enum contains the two possible product image types
@@ -31,6 +31,9 @@ class VirtusizeServerProduct extends VirtusizeModel {
 
   /// The product image URL
   String? get imageURL => decodedData[FlutterVirtusizeKey.imageURL];
+
+  String? get cloudinaryImageURL =>
+      decodedData[FlutterVirtusizeKey.cloudinaryImageURL];
 
   /// The product type
   int get productType => decodedData[FlutterVirtusizeKey.productType];

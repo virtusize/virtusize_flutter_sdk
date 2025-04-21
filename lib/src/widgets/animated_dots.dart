@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import '../res/vs_colors.dart';
+import 'package:virtusize_flutter_sdk/src/res/vs_colors.dart';
 
 class AnimatedDots extends StatefulWidget {
   final int dotNumbers;
 
-  AnimatedDots({this.dotNumbers = 3});
+  const AnimatedDots({super.key, this.dotNumbers = 3});
 
   @override
-  _AnimatedDotsState createState() => new _AnimatedDotsState();
+  State<AnimatedDots> createState() => _AnimatedDotsState();
 }
 
 class _AnimatedDotsState extends State<AnimatedDots>

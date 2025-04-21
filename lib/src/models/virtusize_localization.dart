@@ -1,8 +1,7 @@
 import 'virtusize_model.dart';
 
 class VirtusizeLocalization extends VirtusizeModel {
-
-  VirtusizeLocalization(data) : super(data);
+  VirtusizeLocalization(super.data);
 
   String get vsButtonText => decodedData["vs_button_text"];
   String get vsPrivacyPolicy => decodedData["vs_privacy_policy"];

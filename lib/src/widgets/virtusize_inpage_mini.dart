@@ -23,12 +23,12 @@ class VirtusizeInPageMini extends StatefulWidget {
     required this.product,
     this.backgroundColor = VSColors.vsGray900,
     this.horizontalMargin = 16,
-  }) : style = VirtusizeStyle.None;
+  }) : style = VirtusizeStyle.none;
 
   const VirtusizeInPageMini.vsStyle({
     super.key,
     required this.product,
-    this.style = VirtusizeStyle.Black,
+    this.style = VirtusizeStyle.black,
     this.horizontalMargin = 16,
   }) : backgroundColor = VSColors.vsGray900;
 
@@ -41,6 +41,7 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
   late final StreamSubscription<VSText> _vsTextSubscription;
   late final StreamSubscription<ProductDataCheck> _pdcSubscription;
   late final StreamSubscription<Recommendation> _recSubscription;
+  late final StreamSubscription<String> _errorSubscription;
 
   VSText _vsText = IVirtusizeSDK.instance.vsText;
   ProductDataCheck? _productDataCheck;
@@ -86,6 +87,18 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
         _isLoading = false;
       });
     });
+
+    _errorSubscription = IVirtusizeSDK.instance.productErrorStream.listen((
+      externalProductId,
+    ) {
+      if (_productDataCheck?.externalProductId != externalProductId) {
+        return;
+      }
+      setState(() {
+        _isLoading = false;
+        _hasError = true;
+      });
+    });
   }
 
   @override
@@ -93,6 +106,7 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
     _vsTextSubscription.cancel();
     _pdcSubscription.cancel();
     _recSubscription.cancel();
+    _errorSubscription.cancel();
     super.dispose();
   }
 
@@ -113,7 +127,7 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
 
   Widget _buildVSInPageMini() {
     Color color =
-        widget.style == VirtusizeStyle.Teal
+        widget.style == VirtusizeStyle.teal
             ? VSColors.vsTeal
             : widget.backgroundColor;
 

@@ -7,7 +7,8 @@ buildscript {
     ext.cardview_version = "1.0.0"
     ext.coroutines_version = "1.5.0"
     ext.gradle_version = "8.7.0"
-    ext.virtusize_version = "2.2.3"
+    ext.virtusize_version = "2.12.0"
+
     repositories {
         google()
         mavenCentral()
@@ -23,7 +24,6 @@ allprojects {
     repositories {
         google()
         mavenCentral()
-        maven { url "https://jitpack.io" }
     }
 }
 
@@ -36,12 +36,12 @@ android {
     compileSdk = 35
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11
+        jvmTarget = JavaVersion.VERSION_17
     }
 
     sourceSets {
@@ -57,7 +57,7 @@ android {
         implementation("androidx.appcompat:appcompat:$appcompat_version")
         implementation("androidx.cardview:cardview:$cardview_version")
         implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version")
-
-        implementation("com.github.virtusize:integration_android:$virtusize_version")
-    }
+        implementation("androidx.databinding:viewbinding:7.1.2")
+        implementation("io.flutter:flutter_embedding_debug:1.0.0-dbec018f4d83ae4b7b97eb8c5a066c61832e12df")
+        implementation("com.virtusize.android:virtusize:$virtusize_version")
 }

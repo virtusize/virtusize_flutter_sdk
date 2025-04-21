@@ -24,6 +24,10 @@ A Flutter [plugin](https://flutter.dev/developing-packages/) that wraps Virtusiz
     - [Load Virtusize with the Product Details](#2-load-virtusize-with-the-product-details)
     - [Implement VirtusizeMessageHandler (Optional)](#3-implement-virtusizemessagehandler-optional)
 
+- [Enable SNS authentication](#3-enable-sns-authentication)
+  - [Android](#1-android)
+  - [iOS](#2-ios)
+
 - [Implement Virtusize Widgets](#implement-virtusize-widgets)
   - [Virtusize Button](#1-virtusize-button)
   - [Virtusize InPage](#2-virtusize-inpage)
@@ -31,7 +35,7 @@ A Flutter [plugin](https://flutter.dev/developing-packages/) that wraps Virtusiz
     - [InPage Mini](#3-inpage-mini)
 
 - [The Order API](#the-order-api)
-  - [Initialization](#1-initialization-1)
+  - [Initialization](#1-initialization)
   - [Create a *VirtusizeOrder* object for order data](#2-create-a-virtusizeorder-object-for-order-data)
   - [Send an Order](#3-send-an-order)
   
@@ -47,7 +51,7 @@ Virtusize helps retailers to illustrate the size and fit of clothing, shoes and 
 
 Read more about Virtusize at https://www.virtusize.com
 
-You will need a unique API key and an Admin account, only available to Virtusize customers. Contact our sales team to become a customer.
+You need a unique API key and an Admin account, only available to Virtusize customers. [Contact our sales team](mailto:sales@virtusize.com) to become a customer.
 
 > **This is the integration for Flutter apps only.** For web integration, refer to the developer documentation on https://developers.virtusize.com
 
@@ -55,11 +59,11 @@ You will need a unique API key and an Admin account, only available to Virtusize
 
 ## Requirements
 
-- **iOS 10.3+**
+- **iOS 13.0+**
   
-  Specify the iOS version at least `10.3` in `ios/Podfile`:
+  Specify the iOS version at least `13.0` in `ios/Podfile`:
   ```
-  platform :ios, '10.3'
+  platform :ios, '13.0'
   ```
   
 - **Android 5.0+ (API Level 21+)**
@@ -93,30 +97,13 @@ You will need a unique API key and an Admin account, only available to Virtusize
 
 ### 1. Android
 
-1. Update the Kotlin version in `android/build.gradle` to at least `1.4.32`:
+(1) If you are using Proguard, add following rules to your proguard rules file:
 
-    ```diff
-    buildscript {
-    -    ext.kotlin_version = '1.3.50'
-    +    ext.kotlin_version = '1.4.32'
-        ...
-    }
-    ```
+```
+-keep class com.virtusize.android.**
+```
 
-2. Starting from API 30, Android requires package visibility in your AndroidManifest.xml to open URLs in an app.
-
-    To be able to open URLs for the SDK, add the required `<queries>` element to the `AndroidManifest.xml`.
-    
-    ```xml
-    <queries>
-      <intent>
-        <action android:name="android.intent.action.VIEW" />
-        <data android:scheme="https" />
-      </intent>
-    </queries>
-    ```
-
-3. To be able to open the Virtusize webview in a Fragment for the SDK, inherit from **FlutterFragmentActivity** instead of FlutterActivity in the `android/app/src/main/MainActivity`.
+(2) To be able to open the Virtusize webview in a Fragment for the SDK, inherit from **FlutterFragmentActivity** instead of FlutterActivity in the `android/app/src/main/MainActivity`.
    
     ```diff
     - import io.flutter.embedding.android.FlutterActivity
@@ -140,21 +127,25 @@ import 'package:virtusize_flutter_sdk/virtusize_flutter_sdk.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  VirtusizeSDK.instance.setVirtusizeParams(
-      // Only the API key is required
-      apiKey: '15cc36e1d7dad62b8e11722ce1a245cb6c5e6692',
-      // For using the Order API, a user ID is also required. (can be set later)
-      userId: '123',
-      // By default, the Virtusize environment will be set to VSEnvironment.global
-      env: VSEnvironment.staging,
-      // By default, the initial language will be set according to the Virtusize environment
-      language: VSLanguage.jp,
-      // By default, ShowSGI is false
-      showSGI: true,
-      // By default, Virtusize allows all possible languages
-      allowedLanguages: [VSLanguage.en, VSLanguage.jp],
-      // By default, Virtusize displays all possible info categories in the Product Details tab
-      detailsPanelCards: [VSInfoCategory.generalFit, VSInfoCategory.brandSizing]
+  await VirtusizeSDK.instance.setVirtusizeParams(
+    // Only the API key is required
+    apiKey: '15cc36e1d7dad62b8e11722ce1a245cb6c5e6692',
+    // For using the Order API, a user ID is also required. (can be set later)
+    userId: '123',
+    // By default, the Virtusize environment will be set to VSEnvironment.global
+    env: VSEnvironment.staging,
+    // By default, the initial language will be set according to the Virtusize environment
+    language: VSLanguage.jp,
+    // By default, ShowSGI is false
+    showSGI: true,
+    // By default, Virtusize allows all possible languages
+    allowedLanguages: [VSLanguage.en, VSLanguage.jp],
+    // By default, Virtusize displays all possible info categories in the Product Details tab
+    detailsPanelCards: [VSInfoCategory.generalFit, VSInfoCategory.brandSizing],
+    // By default, Virtusize does not show SNS buttons
+    showSNSButtons: true,
+    // Target the specific environment branch by its name
+    branch: 'branch-name',
   );
 
   runApp(MyApp());
@@ -165,13 +156,15 @@ Possible argument configuration is shown in the following table:
 
 | Argument          | Type                   | Example                                                 | Description                                                  | Required                                                     |
 | ----------------- | ---------------------- | ------------------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| apiKey            | String                 | "api_key"                                               | A unique API key is provided to each Virtusize client.       | Yes                                                          |
-| userId            | String                 | "123"                                                   | Passed from the client if the user is logged into the client's app. | Yes, if the Order API is used.                               |
+| apiKey            | String                 | 'api_key'                                               | A unique API key is provided to each Virtusize client.       | Yes                                                          |
+| userId            | String                 | '123'                                                   | Passed from the client if the user is logged into the client's app. | Yes, if the Order API is used.                               |
 | env               | VSEnvironment          | VSEnvironment.staging                                   | The environment is the region you are running the integration from, either `VSEnvironment.staging`,  `VSEnvironment.global`, `VSEnvironment.japan` or `VSEnvironment.korea`. | No. By default, the Virtusize environment will be set to `VSEnvironment.global`. |
 | language          | VSLanguage             | VSLanguage.jp                                           | Sets the initial language that the integration will load in. The possible values are `VSLanguage.en`, `VSLanguage.jp` and `VSLanguage.kr` | No. By default, the initial language will be set based on the Virtusize environment. |
 | showSGI           | bool                   | true                                                    | Determines whether the integration should use SGI flow for users to add user generated items to their wardrobe. | No. By default, showSGI is set to false.                     |
 | allowedLanguages  | List<`VSLanguage`>     | [VSLanguage.en, VSLanguage.jp]                          | The languages which the user can switch to using the Language Selector | No. By default, the integration allows all possible languages to be displayed, including English, Japanese and Korean. |
 | detailsPanelCards | List<`VSInfoCategory`> | [VSInfoCategory.generalFit, VSInfoCategory.brandSizing] | The info categories which will be display in the Product Details tab. Possible categories are: `VSInfoCategory.modelInfo`, `VSInfoCategory.generalFit`, `VSInfoCategory.brandSizing` and `VSInfoCategory.material` | No. By default, the integration displays all the possible info categories in the Product Details tab. |
+| showSNSButtons           | bool                   | true                                                    | Determines whether the integration will show the SNS buttons to the users. | No. By default, the integration disables the SNS buttons.                     |
+| branch            | String                 | 'branch-name'                                                   | Targets specific environment branch. | No. By default, production environment is targeted. `staging` targets staging environment. `<branch-name>` targets a specific branch.                               |
 
 
 
@@ -247,6 +240,74 @@ void initState() {
 }
 ```
 
+## 3. Enable SNS authentication
+
+### 1. Android
+
+The SNS authentication flow requires opening a Chrome Custom Tab, which will load a web page for the
+user to login with their SNS account. A custom URL scheme must be defined to return the login
+response to your app from a Chrome Custom Tab.
+
+Edit your `AndroidManifest.xml` file to include an intent filter and a `<data>` tag for the custom
+URL scheme.
+
+```xml
+
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.your-company.your-app">
+
+    <activity android:name="com.virtusize.android.auth.views.VitrusizeAuthActivity"
+        android:launchMode="singleTask" android:exported="true">
+        <intent-filter>
+            <action android:name="android.intent.action.VIEW" />
+
+            <category android:name="android.intent.category.DEFAULT" />
+            <category android:name="android.intent.category.BROWSABLE" />
+
+            <data android:host="sns-auth" android:scheme="com.your-company.your-app.virtusize" />
+        </intent-filter>
+    </activity>
+
+</manifest>
+```
+
+**❗IMPORTANT**
+
+1. The URL host has to be `sns-auth`
+2. The URL scheme must begin with your app's package ID (com.your-company.your-app) and **end with
+   .virtusize**, and the scheme which you define must use all **lowercase** letters.
+
+### 2. iOS
+
+The SNS authentication flow requires switching to a SFSafariViewController, which will load a web page for the user to login with their SNS account. A custom URL scheme must be defined to return the login response to your app from a SFSafariViewController.
+
+#### (1) Register a URL type
+
+In Xcode, click on your project's **Info** tab and select **URL Types**.
+
+Add a new URL type and set the URL Schemes and identifier to `com.your-company.your-app.virtusize`
+
+![Screen Shot 2021-11-10 at 21 36 31](https://user-images.githubusercontent.com/7802052/141114271-373fb239-91f8-4176-830b-5bc505e45017.png)
+
+#### (2) Set up application callback handler
+
+Implement App delegate's `application(_:open:options)` method:
+
+```Swift
+override func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
+      NotificationCenter.default.post(
+        name: Notification.Name("VirtusizeFlutterHandleURL"),
+        object: url
+      )
+      
+      return super.application(app, open: url, options: options)
+  }
+```
+
+**❗IMPORTANT**
+
+1. The URL type must include your app's bundle ID and **end with .virtusize**.
+2. If you have multiple app targets, add the URL type for all of them.
 
 
 ## Implement Virtusize Widgets
@@ -277,18 +338,18 @@ If you like, you can also customize the button style.
 
 #### (3) Usage
 
-- **VirtusizeButton.vsStyle**({required VirtusizeClientProduct product, VirtusizeStyle style = VirtusizeStyle.Black, Widget child})
+- **VirtusizeButton.vsStyle**({required VirtusizeClientProduct product, VirtusizeStyle style = VirtusizeStyle.black, Widget child})
 
   Create a `VirtusizeButton` widget with default Virtusize style and with the same `VirtusizeClientProduct` object that you have passed to the `VirtusizeSDK.instance.loadVirtusize` function 
 
   ```dart
-  // A `VirtusizeButton` widget with default `Black` style
+  // A `VirtusizeButton` widget with default `black` style
   VirtusizeButton.vsStyle(product: _product)
     
-  // A `VirtusizeButton` widget with `Teal` style and a custom `Text` widget
+  // A `VirtusizeButton` widget with `teal` style and a custom `Text` widget
   VirtusizeButton.vsStyle(
       product: _product,
-      style: VirtusizeStyle.Teal,
+      style: VirtusizeStyle.teal,
       child: Text("Custom Text")
   )
   ```
@@ -338,18 +399,18 @@ There are two types of InPage in our Virtusize SDK.
 
 ##### A. Usage
 
-- **VirtusizeInPageStandard.vsStyle**({required VirtusizeClientProduct product, VirtusizeStyle style = VirtusizeStyle.Black, double horizontalMargin = 16})
+- **VirtusizeInPageStandard.vsStyle**({required VirtusizeClientProduct product, VirtusizeStyle style = VirtusizeStyle.black, double horizontalMargin = 16})
 
   Create a `VirtusizeInPageStandard` widget with the default Virtusize style and the ability to change the horizontal margin, using the same `VirtusizeClientProduct` object that you have passed to the `VirtusizeSDK.instance.loadVirtusize` function
 
   ```dart
-  // A `VirtusizeInPageStandard` widget with default `Black` style and a default horizontal margin of `16` 
+  // A `VirtusizeInPageStandard` widget with default `black` style and a default horizontal margin of `16` 
   VirtusizeInPageStandard.vsStyle(product: _product)
     
-  // A `VirtusizeInPageStandard` widget with `Teal` style and a horizontal margin of `32`
+  // A `VirtusizeInPageStandard` widget with `teal` style and a horizontal margin of `32`
   VirtusizeInPageStandard.vsStyle(
       product: _product,
-      style: VirtusizeStyle.Teal,
+      style: VirtusizeStyle.teal,
       horizontalMargin: 32
   )
   ```
@@ -424,18 +485,18 @@ This is a mini version of InPage that you can place in your application. The dis
 
 ##### A. Usage
 
-- **VirtusizeInPageMini.vsStyle**({required VirtusizeClientProduct product, VirtusizeStyle style = VirtusizeStyle.Black, double horizontalMargin = 16})
+- **VirtusizeInPageMini.vsStyle**({required VirtusizeClientProduct product, VirtusizeStyle style = VirtusizeStyle.black, double horizontalMargin = 16})
 
   Create a `VirtusizeInPageMini` widget with the default Virtusize style and the ability to change the horizontal margin, using the same `VirtusizeClientProduct` object that you have passed to the `VirtusizeSDK.instance.loadVirtusize` function
 
   ```dart
-  // A `VirtusizeInPageMini` widget with default `Black` style and a default horizontal margin of `16` 
+  // A `VirtusizeInPageMini` widget with default `black` style and a default horizontal margin of `16` 
   VirtusizeInPageMini.vsStyle(product: _product)
     
-  // A `VirtusizeInPageMini` widget with `Teal` style and a default horizontal margin of `16`
+  // A `VirtusizeInPageMini` widget with `teal` style and a default horizontal margin of `16`
   VirtusizeInPageMini.vsStyle(
       product: _product,
-      style: VirtusizeStyle.Teal
+      style: VirtusizeStyle.teal
   )
   ```
   

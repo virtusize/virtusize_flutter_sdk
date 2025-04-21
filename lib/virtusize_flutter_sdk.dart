@@ -1,4 +1,4 @@
-library flutter_virtusize_sdk;
+library;
 
 export 'src/main.dart' hide IVirtusizeSDK;
 export 'src/models/virtusize_client_product.dart';

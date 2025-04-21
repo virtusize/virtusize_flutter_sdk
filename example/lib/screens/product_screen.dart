@@ -54,12 +54,12 @@ class _ProductScreenState extends State<ProductScreen> {
           children: [
             VirtusizeInPageStandard.vsStyle(
               product: _product,
-              style: VirtusizeStyle.Black,
+              style: VirtusizeStyle.black,
             ),
             Container(height: 16),
             VirtusizeInPageMini.vsStyle(
               product: _product,
-              style: VirtusizeStyle.Teal,
+              style: VirtusizeStyle.teal,
             ),
             Container(height: 16),
             VirtusizeButton.vsStyle(product: _product),
