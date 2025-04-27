@@ -58,8 +58,10 @@ android {
         implementation("androidx.cardview:cardview:$cardview_version")
         implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version")
         implementation("androidx.databinding:viewbinding:7.1.2")
-        implementation("io.flutter:flutter_embedding_debug:1.0.0-dbec018f4d83ae4b7b97eb8c5a066c61832e12df")
         implementation("com.virtusize.android:virtusize:$virtusize_version")
+
+        // Use this for debug only
+        // implementation("io.flutter:flutter_embedding_debug:1.0.0-a84a7a4944ec0f2a2566bc56217c394addeaf2c2")
 
         // Testing frameworks
         testImplementation("junit:junit:4.13.2")
