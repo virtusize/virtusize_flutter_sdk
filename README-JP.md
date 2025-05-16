@@ -22,6 +22,10 @@ A Flutter [plugin](https://flutter.dev/developing-packages/) that wraps Virtusiz
         - [Virtusizeにて商品詳細をロードする](#2-virtusizeにて商品詳細をロードする)
         - [VirtusizeMessageHandlerの実装する（オプション）](#3-virtusizemessagehandlerを実装するオプション)
     
+- [SNS認証を有効にする](#3-enable-sns-authentication)
+  - [Android](#1-android)
+  - [iOS](#2-ios)
+
 - [Virtusizeウィジェット実装](#virtusizeウィジェット実装)
     - [バーチャサイズ・ボタン（Virtusize Button）](#1-バーチャサイズボタンvirtusize-button)
     - [バーチャサイズ・インページ（Virtuzie InPage）](#2-バーチャサイズインページvirtuzie-inpage)
@@ -29,7 +33,7 @@ A Flutter [plugin](https://flutter.dev/developing-packages/) that wraps Virtusiz
         - [インページ・ミニ（InPage Mini）](#3-インページミニinpage-mini)
 
 - [Order API](#order-api)
-    - [はじめに](#1-はじめに-1)
+    - [はじめに](#1-はじめに)
     - [注文データのVirtusizeOrder オブジェクトを作成](#2-注文データのvirtusizeorder-オブジェクトを作成)
     - [注文情報の送信](#3-注文情報の送信)
 
@@ -53,12 +57,12 @@ A Flutter [plugin](https://flutter.dev/developing-packages/) that wraps Virtusiz
 
 ## 対応バージョン
 
-- **iOS 10.3+**
+- **iOS 13.0+**
 
   iOS バージョン`10.3`以上をご利用されているか`ios/Podfile`にてご確認ください。
 
   ```
-  platform :ios, '10.3'
+  platform :ios, '13.0'
   ```
   
 - **Android 5.0+ (API Level 21+)**
@@ -93,28 +97,13 @@ A Flutter [plugin](https://flutter.dev/developing-packages/) that wraps Virtusiz
 
 ### 1. Android
 
-1. `android/build.gradle`のKotlinバージョン`1.4.32`以上にアップデートしてください。
+(1) Proguardを使用している場合は、以下のルールをProguardルールファイルに追加してください：
 
-    ```diff
-    buildscript {
-    -    ext.kotlin_version = '1.3.50'
-    +    ext.kotlin_version = '1.4.32'
-        ...
-    }
-    ```
+```
+-keep class com.virtusize.android.**
+```
 
-2. API30よりAndroidではアプリでURLを開くために、AndroidManifest.xmlでパッケージを表示する必要があります。SDKのURLを開くことができるようにするには、必要な`<queries>`を`AndroidManifest.xml`に追加します。
-
-    ```xml
-    <queries>
-      <intent>
-        <action android:name="android.intent.action.VIEW" />
-        <data android:scheme="https" />
-      </intent>
-    </queries>
-    ```
-
-3. SDKフラグメントでVirtusizeWebビューを開くには、`android/app/src/main/MainActivity`内のFlutterActivityではなく**FlutterFragmentActivity**から継承をお願いします。
+(2) SDKでVirtusizeのWebViewをFragment内で開けるようにするには、`android/app/src/main/MainActivity`でFlutterActivityの代わりに**FlutterFragmentActivity**を継承してください。
 
     ```diff
     - import io.flutter.embedding.android.FlutterActivity
@@ -124,7 +113,6 @@ A Flutter [plugin](https://flutter.dev/developing-packages/) that wraps Virtusiz
     + class MainActivity: FlutterFragmentActivity() {
     }
     ```
-
 
 
 ### 2. Flutter
@@ -138,21 +126,25 @@ import 'package:virtusize_flutter_sdk/virtusize_flutter_sdk.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  VirtusizeSDK.instance.setVirtusizeParams(
-      // Only the API key is required
-      apiKey: '15cc36e1d7dad62b8e11722ce1a245cb6c5e6692',
-      // For using the Order API, a user ID is also required. (can be set later)
-      userId: '123',
-      // By default, the Virtusize environment will be set to VSEnvironment.global
-      env: VSEnvironment.staging,
-      // By default, the initial language will be set according to the Virtusize environment
-      language: VSLanguage.jp,
-      // By default, ShowSGI is false
-      showSGI: true,
-      // By default, Virtusize allows all possible languages
-      allowedLanguages: [VSLanguage.en, VSLanguage.jp],
-      // By default, Virtusize displays all possible info categories in the Product Details tab
-      detailsPanelCards: [VSInfoCategory.generalFit, VSInfoCategory.brandSizing]
+  await VirtusizeSDK.instance.setVirtusizeParams(
+    // Only the API key is required
+    apiKey: '15cc36e1d7dad62b8e11722ce1a245cb6c5e6692',
+    // For using the Order API, a user ID is also required. (can be set later)
+    userId: '123',
+    // By default, the Virtusize environment will be set to VSEnvironment.global
+    env: VSEnvironment.staging,
+    // By default, the initial language will be set according to the Virtusize environment
+    language: VSLanguage.jp,
+    // By default, ShowSGI is false
+    showSGI: true,
+    // By default, Virtusize allows all possible languages
+    allowedLanguages: [VSLanguage.en, VSLanguage.jp],
+    // By default, Virtusize displays all possible info categories in the Product Details tab
+    detailsPanelCards: [VSInfoCategory.generalFit, VSInfoCategory.brandSizing],
+    // By default, Virtusize does not show SNS buttons
+    showSNSButtons: true,
+    // Target the specific environment branch by its name
+    branch: 'branch-name',
   );
 
   runApp(MyApp());
@@ -163,13 +155,15 @@ Future<void> main() async {
 
 | データ形式        | タイプ                 | 例                                                      | 説明                                                         | 必須設定                                                     |
 | ----------------- | ---------------------- | ------------------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| apiKey            | String                 | "api_key"                                               | 担当者が用意した「API キー」遠設定ください。                 | Yes                                                          |
-| userId            | String                 | "123"                                                   | ユーザーがクライアントのアプリにログインしている場合、クライアントから渡されます。 | Yes,OrderAPIが使用されている場合。                           |
+| apiKey            | String                 | 'api_key'                                               | 担当者が用意した「API キー」遠設定ください。                 | Yes                                                          |
+| userId            | String                 | '123'                                                   | ユーザーがクライアントのアプリにログインしている場合、クライアントから渡されます。 | Yes,OrderAPIが使用されている場合。                           |
 | env               | VSEnvironment          | VSEnvironment.staging                                   | 設定環境は、統合を実行している地域のいずれか<br />`VSEnvironment.staging`,  `VSEnvironment.global`, `VSEnvironment.japan` または `VSEnvironment.korea`。 | No. デフォルトでは、Virtusize環境は次のように設定されます`VSEnvironment.global`。 |
 | language          | VSLanguage             | VSLanguage.jp                                           | 統合がロードされる初期言語を設定します。可能な値は次のとおりです。<br />`VSLanguage.en`, `VSLanguage.jp` および  `VSLanguage.kr` | No. デフォルトでは、初期言語はVirtusize環境に基づいて設定されます。 |
 | showSGI           | bool                   | true                                                    | ユーザーが生成したアイテムをワードローブに追加する方法として、SGIを取得の上、SGIフローを使用するかどうかを決定します。 | No. デフォルトではShowSGIはfalseに設定されています。         |
 | allowedLanguages  | List<`VSLanguage`>     | [VSLanguage.en, VSLanguage.jp]                          | ユーザーが言語選択ボタンより選択できる言語。                 | 特になし。デフォルトでは、英語、日本語、韓国語など、表示可能なすべての言語が表示されるようになっています。 |
 | detailsPanelCards | List<`VSInfoCategory`> | [VSInfoCategory.generalFit, VSInfoCategory.brandSizing] | 商品詳細タブに表示する情報のカテゴリ。表示可能カテゴリは以下：<br />`VSInfoCategory.modelInfo`, `VSInfoCategory.generalFit`, `VSInfoCategory.brandSizing` および`VSInfoCategory.material` | No. デフォルトでは、商品詳細タブに表示可能なすべての情報カテゴリが表示されます。 |
+| showSNSButtons           | bool                   | true                                                    | 統合時にユーザーにSNSボタンを表示するかどうかを決定します。 | No.デフォルトでは、統合時にSNSボタンは無効になっています。                     |
+| branch            | String                 | 'branch-name'                                                   | 特定の環境ブランチを対象とします。 | デフォルトでは、本番環境が対象になります。`staging` を指定するとステージング環境が対象になります。`<branch-name>` を指定すると、特定のブランチが対象になります。                              |
 
 
 
@@ -245,6 +239,73 @@ void initState() {
 }
 ```
 
+こちらが翻訳済みの日本語バージョンです（Markdown形式を維持しています）：
+
+---
+
+## 3. SNS認証を有効にする
+
+### 1. Android
+
+SNS認証フローでは、Chrome Custom Tabを開いてユーザーがSNSアカウントでログインできるウェブページを読み込みます。ログインのレスポンスをChrome Custom Tabからアプリに返すためには、カスタムURLスキームを定義する必要があります。
+
+`AndroidManifest.xml` ファイルを編集し、インテントフィルターおよびカスタムURLスキーム用の `<data>` タグを追加してください。
+
+```xml
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.your-company.your-app">
+
+    <activity android:name="com.virtusize.android.auth.views.VitrusizeAuthActivity"
+        android:launchMode="singleTask" android:exported="true">
+        <intent-filter>
+            <action android:name="android.intent.action.VIEW" />
+
+            <category android:name="android.intent.category.DEFAULT" />
+            <category android:name="android.intent.category.BROWSABLE" />
+
+            <data android:host="sns-auth" android:scheme="com.your-company.your-app.virtusize" />
+        </intent-filter>
+    </activity>
+
+</manifest>
+```
+
+**❗重要**
+
+1. URLのホストは `sns-auth` である必要があります。
+2. URLスキームはアプリのパッケージID（`com.your-company.your-app`）で始まり、**`.virtusize`で終わる**必要があります。また、スキームはすべて**小文字**で定義してください。
+
+### 2. iOS
+
+SNS認証フローでは、SFSafariViewControllerに切り替えて、ユーザーがSNSアカウントでログインできるウェブページを読み込みます。ログインのレスポンスをSFSafariViewControllerからアプリに返すためには、カスタムURLスキームを定義する必要があります。
+
+#### (1) URLタイプの登録
+
+Xcodeで、プロジェクトの **Info** タブをクリックし、**URL Types** を選択します。
+
+新しいURLタイプを追加し、URLスキームと識別子を `com.your-company.your-app.virtusize` に設定してください。
+
+![Screen Shot 2021-11-10 at 21 36 31](https://user-images.githubusercontent.com/7802052/141114271-373fb239-91f8-4176-830b-5bc505e45017.png)
+
+#### (2) アプリケーションのコールバックハンドラーを設定
+
+AppDelegate の `application(_:open:options)` メソッドを実装してください：
+
+```Swift
+override func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
+      NotificationCenter.default.post(
+        name: Notification.Name("VirtusizeFlutterHandleURL"),
+        object: url
+      )
+      
+      return super.application(app, open: url, options: options)
+  }
+```
+
+**❗重要**
+
+1. URLタイプには、アプリのバンドルIDを含め、**`.virtusize`で終わる**必要があります。
+2. 複数のアプリアイデンティティ（ターゲット）がある場合は、それぞれにURLタイプを追加してください。
 
 
 ## Virtusizeウィジェット実装
@@ -275,18 +336,18 @@ SDKのVirtusizeボタンには2つのデフォルトスタイルがあります�
 
 #### (3) 使用方法
 
-- **VirtusizeButton.vsStyle**({required VirtusizeClientProduct product, VirtusizeStyle style = VirtusizeStyle.Black, Widget child})
+- **VirtusizeButton.vsStyle**({required VirtusizeClientProduct product, VirtusizeStyle style = VirtusizeStyle.black, Widget child})
 
   デフォルトのVirtusizeスタイルで、`VirtusizeSDK.instance.loadVirtusize`関数に渡したものと同じ`VirtusizeClientProduct`オブジェクトを使用して`VirtusizeButton`ウィジェットを作成します。
 
   ```dart
-  // A `VirtusizeButton` widget with default `Black` style
+  // A `VirtusizeButton` widget with default `black` style
   VirtusizeButton.vsStyle(product: _product)
     
-  // A `VirtusizeButton` widget with `Teal` style and a custom `Text` widget
+  // A `VirtusizeButton` widget with `teal` style and a custom `Text` widget
   VirtusizeButton.vsStyle(
       product: _product,
-      style: VirtusizeStyle.Teal,
+      style: VirtusizeStyle.teal,
       child: Text("Custom Text")
   )
   ```
@@ -336,18 +397,18 @@ Virtusize SDKには2種類のInPageがあります。
 
 ##### A. 使用方法
 
-- **VirtusizeInPageStandard.vsStyle**({required VirtusizeClientProduct product, VirtusizeStyle style = VirtusizeStyle.Black, double horizontalMargin = 16})
+- **VirtusizeInPageStandard.vsStyle**({required VirtusizeClientProduct product, VirtusizeStyle style = VirtusizeStyle.black, double horizontalMargin = 16})
 
   `VirtusizeSDK.instance.loadVirtusize`関数に渡した同じ`VirtusizeClientProduct`オブジェクトを使用して、デフォルトのVirtusizeスタイルとhorizontal marginを変更する機能を備えた`VirtusizeInPageStandard`ウィジェットを作成します。
 
   ```dart
-  // A `VirtusizeInPageStandard` widget with default `Black` style and a default horizontal margin of `16` 
+  // A `VirtusizeInPageStandard` widget with default `black` style and a default horizontal margin of `16` 
   VirtusizeInPageStandard.vsStyle(product: _product)
     
-  // A `VirtusizeInPageStandard` widget with `Teal` style and a horizontal margin of `32`
+  // A `VirtusizeInPageStandard` widget with `teal` style and a horizontal margin of `32`
   VirtusizeInPageStandard.vsStyle(
       product: _product,
-      style: VirtusizeStyle.Teal,
+      style: VirtusizeStyle.teal,
       horizontalMargin: 32
   )
   ```
@@ -422,18 +483,18 @@ Virtusize SDKには2種類のInPageがあります。
 
 ##### A. 使用方法
 
-- **VirtusizeInPageMini.vsStyle**({required VirtusizeClientProduct product, VirtusizeStyle style = VirtusizeStyle.Black, double horizontalMargin = 16})
+- **VirtusizeInPageMini.vsStyle**({required VirtusizeClientProduct product, VirtusizeStyle style = VirtusizeStyle.black, double horizontalMargin = 16})
 
   `VirtusizeSDK.instance.loadVirtusize`関数に渡したものと同じ`VirtusizeClientProduct`オブジェクトを使用して、デフォルトのVirtusizeスタイルとhorizontal marginを変更する機能を備えた`VirtusizeInPageMini`ウィジェットを作成します。
 
   ```dart
-  // A `VirtusizeInPageMini` widget with default `Black` style and a default horizontal margin of `16` 
+  // A `VirtusizeInPageMini` widget with default `black` style and a default horizontal margin of `16` 
   VirtusizeInPageMini.vsStyle(product: _product)
     
-  // A `VirtusizeInPageMini` widget with `Teal` style and a default horizontal margin of `16`
+  // A `VirtusizeInPageMini` widget with `teal` style and a default horizontal margin of `16`
   VirtusizeInPageMini.vsStyle(
       product: _product,
-      style: VirtusizeStyle.Teal
+      style: VirtusizeStyle.teal
   )
   ```
 
