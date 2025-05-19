@@ -22,7 +22,7 @@ A Flutter [plugin](https://flutter.dev/developing-packages/) that wraps Virtusiz
         - [Virtusizeにて商品詳細をロードする](#2-virtusizeにて商品詳細をロードする)
         - [VirtusizeMessageHandlerの実装する（オプション）](#3-virtusizemessagehandlerを実装するオプション)
     
-- [SNS認証を有効にする](#3-enable-sns-authentication)
+- [SNS認証を有効にする](#SNS認証を有効にする)
   - [Android](#1-android)
   - [iOS](#2-ios)
 
