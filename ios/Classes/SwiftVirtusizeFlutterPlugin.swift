@@ -44,6 +44,7 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
                     VirtusizeFlutter.APIKey = apiKey
                 } else {
                     result(FlutterError.argumentNotSet(VirtusizeFlutterKey.apiKey))
+                    return
                 }
 
                 if let userId = arguments[VirtusizeFlutterKey.externalUserId] as? String {
