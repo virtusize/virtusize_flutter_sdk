@@ -2,9 +2,29 @@ name: Publish to pub.dev
 
 on:
   workflow_dispatch:
-
+    
+# Publish using custom workflow
 jobs:
   publish:
     permissions:
       id-token: write # Required for authentication using OIDC
-    uses: dart-lang/setup-dart/.github/workflows/publish.yml@v1
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Setup Flutter SDK and automated pub.dev credentials
+      - uses: flutter-actions/setup-flutter@v4
+        with:
+          channel: stable
+          version: 3.29.0
+      - uses: flutter-actions/setup-pubdev-credentials@v1
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Publish - dry run
+        run: dart pub publish --dry-run
+        
+      - name: Publish
+        run: flutter pub publish --force
