@@ -109,8 +109,8 @@ class VirtusizeSDK {
     /// The info categories that will be displayed in the Product Details tab
     List<VSInfoCategory> detailsPanelCards = VSInfoCategory.values,
 
-    // By default, Virtusize disables the SNS buttons
-    bool showSNSButtons = false,
+    // By default, Virtusize enables the SNS buttons
+    bool showSNSButtons = true,
 
     /// Target the specific environment branch by its name
     String? branch,
