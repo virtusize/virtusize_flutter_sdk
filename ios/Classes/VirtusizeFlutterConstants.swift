@@ -13,6 +13,7 @@ struct VirtusizeFlutterMethod {
 	static let onProduct = "onProduct"
 	static let onProductDataCheck = "onProductDataCheck"
 	static let onRecChange = "onRecChange"
+    static let onLanguageClick = "onLanguageClick"
 	static let onProductError = "onProductError"
 }
 

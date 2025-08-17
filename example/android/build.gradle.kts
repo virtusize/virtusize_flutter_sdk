@@ -3,6 +3,13 @@ allprojects {
         google()
         mavenCentral()
     }
+    
+    // Force compatible byte-buddy version to fix CI issues
+    configurations.all {
+        resolutionStrategy {
+            force("net.bytebuddy:byte-buddy:1.12.22")
+        }
+    }
 }
 
 val newBuildDir: Directory = rootProject.layout.buildDirectory.dir("../../build").get()

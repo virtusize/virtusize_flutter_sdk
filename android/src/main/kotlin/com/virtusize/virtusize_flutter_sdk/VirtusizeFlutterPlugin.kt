@@ -67,6 +67,15 @@ class VirtusizeFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
           )
         )
       }
+
+      override fun onLangugeClick(language: VirtusizeLanguage) {
+        scope.launch {
+          channel.invokeMethod(
+            VirtusizeFlutterMethod.ON_LANGUAGE_CLICK,
+            mutableMapOf(VirtusizeFlutterKey.LANGUAGE to language.value)
+          )
+        }
+      }
     }
 
   private fun sendOnProductResult(product: Product?, imageType: String) {

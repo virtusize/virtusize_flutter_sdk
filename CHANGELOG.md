@@ -1,3 +1,6 @@
+### 2.1.0
+* Update native SDK support to Android 2.12.5 & iOS 2.12.8
+
 ## 2.0.0
 * Add null-safety support.
 * Update minimum supported SDK version to Flutter 3.3/Dart 3.7.
