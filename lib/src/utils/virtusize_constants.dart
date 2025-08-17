@@ -16,6 +16,7 @@ class FlutterVirtusizeMethod {
   static const String onProductDataCheck = "onProductDataCheck";
   static const String onRecChange = "onRecChange";
   static const String onProductError = "onProductError";
+  static const String onLanguageClick = "onLanguageClick";
 }
 
 class FlutterVirtusizeKey {

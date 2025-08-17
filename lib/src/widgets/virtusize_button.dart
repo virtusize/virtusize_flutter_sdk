@@ -44,7 +44,9 @@ class _VirtusizeButtonState extends State<VirtusizeButton> {
     super.initState();
 
     _vsTextSubscription = IVirtusizeSDK.instance.vsTextStream.listen((vsText) {
-      _vsText = vsText;
+      setState(() {
+        _vsText = vsText;
+      });
     });
 
     _pdcSubscription = IVirtusizeSDK.instance.pdcStream.listen((

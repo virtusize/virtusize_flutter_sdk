@@ -75,6 +75,11 @@ class VirtusizeSDK {
       FlutterVirtusizeMethod.onVSError: (call) {
         _virtusizeMessageListener.vsError?.call(call.arguments);
       },
+      FlutterVirtusizeMethod.onLanguageClick: (call) {
+        final displayLanguage = call.arguments['language'];
+        var language = VSLanguage.en;
+        _loadVSText(displayLanguage, language);
+      },
     };
 
     final method = methodCallExecutionMap[call.method];
@@ -109,8 +114,8 @@ class VirtusizeSDK {
     /// The info categories that will be displayed in the Product Details tab
     List<VSInfoCategory> detailsPanelCards = VSInfoCategory.values,
 
-    // By default, Virtusize disables the SNS buttons
-    bool showSNSButtons = false,
+    // By default, Virtusize enables the SNS buttons
+    bool showSNSButtons = true,
 
     /// Target the specific environment branch by its name
     String? branch,
@@ -136,24 +141,26 @@ class VirtusizeSDK {
             FlutterVirtusizeKey.branch: branch,
           });
 
-      try {
-        // Loads the i18n localization data and the custom font information
-        final vsText = await VSText.load(
-          paramsData[FlutterVirtusizeKey.displayLanguage],
-          language,
-        );
-
-        IVirtusizeSDK.instance._vsTextController.add(vsText);
-        IVirtusizeSDK.instance.vsText = vsText;
-      } catch (e) {
-        log(
-          'Failed to load the i18n localization data and the custom font information',
-          name: virtusizeLogLabel,
-        );
-      }
+      await _loadVSText(
+        paramsData[FlutterVirtusizeKey.displayLanguage],
+        language,
+      );
     } on PlatformException catch (error) {
       log(
         'Failed to set the Virtusize parameters: $error',
+        name: virtusizeLogLabel,
+      );
+    }
+  }
+
+  Future<void> _loadVSText(String displayLanguage, VSLanguage language) async {
+    try {
+      final vsText = await VSText.load(displayLanguage, language);
+      IVirtusizeSDK.instance._vsTextController.add(vsText);
+      IVirtusizeSDK.instance.vsText = vsText;
+    } catch (e) {
+      log(
+        'Failed to load the i18n localization data and the custom font information',
         name: virtusizeLogLabel,
       );
     }

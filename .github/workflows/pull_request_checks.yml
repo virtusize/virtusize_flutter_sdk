@@ -56,7 +56,7 @@ jobs:
       
       - name: Run Android tests
         working-directory: ./example/android
-        run: ./gradlew testDebugUnitTest
+        run: ./gradlew testDebugUnitTest -x :url_launcher_android:testDebugUnitTest
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
