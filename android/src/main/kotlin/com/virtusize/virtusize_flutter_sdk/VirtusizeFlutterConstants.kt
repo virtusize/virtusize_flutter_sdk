@@ -13,6 +13,7 @@ internal object VirtusizeFlutterMethod {
     const val ON_PRODUCT = "onProduct"
     const val ON_PRODUCT_DATA_CHECK = "onProductDataCheck"
     const val ON_REC_CHANGE = "onRecChange"
+    const val ON_LANGUAGE_CLICK = "onLanguageClick"
     const val ON_PRODUCT_ERROR = "onProductError"
 }
 

@@ -207,6 +207,15 @@ extension SwiftVirtusizeFlutterPlugin: VirtusizeFlutterProductEventHandler {
             }
     }
     
+    public func onLanguageClick(language: VirtusizeLanguage) {
+        self.flutterChannel?.invokeMethod(
+            VirtusizeFlutterMethod.onLanguageClick,
+            arguments:  [
+                VirtusizeFlutterKey.language: language.rawValue
+            ]
+        )
+    }
+    
     public func onInPageError(externalId: String) {
         DispatchQueue.main.async {
             self.flutterChannel?.invokeMethod(
