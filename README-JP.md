@@ -57,12 +57,12 @@ A Flutter [plugin](https://flutter.dev/developing-packages/) that wraps Virtusiz
 
 ## 対応バージョン
 
-- **iOS 13.0+**
+- **iOS 14.0+**
 
-  iOS バージョン`10.3`以上をご利用されているか`ios/Podfile`にてご確認ください。
+  iOS バージョン`14.0`以上をご利用されているか`ios/Podfile`にてご確認ください。
 
   ```
-  platform :ios, '13.0'
+  platform :ios, '14.0'
   ```
   
 - **Android 5.0+ (API Level 21+)**
@@ -85,7 +85,7 @@ A Flutter [plugin](https://flutter.dev/developing-packages/) that wraps Virtusiz
 
     ```yaml
     dependencies:
-      virtusize_flutter_sdk: ^2.0.0
+      virtusize_flutter_sdk: ^2.1.0
     ```
 
 

@@ -1,4 +1,7 @@
-### Future release
+### Update
+* Update native SDK support to Android 2.12.9 & iOS 2.12.16
+
+## 2.1.0
 * Update native SDK support to Android 2.12.5 & iOS 2.12.8
 
 ## 2.0.0
