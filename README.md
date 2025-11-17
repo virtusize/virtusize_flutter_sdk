@@ -59,11 +59,11 @@ You need a unique API key and an Admin account, only available to Virtusize cust
 
 ## Requirements
 
-- **iOS 13.0+**
-  
-  Specify the iOS version at least `13.0` in `ios/Podfile`:
+- **iOS 14.0+**
+
+  Specify the iOS version at least `14.0` in `ios/Podfile`:
   ```
-  platform :ios, '13.0'
+  platform :ios, '14.0'
   ```
   
 - **Android 5.0+ (API Level 21+)**
@@ -85,7 +85,7 @@ You need a unique API key and an Admin account, only available to Virtusize cust
 
     ```yaml
     dependencies:
-      virtusize_flutter_sdk: ^2.1.0
+      virtusize_flutter_sdk: ^2.2.0
     ```
 
 
