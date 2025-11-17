@@ -7,7 +7,7 @@ buildscript {
     ext.cardview_version = "1.0.0"
     ext.coroutines_version = "1.5.0"
     ext.gradle_version = "8.7.0"
-    ext.virtusize_version = "2.12.8"
+    ext.virtusize_version = "2.12.9"
 
     repositories {
         google()
