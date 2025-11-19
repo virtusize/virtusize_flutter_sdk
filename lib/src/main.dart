@@ -119,6 +119,9 @@ class VirtusizeSDK {
 
     /// Target the specific environment branch by its name
     String? branch,
+
+    // By default, Virtusize shows the Privacy Policy
+    bool? showShowPrivacyPolicy = true,
   }) async {
     try {
       // [paramsData] is a map with two key-value pairs to return the Virtusize parameters and the display language from Native
@@ -139,7 +142,10 @@ class VirtusizeSDK {
                 }).toList(),
             FlutterVirtusizeKey.showSNSButtons: showSNSButtons,
             FlutterVirtusizeKey.branch: branch,
-          });
+            FlutterVirtusizeKey.showPrivacyPolicy: showShowPrivacyPolicy,
+      });
+
+      IVirtusizeSDK.instance._showPrivacyPolicy = showShowPrivacyPolicy;
 
       await _loadVSText(
         paramsData[FlutterVirtusizeKey.displayLanguage],
@@ -274,6 +280,9 @@ class IVirtusizeSDK {
   /// A stream controller to send the [String] data to multiple Virtusize widgets
   late StreamController<String> _productErrorController;
   Stream<String> get productErrorStream => _productErrorController.stream;
+
+  bool? _showPrivacyPolicy = true;
+  bool? get showPrivacyPolicy => _showPrivacyPolicy;
 
   IVirtusizeSDK._();
 

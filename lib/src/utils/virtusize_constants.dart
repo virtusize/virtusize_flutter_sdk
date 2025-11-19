@@ -41,4 +41,5 @@ class FlutterVirtusizeKey {
   static const String recText = "recText";
   static const String showUserProductImage = "showUserProductImage";
   static const String isValidProduct = "isValidProduct";
+  static const String showPrivacyPolicy = "showPrivacyPolicy";
 }

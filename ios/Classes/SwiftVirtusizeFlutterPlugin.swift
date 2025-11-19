@@ -93,7 +93,11 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
                 if let branch = arguments[VirtusizeFlutterKey.branch] as? String {
                     virtusizeBuilder = virtusizeBuilder.setBranch(branch)
                 }
-                
+
+                if let showPrivacyPolicy = arguments[VirtusizeFlutterKey.showPrivacyPolicy] as? Bool {
+                    virtusizeBuilder = virtusizeBuilder.setShowPrivacyPolicy(showPrivacyPolicy)
+                }
+
                 VirtusizeFlutter.params = virtusizeBuilder.build()
                 result([
                     VirtusizeFlutterKey.virtusizeParams: arguments,

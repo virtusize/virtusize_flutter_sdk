@@ -60,10 +60,13 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
   VirtusizeServerProduct? _userProduct;
   String? _topRecText;
   String? _bottomRecText;
+  late bool _showPrivacyPolicy;
 
   @override
   void initState() {
     super.initState();
+
+    _showPrivacyPolicy = IVirtusizeSDK.instance.showPrivacyPolicy ?? true;
 
     _vsTextSubscription = IVirtusizeSDK.instance.vsTextStream.listen((vsText) {
       _vsText = vsText;
@@ -207,6 +210,7 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
                       fit: BoxFit.cover,
                     ),
                   ),
+                  if(_showPrivacyPolicy)
                   GestureDetector(
                     onTap: _openPrivacyPolicyLink,
                     child: Text(
