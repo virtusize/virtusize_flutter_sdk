@@ -27,6 +27,7 @@ struct VirtusizeFlutterKey {
 	static let detailsPanelCards = "detailsPanelCards"
 	static let showSNSButtons = "showSNSButtons"
 	static let branch = "branch"
+	static let serviceEnvironment = "serviceEnvironment"
 	static let externalProductId = "externalProductId"
 	static let imageURL = "imageURL"
 	static let cloudinaryImageURL = "cloudinaryImageURL"

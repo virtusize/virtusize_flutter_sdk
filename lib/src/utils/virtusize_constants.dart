@@ -29,6 +29,7 @@ class FlutterVirtusizeKey {
   static const String detailsPanelCards = "detailsPanelCards";
   static const String showSNSButtons = "showSNSButtons";
   static const String branch = "branch";
+  static const String serviceEnvironment = "serviceEnvironment";
   static const String externalProductId = "externalProductId";
   static const String imageURL = "imageURL";
   static const String cloudinaryImageURL = "cloudinaryImageURL";

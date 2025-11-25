@@ -98,6 +98,10 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
                     virtusizeBuilder = virtusizeBuilder.setShowPrivacyPolicy(showPrivacyPolicy)
                 }
 
+                if let serviceEnvironment = arguments[VirtusizeFlutterKey.serviceEnvironment] as? Bool {
+                    virtusizeBuilder = virtusizeBuilder.setServiceEnvironment(serviceEnvironment)
+                }
+
                 VirtusizeFlutter.params = virtusizeBuilder.build()
                 result([
                     VirtusizeFlutterKey.virtusizeParams: arguments,

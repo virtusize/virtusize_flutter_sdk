@@ -186,6 +186,10 @@ class VirtusizeFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
           virtusizeFlutterBuilder = virtusizeFlutterBuilder.setShowPrivacyPolicy(showPrivacyPolicy)
         }
 
+        call.argument<Boolean>(VirtusizeFlutterKey.SERVICE_ENVIRONMENT)?.let { serviceEnvironment ->
+          virtusizeFlutterBuilder = virtusizeFlutterBuilder.setServiceEnvironment(serviceEnvironment)
+        }
+
         virtusizeFlutter = virtusizeFlutterBuilder
           .setPresenter(virtusizeFlutterPresenter)
           .build()
