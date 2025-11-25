@@ -85,7 +85,7 @@ You need a unique API key and an Admin account, only available to Virtusize cust
 
     ```yaml
     dependencies:
-      virtusize_flutter_sdk: ^2.2.0
+      virtusize_flutter_sdk: ^2.2.1
     ```
 
 

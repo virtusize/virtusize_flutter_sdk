@@ -1,3 +1,7 @@
+## 2.2.1
+* Update native SDK support to Android 2.12.10 & iOS 2.12.17
+* - Feature: Added Service Environment configurations
+
 ## 2.2.0
 * Update native SDK support to Android 2.12.9 & iOS 2.12.16
 
