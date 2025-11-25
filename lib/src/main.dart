@@ -122,6 +122,9 @@ class VirtusizeSDK {
 
     // By default, Virtusize shows the Privacy Policy
     bool? showShowPrivacyPolicy = true,
+
+    /// The boolean value to determine whether to use or not services.virtusize.com url
+    bool serviceEnvironment = true,
   }) async {
     try {
       // [paramsData] is a map with two key-value pairs to return the Virtusize parameters and the display language from Native
@@ -143,6 +146,7 @@ class VirtusizeSDK {
             FlutterVirtusizeKey.showSNSButtons: showSNSButtons,
             FlutterVirtusizeKey.branch: branch,
             FlutterVirtusizeKey.showPrivacyPolicy: showShowPrivacyPolicy,
+            FlutterVirtusizeKey.serviceEnvironment: serviceEnvironment,
       });
 
       IVirtusizeSDK.instance._showPrivacyPolicy = showShowPrivacyPolicy;

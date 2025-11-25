@@ -28,6 +28,7 @@ internal object VirtusizeFlutterKey {
     const val DETAILS_PANEL_CARDS = "detailsPanelCards"
     const val SHOW_SNS_BUTTONS = "showSNSButtons"
     const val BRANCH = "branch"
+    const val SERVICE_ENVIRONMENT = "serviceEnvironment"
     const val EXTERNAL_PRODUCT_ID = "externalProductId"
     const val IMAGE_URL = "imageURL"
     const val CLOUDINARY_IMAGE_URL = "cloudinaryImageURL"
