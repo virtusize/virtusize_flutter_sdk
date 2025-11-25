@@ -6,6 +6,7 @@ internal object VirtusizeFlutterMethod {
     const val GET_PRIVACY_POLICY_LINK = "getPrivacyPolicyLink"
     const val SEND_ORDER = "sendOrder"
     const val LOAD_VIRTUSIZE = "loadVirtusize"
+    const val SHOW_PRIVACY_POLICY = "showPrivacyPolicy"
 
     // Android to Flutter
     const val ON_VS_EVENT = "onVSEvent"
@@ -39,6 +40,7 @@ internal object VirtusizeFlutterKey {
     const val REC_TEXT = "recText"
     const val SHOW_USER_PRODUCT_IMAGE = "showUserProductImage"
     const val IS_VALID_PRODUCT = "isValidProduct"
+    const val SHOW_PRIVACY_POLICY = "showPrivacyPolicy"
 }
 
 internal object VirtusizeEventKey {
