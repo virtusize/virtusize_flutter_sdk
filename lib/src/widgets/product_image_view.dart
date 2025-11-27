@@ -13,23 +13,25 @@ class ProductImageView extends StatelessWidget {
     return Stack(
       alignment: Alignment.center,
       children: [
-        Container(
+        SizedBox(
           width: 40,
           height: 40,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.all(Radius.circular(20.0)),
-            image:
-                product.imageType == ProductImageType.user
-                    ? DecorationImage(
-                      image: VSImages.circleDashedBorder.image,
-                      fit: BoxFit.cover,
-                    )
-                    : null,
-            border:
-                product.imageType == ProductImageType.store
-                    ? Border.all(color: VSColors.vsGray800, width: 0.5)
-                    : null,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.all(Radius.circular(20.0)),
+              image:
+                  product.imageType == ProductImageType.user
+                      ? DecorationImage(
+                        image: VSImages.circleDashedBorder.image,
+                        fit: BoxFit.cover,
+                      )
+                      : null,
+              border:
+                  product.imageType == ProductImageType.store
+                      ? Border.all(color: VSColors.vsGray800, width: 0.5)
+                      : null,
+            ),
           ),
         ),
         Container(
