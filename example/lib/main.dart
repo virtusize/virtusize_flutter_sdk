@@ -26,8 +26,6 @@ Future<void> main() async {
     showSNSButtons: true,
     // Target the specific environment branch by its name
     branch: null,
-    // By default, Virtusize shows the Privacy Policy
-    showShowPrivacyPolicy: false,
   );
 
   runApp(MyApp());

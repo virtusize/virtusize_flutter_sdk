@@ -66,7 +66,7 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
   void initState() {
     super.initState();
 
-    _showPrivacyPolicy = IVirtusizeSDK.instance.showPrivacyPolicy ?? true;
+    _showPrivacyPolicy = IVirtusizeSDK.instance.showPrivacyPolicy;
 
     _vsTextSubscription = IVirtusizeSDK.instance.vsTextStream.listen((vsText) {
       _vsText = vsText;

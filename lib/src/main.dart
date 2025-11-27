@@ -120,8 +120,9 @@ class VirtusizeSDK {
     /// Target the specific environment branch by its name
     String? branch,
 
+    //Hide method as for the moment
     // By default, Virtusize shows the Privacy Policy
-    bool? showShowPrivacyPolicy = true,
+    //bool? showShowPrivacyPolicy = true,
 
     /// The boolean value to determine whether to use or not services.virtusize.com url
     bool serviceEnvironment = true,
@@ -145,11 +146,11 @@ class VirtusizeSDK {
                 }).toList(),
             FlutterVirtusizeKey.showSNSButtons: showSNSButtons,
             FlutterVirtusizeKey.branch: branch,
-            FlutterVirtusizeKey.showPrivacyPolicy: showShowPrivacyPolicy,
+            // FlutterVirtusizeKey.showPrivacyPolicy: showShowPrivacyPolicy,
             FlutterVirtusizeKey.serviceEnvironment: serviceEnvironment,
       });
 
-      IVirtusizeSDK.instance._showPrivacyPolicy = showShowPrivacyPolicy;
+      // IVirtusizeSDK.instance._showPrivacyPolicy = showShowPrivacyPolicy;
 
       await _loadVSText(
         paramsData[FlutterVirtusizeKey.displayLanguage],
@@ -286,7 +287,7 @@ class IVirtusizeSDK {
   Stream<String> get productErrorStream => _productErrorController.stream;
 
   bool? _showPrivacyPolicy = true;
-  bool? get showPrivacyPolicy => _showPrivacyPolicy;
+  bool get showPrivacyPolicy => _showPrivacyPolicy ?? true;
 
   IVirtusizeSDK._();
 
