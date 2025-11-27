@@ -1,3 +1,6 @@
+## 2.2.2
+* - Bugfix: fix for horizontalMargin parameter VirtusizeInPageStandard
+
 ## 2.2.1
 * Update native SDK support to Android 2.12.10 & iOS 2.12.17
 * - Feature: Added Service Environment configurations
