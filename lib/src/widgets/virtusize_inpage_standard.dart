@@ -210,16 +210,16 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
                       fit: BoxFit.cover,
                     ),
                   ),
-                  if(_showPrivacyPolicy)
-                  GestureDetector(
-                    onTap: _openPrivacyPolicyLink,
-                    child: Text(
-                      _vsText.localization.vsPrivacyPolicy,
-                      style: _vsText.vsFont.getTextStyle(
-                        fontSize: VSFontSize.xsmall,
+                  if (_showPrivacyPolicy)
+                    GestureDetector(
+                      onTap: _openPrivacyPolicyLink,
+                      child: Text(
+                        _vsText.localization.vsPrivacyPolicy,
+                        style: _vsText.vsFont.getTextStyle(
+                          fontSize: VSFontSize.xsmall,
+                        ),
                       ),
                     ),
-                  ),
                 ],
               )
               : Container(),
@@ -286,21 +286,26 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
                                   ? ProductImageView(product: _storeProduct!)
                                   : null,
                         )
-                        : Stack(
-                          children: [
-                            Container(width: 78),
-                            if (_userProduct != null)
-                              Positioned(
-                                child: ProductImageView(product: _userProduct!),
-                              ),
-                            if (_storeProduct != null)
-                              Positioned(
-                                left: 38,
-                                child: ProductImageView(
-                                  product: _storeProduct!,
+                        : SizedBox(
+                          width: 71,
+                          child: Stack(
+                            children: [
+                              if (_userProduct != null)
+                                Align(
+                                  alignment: Alignment.bottomRight,
+                                  child: ProductImageView(
+                                    product: _userProduct!,
+                                  ),
                                 ),
-                              ),
-                          ],
+                              if (_storeProduct != null)
+                                Align(
+                                  alignment: Alignment.topLeft,
+                                  child: ProductImageView(
+                                    product: _storeProduct!,
+                                  ),
+                                ),
+                            ],
+                          ),
                         )
                     : _storeProduct != null
                     ? ProductImageView(product: _storeProduct!)
