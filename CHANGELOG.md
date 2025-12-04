@@ -1,3 +1,6 @@
+## 2.2.3
+* Update native SDK support to Android 2.12.11 & iOS 2.12.18
+
 ## 2.2.2
 * - Bugfix: fix for horizontalMargin parameter VirtusizeInPageStandard
 
