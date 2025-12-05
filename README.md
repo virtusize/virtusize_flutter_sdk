@@ -146,6 +146,8 @@ Future<void> main() async {
     showSNSButtons: true,
     // Target the specific environment branch by its name
     branch: 'branch-name',
+    // By default, Virtusize shows the Privacy Policy
+    showShowPrivacyPolicy: true,
   );
 
   runApp(MyApp());
@@ -165,7 +167,7 @@ Possible argument configuration is shown in the following table:
 | detailsPanelCards | List<`VSInfoCategory`> | [VSInfoCategory.generalFit, VSInfoCategory.brandSizing] | The info categories which will be display in the Product Details tab. Possible categories are: `VSInfoCategory.modelInfo`, `VSInfoCategory.generalFit`, `VSInfoCategory.brandSizing` and `VSInfoCategory.material` | No. By default, the integration displays all the possible info categories in the Product Details tab. |
 | showSNSButtons           | bool                   | true                                                    | Determines whether the integration will show the SNS buttons to the users. | No. By default, the integration disables the SNS buttons.                     |
 | branch            | String                 | 'branch-name'                                                   | Targets specific environment branch. | No. By default, production environment is targeted. `staging` targets staging environment. `<branch-name>` targets a specific branch.                               |
-
+| setShowPrivacyPolicy | Boolean                           | setShowPrivacyPolicy(true)                                                                                                                                                                                                                     | Controls whether the privacy policy shows to users                                                                                                                                                                                                | No. By default, the privacy policy is shown                                                                                          |
 #### (2) Load Virtusize with the Product Details
 
 In the `initState` of your product page widget, you will need to use `VirtusizeSDK.instance.loadVirtusize` to populate the Virtusize widgets:
