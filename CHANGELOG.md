@@ -1,3 +1,6 @@
+## 2.2.5
+* Update documentation
+
 ## 2.2.4
 * Add optional show/hide Privacy Policy settings
 
