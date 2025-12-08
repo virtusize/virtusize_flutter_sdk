@@ -4,7 +4,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'virtusize_flutter_sdk'
-  s.version          = '2.2.5'
+  s.version          = '2.2.6'
   s.summary          = 'Virtusize SDK for Flutter.'
   s.description      = <<-DESC
 This SDK helps clients to integrate Virtusize’s size and fit service into their Flutter applications for Android & iOS.
@@ -17,7 +17,7 @@ This SDK helps clients to integrate Virtusize’s size and fit service into thei
   s.resources = 'Resources/**/*.json'
   s.resource_bundle = { 'virtusize_flutter_sdk' => ['Resources/**/*.json'] }
   s.dependency 'Flutter'
-  s.dependency 'Virtusize', '~> 2.12.18'
+  s.dependency 'Virtusize', '~> 2.12.19'
   s.static_framework = true
   
   s.platform = :ios, '14.0'

@@ -1,3 +1,6 @@
+## 2.2.6
+* Update native SDK support to Android 2.12.12 & iOS 2.12.19
+
 ## 2.2.5
 * Update documentation
 

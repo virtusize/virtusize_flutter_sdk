@@ -85,7 +85,7 @@ A Flutter [plugin](https://flutter.dev/developing-packages/) that wraps Virtusiz
 
     ```yaml
     dependencies:
-      virtusize_flutter_sdk: ^2.2.5
+      virtusize_flutter_sdk: ^2.2.6
     ```
 
 
