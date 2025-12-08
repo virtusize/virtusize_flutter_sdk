@@ -164,7 +164,7 @@ Future<void> main() async {
 | detailsPanelCards | List<`VSInfoCategory`> | [VSInfoCategory.generalFit, VSInfoCategory.brandSizing] | 商品詳細タブに表示する情報のカテゴリ。表示可能カテゴリは以下：<br />`VSInfoCategory.modelInfo`, `VSInfoCategory.generalFit`, `VSInfoCategory.brandSizing` および`VSInfoCategory.material` | No. デフォルトでは、商品詳細タブに表示可能なすべての情報カテゴリが表示されます。 |
 | showSNSButtons           | bool                   | true                                                    | 統合時にユーザーにSNSボタンを表示するかどうかを決定します。 | No.デフォルトでは、統合時にSNSボタンは無効になっています。                     |
 | branch            | String                 | 'branch-name'                                                   | 特定の環境ブランチを対象とします。 | デフォルトでは、本番環境が対象になります。`staging` を指定するとステージング環境が対象になります。`<branch-name>` を指定すると、特定のブランチが対象になります。                              |
-
+| showPrivacyPolicy | Boolean                           | showShowPrivacyPolicy: true                   | プライバシー ポリシーをユーザーに表示するかどうかを制御します。                                           | No. デフォルトでは、プライバシー ポリシーが表示されます。                                                               |
 
 
 #### (2) Virtusizeにて商品詳細をロードする
