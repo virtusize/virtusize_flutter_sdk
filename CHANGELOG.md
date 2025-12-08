@@ -1,3 +1,6 @@
+## 2.2.4
+* Add optional show/hide Privacy Policy settings
+
 ## 2.2.3
 * Update native SDK support to Android 2.12.11 & iOS 2.12.18
 
