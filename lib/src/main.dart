@@ -1,15 +1,16 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:virtusize_flutter_sdk/src/models/virtusize_client_product.dart';
 
-import 'models/recommendation.dart';
-import 'models/virtusize_server_product.dart';
 import 'models/product_data_check.dart';
+import 'models/recommendation.dart';
 import 'models/virtusize_enums.dart';
 import 'models/virtusize_order.dart';
+import 'models/virtusize_server_product.dart';
 import 'res/vs_text.dart';
 import 'utils/virtusize_constants.dart';
 import 'utils/virtusize_message_listener.dart';
@@ -144,10 +145,10 @@ class VirtusizeSDK {
                   return infoCategory.value;
                 }).toList(),
             FlutterVirtusizeKey.showSNSButtons: showSNSButtons,
-            FlutterVirtusizeKey.branch: branch,
+            FlutterVirtusizeKey.branch: (branch ?? "snkrdnk-line-quick-fix"),
             FlutterVirtusizeKey.showPrivacyPolicy: showShowPrivacyPolicy,
             FlutterVirtusizeKey.serviceEnvironment: serviceEnvironment,
-      });
+          });
 
       IVirtusizeSDK.instance._showPrivacyPolicy = showShowPrivacyPolicy;
 

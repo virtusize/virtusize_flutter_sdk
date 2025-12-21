@@ -1,71 +1,77 @@
 import 'package:flutter/material.dart';
+import 'package:dotted_border/dotted_border.dart';
 import 'package:virtusize_flutter_sdk/src/models/virtusize_server_product.dart';
 import 'package:virtusize_flutter_sdk/src/res/vs_colors.dart';
 import 'package:virtusize_flutter_sdk/src/res/vs_images.dart';
 
-class ProductImageView extends StatelessWidget {
-  final VirtusizeServerProduct product;
+enum ProductImageViewType { store, user }
 
-  const ProductImageView({super.key, required this.product});
+class ProductImageView extends StatelessWidget {
+  final VirtusizeServerProduct? product;
+  final ProductImageViewType type;
+
+  const ProductImageView({
+    super.key,
+    this.product,
+    this.type = ProductImageViewType.store,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        SizedBox(
-          width: 40,
-          height: 40,
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.all(Radius.circular(20.0)),
-              image:
-                  product.imageType == ProductImageType.user
-                      ? DecorationImage(
-                        image: VSImages.circleDashedBorder.image,
-                        fit: BoxFit.cover,
-                      )
-                      : null,
-              border:
-                  product.imageType == ProductImageType.store
-                      ? Border.all(color: VSColors.vsGray800, width: 0.5)
-                      : null,
-            ),
-          ),
+    final imageContainer = Container(
+      width: product?.networkProductImage != null ? 36 : 24,
+      height: product?.networkProductImage != null ? 36 : 24,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        image:
+            product?.networkProductImage != null
+                ? DecorationImage(
+                  image: product!.networkProductImage!.image,
+                  fit: BoxFit.contain,
+                )
+                : DecorationImage(
+                  image:
+                      // product?.productType != null
+                      //     ? VSImages.getProductTypeImage(
+                      //       productType: product!.productType,
+                      //       style: product?.productStyle,
+                      //     ).image
+                      //     :
+                      VSImages.body.image,
+                  colorFilter: ColorFilter.mode(
+                    type == ProductImageViewType.store
+                        ? VSColors.vsGray800
+                        : VSColors.vsTeal,
+                    BlendMode.srcIn,
+                  ),
+                  fit: BoxFit.contain,
+                ),
+        borderRadius: BorderRadius.all(Radius.circular(18.0)),
+      ),
+    );
+
+    if (type == ProductImageViewType.user) {
+      return DottedBorder(
+        borderType: BorderType.RRect,
+        radius: Radius.circular(18.0),
+        dashPattern: [3, 2],
+        color: VSColors.vsTeal,
+        strokeWidth: 0.5,
+        child: imageContainer,
+      );
+    }
+
+    return Container(
+      width: product?.networkProductImage != null ? 36 : 24,
+      height: product?.networkProductImage != null ? 36 : 24,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.all(Radius.circular(18.0)),
+        border: Border.all(
+          color: VSColors.vsGray800,
+          width: 0.5,
         ),
-        Container(
-          width: product.networkProductImage != null ? 36 : 24,
-          height: product.networkProductImage != null ? 36 : 24,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            image:
-                product.networkProductImage != null
-                    ? DecorationImage(
-                      image: product.networkProductImage!.image,
-                      fit: BoxFit.contain,
-                    )
-                    : DecorationImage(
-                      image:
-                          VSImages.getProductTypeImage(
-                            productType: product.productType,
-                            style: product.productStyle,
-                          ).image,
-                      colorFilter: ColorFilter.mode(
-                        product.imageType == ProductImageType.store
-                            ? VSColors.vsGray800
-                            : VSColors.vsTeal,
-                        BlendMode.srcIn,
-                      ),
-                      fit: BoxFit.contain,
-                    ),
-            borderRadius:
-                product.networkProductImage != null
-                    ? BorderRadius.all(Radius.circular(18.0))
-                    : null,
-          ),
-        ),
-      ],
+      ),
+      child: imageContainer,
     );
   }
 }

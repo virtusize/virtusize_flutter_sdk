@@ -22,9 +22,18 @@ class VSImages {
     'assets/images/circle_dashed_border.png',
     package: 'virtusize_flutter_sdk',
   );
+  static Image body = Image.asset(
+    'assets/images/body.png',
+    package: 'virtusize_flutter_sdk',
+  );
 
   /// Gets the product type image based on the [productType] and [style]
-  static Image getProductTypeImage({required int productType, String? style}) {
+  /// Returns body.png as default when productType is null
+  static Image getProductTypeImage({int? productType, String? style}) {
+    if (productType == null) {
+      return body;
+    }
+
     final postFixName =
         style != null ? '${productType}_$style' : '$productType';
 

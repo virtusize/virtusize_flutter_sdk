@@ -2,17 +2,17 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:virtusize_flutter_sdk/src/utils/virtusize_product_image_loader.dart';
-
 import 'package:virtusize_flutter_sdk/src/main.dart';
+import 'package:virtusize_flutter_sdk/src/models/product_data_check.dart';
 import 'package:virtusize_flutter_sdk/src/models/recommendation.dart';
 import 'package:virtusize_flutter_sdk/src/models/virtusize_server_product.dart';
-import 'package:virtusize_flutter_sdk/src/models/product_data_check.dart';
 import 'package:virtusize_flutter_sdk/src/res/vs_colors.dart';
 import 'package:virtusize_flutter_sdk/src/res/vs_font.dart';
 import 'package:virtusize_flutter_sdk/src/res/vs_images.dart';
 import 'package:virtusize_flutter_sdk/src/res/vs_text.dart';
+import 'package:virtusize_flutter_sdk/src/utils/virtusize_product_image_loader.dart';
 import 'package:virtusize_flutter_sdk/virtusize_flutter_sdk.dart';
+
 import 'animated_dots.dart';
 import 'animated_product_images.dart';
 import 'cta_button.dart';
@@ -116,7 +116,7 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
         return;
       }
       setState(() {
-        _showUserProductImage = recommendation.showUserProductImage;
+        _showUserProductImage = true; //recommendation.showUserProductImage;
         try {
           _splitRecTexts(recommendation.text);
         } catch (e) {
@@ -277,14 +277,14 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
                     : _showUserProductImage
                     ? overlayImages
                         ? AnimatedProductImages(
-                          userProductImageView:
-                              _userProduct != null
-                                  ? ProductImageView(product: _userProduct!)
-                                  : null,
-                          storeProductImageView:
-                              _storeProduct != null
-                                  ? ProductImageView(product: _storeProduct!)
-                                  : null,
+                          userProductImageView: ProductImageView(
+                            product: _userProduct,
+                            type: ProductImageViewType.user,
+                          ),
+                          storeProductImageView: ProductImageView(
+                            product: _storeProduct,
+                            type: ProductImageViewType.store,
+                          ),
                         )
                         : SizedBox(
                           width: 71,

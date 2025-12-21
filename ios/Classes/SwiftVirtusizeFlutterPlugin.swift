@@ -113,6 +113,7 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
                     return
                 }
                 VirtusizeFlutter.userID = userId
+                result(true)
             case VirtusizeFlutterMethod.loadVirtusize:
                 guard let arguments = call.arguments as? [String: Any] else {
                     result(FlutterError.noArguments)
