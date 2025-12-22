@@ -23,12 +23,14 @@ class VirtusizeInPageStandard extends StatefulWidget {
   final VirtusizeStyle style;
   final Color buttonBackgroundColor;
   final double horizontalMargin;
+  final bool alwaysShowUserProductImage;
 
   const VirtusizeInPageStandard({
     super.key,
     required this.product,
     this.buttonBackgroundColor = VSColors.vsGray900,
     this.horizontalMargin = 16,
+    this.alwaysShowUserProductImage = true,
   }) : style = VirtusizeStyle.none;
 
   const VirtusizeInPageStandard.vsStyle({
@@ -36,6 +38,7 @@ class VirtusizeInPageStandard extends StatefulWidget {
     required this.product,
     this.style = VirtusizeStyle.black,
     this.horizontalMargin = 16,
+    this.alwaysShowUserProductImage = true,
   }) : buttonBackgroundColor = VSColors.vsGray900;
 
   @override
@@ -116,7 +119,9 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
         return;
       }
       setState(() {
-        _showUserProductImage = true; //recommendation.showUserProductImage;
+        _showUserProductImage = widget.alwaysShowUserProductImage
+            ? true
+            : recommendation.showUserProductImage;
         try {
           _splitRecTexts(recommendation.text);
         } catch (e) {

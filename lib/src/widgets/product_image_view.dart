@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:dotted_border/dotted_border.dart';
+import 'package:flutter/material.dart';
 import 'package:virtusize_flutter_sdk/src/models/virtusize_server_product.dart';
 import 'package:virtusize_flutter_sdk/src/res/vs_colors.dart';
 import 'package:virtusize_flutter_sdk/src/res/vs_images.dart';
@@ -19,8 +19,8 @@ class ProductImageView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final imageContainer = Container(
-      width: product?.networkProductImage != null ? 36 : 24,
-      height: product?.networkProductImage != null ? 36 : 24,
+      width: 36,
+      height: 36,
       decoration: BoxDecoration(
         color: Colors.white,
         image:
@@ -31,13 +31,12 @@ class ProductImageView extends StatelessWidget {
                 )
                 : DecorationImage(
                   image:
-                      // product?.productType != null
-                      //     ? VSImages.getProductTypeImage(
-                      //       productType: product!.productType,
-                      //       style: product?.productStyle,
-                      //     ).image
-                      //     :
-                      VSImages.body.image,
+                      product != null && type == ProductImageViewType.user
+                          ? VSImages.getProductTypeImage(
+                            productType: product!.productType,
+                            style: product?.productStyle,
+                          ).image
+                          : VSImages.body.image,
                   colorFilter: ColorFilter.mode(
                     type == ProductImageViewType.store
                         ? VSColors.vsGray800
@@ -51,25 +50,28 @@ class ProductImageView extends StatelessWidget {
     );
 
     if (type == ProductImageViewType.user) {
-      return DottedBorder(
-        borderType: BorderType.RRect,
-        radius: Radius.circular(18.0),
-        dashPattern: [3, 2],
-        color: VSColors.vsTeal,
-        strokeWidth: 0.5,
-        child: imageContainer,
+      return Container(
+        width: 36,
+        height: 36,
+        child: Center(
+          child: DottedBorder(
+            borderType: BorderType.RRect,
+            radius: Radius.circular(18.0),
+            dashPattern: [3, 2],
+            color: VSColors.vsTeal,
+            strokeWidth: 0.5,
+            child: imageContainer,
+          ),
+        ),
       );
     }
 
     return Container(
-      width: product?.networkProductImage != null ? 36 : 24,
-      height: product?.networkProductImage != null ? 36 : 24,
+      width: 36,
+      height: 36,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.all(Radius.circular(18.0)),
-        border: Border.all(
-          color: VSColors.vsGray800,
-          width: 0.5,
-        ),
+        border: Border.all(color: VSColors.vsGray800, width: 0.5),
       ),
       child: imageContainer,
     );
