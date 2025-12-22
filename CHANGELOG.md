@@ -1,3 +1,8 @@
+## 2.2.7
+* Fix: the human icon thumbnail is missing in inpage
+* Fix: opening the privacy policy redirects to an external browser
+* Fix: Auth losts on new webview session
+
 ## 2.2.6
 * Update native SDK support to Android 2.12.12 & iOS 2.12.19
 
