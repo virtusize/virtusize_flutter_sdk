@@ -16,20 +16,20 @@ class VirtusizeInPageMini extends StatefulWidget {
   final VirtusizeClientProduct product;
   final VirtusizeStyle style;
   final Color backgroundColor;
-  final double horizontalMargin;
+  final EdgeInsets padding;
 
   const VirtusizeInPageMini({
     super.key,
     required this.product,
     this.backgroundColor = VSColors.vsGray900,
-    this.horizontalMargin = 16,
+    this.padding = const EdgeInsets.symmetric(horizontal: 16),
   }) : style = VirtusizeStyle.none;
 
   const VirtusizeInPageMini.vsStyle({
     super.key,
     required this.product,
     this.style = VirtusizeStyle.black,
-    this.horizontalMargin = 16,
+    this.padding = const EdgeInsets.symmetric(horizontal: 16),
   }) : backgroundColor = VSColors.vsGray900;
 
   @override
@@ -132,7 +132,7 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
             : widget.backgroundColor;
 
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: widget.horizontalMargin),
+      margin: widget.padding,
       color: _isLoading || _hasError ? Colors.white : color,
       width: double.infinity,
       child:
