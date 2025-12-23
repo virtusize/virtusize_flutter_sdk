@@ -22,14 +22,14 @@ class VirtusizeInPageStandard extends StatefulWidget {
   final VirtusizeClientProduct product;
   final VirtusizeStyle style;
   final Color buttonBackgroundColor;
-  final EdgeInsets padding;
+  final EdgeInsets margin;
   final bool alwaysShowUserProductImage;
 
   const VirtusizeInPageStandard({
     super.key,
     required this.product,
     this.buttonBackgroundColor = VSColors.vsGray900,
-    this.padding = const EdgeInsets.symmetric(horizontal: 16),
+    this.margin = const EdgeInsets.symmetric(horizontal: 16),
     this.alwaysShowUserProductImage = true,
   }) : style = VirtusizeStyle.none;
 
@@ -37,7 +37,7 @@ class VirtusizeInPageStandard extends StatefulWidget {
     super.key,
     required this.product,
     this.style = VirtusizeStyle.black,
-    this.padding = const EdgeInsets.symmetric(horizontal: 16),
+    this.margin = const EdgeInsets.symmetric(horizontal: 16),
     this.alwaysShowUserProductImage = true,
   }) : buttonBackgroundColor = VSColors.vsGray900;
 
@@ -196,7 +196,7 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
 
   Widget _buildVSInPageStandard(BuildContext context) {
     return Container(
-      margin: widget.padding,
+      margin: widget.margin,
       width: double.infinity,
       child: Column(
         children: [
@@ -235,7 +235,7 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
 
   Widget _buildVSInPageCardView(BuildContext context) {
     double inPageCardWidth =
-        MediaQuery.of(context).size.width - widget.padding.horizontal;
+        MediaQuery.of(context).size.width - widget.margin.horizontal;
     bool overlayImages = inPageCardWidth <= 411;
 
     final color =
