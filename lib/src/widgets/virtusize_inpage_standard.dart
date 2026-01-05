@@ -25,21 +25,21 @@ class VirtusizeInPageStandard extends StatefulWidget {
   final EdgeInsets margin;
   final bool alwaysShowUserProductImage;
 
-  const VirtusizeInPageStandard({
-    super.key,
+  VirtusizeInPageStandard({
     required this.product,
     this.buttonBackgroundColor = VSColors.vsGray900,
     this.margin = const EdgeInsets.symmetric(horizontal: 16),
     this.alwaysShowUserProductImage = true,
-  }) : style = VirtusizeStyle.none;
+  }) : style = VirtusizeStyle.none,
+       super(key: ValueKey('standard_${product.externalProductId}'));
 
-  const VirtusizeInPageStandard.vsStyle({
-    super.key,
+  VirtusizeInPageStandard.vsStyle({
     required this.product,
     this.style = VirtusizeStyle.black,
     this.margin = const EdgeInsets.symmetric(horizontal: 16),
     this.alwaysShowUserProductImage = true,
-  }) : buttonBackgroundColor = VSColors.vsGray900;
+  }) : buttonBackgroundColor = VSColors.vsGray900,
+       super(key: ValueKey('vs_standard_${product.externalProductId}'));
 
   @override
   // ignore: library_private_types_in_public_api
@@ -64,6 +64,8 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
   String? _topRecText;
   String? _bottomRecText;
   late bool _showPrivacyPolicy;
+  Timer? _productDataCheckTimeout;
+  bool _productDataCheckTimedOut = false;
 
   @override
   void initState() {
@@ -79,10 +81,12 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
       if (widget.product.externalProductId != pdc.externalProductId) {
         return;
       }
+      _productDataCheckTimeout?.cancel();
       setState(() {
         _isLoading = true;
         _hasError = false;
         _productDataCheck = pdc;
+        _productDataCheckTimedOut = false;
       });
     });
 
@@ -119,9 +123,10 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
         return;
       }
       setState(() {
-        _showUserProductImage = widget.alwaysShowUserProductImage
-            ? true
-            : recommendation.showUserProductImage;
+        _showUserProductImage =
+            widget.alwaysShowUserProductImage
+                ? true
+                : recommendation.showUserProductImage;
         try {
           _splitRecTexts(recommendation.text);
         } catch (e) {
@@ -142,6 +147,42 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
         _hasError = true;
       });
     });
+
+    // Start timeout timer for product data check
+    _startProductDataCheckTimeout();
+  }
+
+  void _startProductDataCheckTimeout() {
+    _productDataCheckTimeout?.cancel();
+    _productDataCheckTimedOut = false;
+
+    _productDataCheckTimeout = Timer(Duration(seconds: 10), () {
+      if (!mounted) return;
+      if (_productDataCheck == null) {
+        setState(() {
+          _productDataCheckTimedOut = true;
+        });
+      }
+    });
+  }
+
+  @override
+  void didUpdateWidget(VirtusizeInPageStandard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.product.externalProductId !=
+        widget.product.externalProductId) {
+      setState(() {
+        _productDataCheck = null;
+        _hasError = false;
+        _isLoading = true;
+        _showUserProductImage = false;
+        _storeProduct = null;
+        _userProduct = null;
+        _topRecText = null;
+        _bottomRecText = null;
+      });
+      _startProductDataCheckTimeout();
+    }
   }
 
   bool compareProduct({
@@ -170,14 +211,23 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
     _productSubscription.cancel();
     _recSubscription.cancel();
     _errorSubscription.cancel();
+    _productDataCheckTimeout?.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return _productDataCheck?.isValidProduct == true
-        ? _buildVSInPageStandard(context)
-        : SizedBox.shrink();
+    // Hide if product data check timed out
+    if (_productDataCheckTimedOut && _productDataCheck == null) {
+      return SizedBox.shrink();
+    }
+
+    // Show the widget while loading or if the product is valid
+    // Hide only if PDC confirms the product is invalid
+    if (_productDataCheck == null || _productDataCheck!.isValidProduct) {
+      return _buildVSInPageStandard(context);
+    }
+    return SizedBox.shrink();
   }
 
   Future<void> _openVirtusizeWebview() async {

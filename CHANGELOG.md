@@ -1,3 +1,10 @@
+## 2.2.8
+* Fix recommended size is shown in InPage even when there is no available size in the comparison screen
+* Fix: Virtusize button state when loading a new product
+* Fix: Android: InPage Standard sometimes does not appear
+* Fix: Android: VS widget sometimes does not show when navigating between different colors
+* Update native SDK support to Android 2.12.15 & iOS 2.12.22
+
 ## 2.2.7
 * Fix: the human icon thumbnail is missing in inpage
 * Fix: opening the privacy policy redirects to an external browser

@@ -30,13 +30,18 @@ class VirtusizeFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
   private var virtusizeFlutterPresenter: VirtusizeFlutterPresenter =
     object : VirtusizeFlutterPresenter {
       override fun onValidProductCheck(productWithPCDData: VirtusizeProduct) {
-        channel.invokeMethod(
-          VirtusizeFlutterMethod.ON_PRODUCT_DATA_CHECK,
-          mutableMapOf(
-            VirtusizeFlutterKey.EXTERNAL_PRODUCT_ID to productWithPCDData.externalId,
-            VirtusizeFlutterKey.IS_VALID_PRODUCT to (productWithPCDData.productCheckData?.data?.validProduct ?: false),
+        // Post to main thread with delay to ensure Flutter widgets have time to subscribe
+        // This handles the case where cached data causes synchronous callback execution
+        scope.launch {
+          kotlinx.coroutines.delay(100)
+          channel.invokeMethod(
+            VirtusizeFlutterMethod.ON_PRODUCT_DATA_CHECK,
+            mutableMapOf(
+              VirtusizeFlutterKey.EXTERNAL_PRODUCT_ID to productWithPCDData.externalId,
+              VirtusizeFlutterKey.IS_VALID_PRODUCT to (productWithPCDData.productCheckData?.data?.validProduct ?: false),
+            )
           )
-        )
+        }
       }
 
       override fun hasInPageError(
@@ -54,18 +59,27 @@ class VirtusizeFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
         storeProduct: Product?,
         bestUserProduct: Product?,
         recommendationText: String?,
+        willFit: Boolean?,
       ) {
-        sendOnProductResult(storeProduct, "store")
-        sendOnProductResult(bestUserProduct, "user")
+        scope.launch {
+          kotlinx.coroutines.delay(100)
+          sendOnProductResult(storeProduct, "store")
+          sendOnProductResult(bestUserProduct, "user")
 
-        channel.invokeMethod(
-          VirtusizeFlutterMethod.ON_REC_CHANGE,
-          mutableMapOf(
-            VirtusizeFlutterKey.EXTERNAL_PRODUCT_ID to externalProductId,
-            VirtusizeFlutterKey.REC_TEXT to recommendationText,
-            VirtusizeFlutterKey.SHOW_USER_PRODUCT_IMAGE to true
+          // Show user product image only if:
+          // - willFit is not explicitly false (when false, it means "Your size not found")
+          // - AND there is a bestUserProduct available
+          val showUserProductImage = willFit != false && bestUserProduct != null
+
+          channel.invokeMethod(
+            VirtusizeFlutterMethod.ON_REC_CHANGE,
+            mutableMapOf(
+              VirtusizeFlutterKey.EXTERNAL_PRODUCT_ID to externalProductId,
+              VirtusizeFlutterKey.REC_TEXT to recommendationText,
+              VirtusizeFlutterKey.SHOW_USER_PRODUCT_IMAGE to showUserProductImage
+            )
           )
-        )
+        }
       }
 
       override fun onLangugeClick(language: VirtusizeLanguage) {
@@ -210,6 +224,7 @@ class VirtusizeFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
           return
         }
         virtusizeFlutter.setUserId(call.arguments.toString())
+        result.success(true)
       }
       VirtusizeFlutterMethod.LOAD_VIRTUSIZE -> {
         val externalId = call.argument<String>(VirtusizeFlutterKey.EXTERNAL_PRODUCT_ID)
@@ -224,6 +239,7 @@ class VirtusizeFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
         )
 
         virtusizeFlutter.load(virtusizeProduct)
+        result.success(true)
       }
       VirtusizeFlutterMethod.OPEN_VIRTUSIZE_WEB_VIEW -> {
         val externalProductId = call.arguments as? String
@@ -237,6 +253,7 @@ class VirtusizeFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
           activity,
           externalProductId
         )
+        result.success(true)
       }
       VirtusizeFlutterMethod.GET_PRIVACY_POLICY_LINK -> {
         result.success(
