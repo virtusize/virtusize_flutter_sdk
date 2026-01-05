@@ -1,3 +1,4 @@
+## 2.2.8
 * Fix recommended size is shown in InPage even when there is no available size in the comparison screen
 * Fix: Virtusize button state when loading a new product
 * Fix: Android: InPage Standard sometimes does not appear
