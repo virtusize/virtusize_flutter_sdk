@@ -121,7 +121,6 @@ class _HomeScreenState extends State<HomeScreen> {
             VirtusizeInPageMini(
               product: _product,
               backgroundColor: Colors.blue,
-              horizontalMargin: 32,
             ),
             Container(height: 16),
 
@@ -136,7 +135,6 @@ class _HomeScreenState extends State<HomeScreen> {
             VirtusizeInPageStandard(
               product: _product,
               buttonBackgroundColor: Colors.amber,
-              horizontalMargin: 32,
             ),
             Container(height: 16),
 
