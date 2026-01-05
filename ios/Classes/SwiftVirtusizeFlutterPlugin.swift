@@ -128,18 +128,20 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
                 if let imageURLString = arguments[VirtusizeFlutterKey.imageURL] as? String {
                     imageURL = URL(string: imageURLString)
                 }
-                
+
                 let product = VirtusizeProduct(externalId: externalProductId, imageURL: imageURL)
                 VirtusizeFlutter.load(product: product)
+                result(true)
             case VirtusizeFlutterMethod.openVirtusizeWebView:
                 guard let externalProductId = call.arguments as? String else {
                     result(FlutterError.noArguments)
                     return
                 }
-            
+
                 VirtusizeFlutter.openVirtusizeWebView(
                     externalId: externalProductId,
                     messageHandler: self)
+                result(true)
             case VirtusizeFlutterMethod.getPrivacyPolicyLink:
                 result(VirtusizeFlutter.getPrivacyPolicyLink())
             case VirtusizeFlutterMethod.sendOrder:
@@ -180,7 +182,8 @@ extension SwiftVirtusizeFlutterPlugin: VirtusizeFlutterProductEventHandler {
         clientProductImageURL: String?,
         storeProduct: VirtusizeServerProduct,
         bestUserProduct: VirtusizeServerProduct?,
-        recommendationText: String) {
+        recommendationText: String,
+        willFit: Bool?) {
             DispatchQueue.main.async { [self] in
                 self.flutterChannel?.invokeMethod(
                     VirtusizeFlutterMethod.onProduct,
@@ -193,7 +196,7 @@ extension SwiftVirtusizeFlutterPlugin: VirtusizeFlutterProductEventHandler {
                         VirtusizeFlutterKey.productStyle: storeProduct.productStyle
                     ]
                 )
-                
+
                 self.flutterChannel?.invokeMethod(
                     VirtusizeFlutterMethod.onProduct,
                     arguments:  [
@@ -204,13 +207,18 @@ extension SwiftVirtusizeFlutterPlugin: VirtusizeFlutterProductEventHandler {
                         VirtusizeFlutterKey.productStyle: bestUserProduct?.productStyle
                     ]
                 )
-            
+
+                // Show user product image only if:
+                // - willFit is not explicitly false (when false, it means "Your size not found")
+                // - AND there is a bestUserProduct available
+                let showUserProductImage = willFit != false && bestUserProduct != nil
+
                 self.flutterChannel?.invokeMethod(
                     VirtusizeFlutterMethod.onRecChange,
                     arguments: [
                         VirtusizeFlutterKey.externalProductId: externalId,
                         VirtusizeFlutterKey.recText: recommendationText,
-                        VirtusizeFlutterKey.showUserProductImage: true
+                        VirtusizeFlutterKey.showUserProductImage: showUserProductImage
                     ]
                 )
             }

@@ -14,18 +14,15 @@ class VirtusizeButton extends StatefulWidget {
   final Widget? child;
   final VirtusizeStyle style;
 
-  const VirtusizeButton({
-    super.key,
-    required this.product,
-    required Widget this.child,
-  }) : style = VirtusizeStyle.none;
+  VirtusizeButton({required this.product, required Widget this.child})
+    : style = VirtusizeStyle.none,
+      super(key: ValueKey('button_${product.externalProductId}'));
 
-  const VirtusizeButton.vsStyle({
-    super.key,
+  VirtusizeButton.vsStyle({
     required this.product,
     this.style = VirtusizeStyle.black,
     this.child,
-  });
+  }) : super(key: ValueKey('vs_button_${product.externalProductId}'));
 
   @override
   // ignore: library_private_types_in_public_api
@@ -38,6 +35,8 @@ class _VirtusizeButtonState extends State<VirtusizeButton> {
 
   VSText _vsText = IVirtusizeSDK.instance.vsText;
   bool _isValidProduct = false;
+  Timer? _productDataCheckTimeout;
+  bool _productDataCheckTimedOut = false;
 
   @override
   void initState() {
@@ -56,22 +55,54 @@ class _VirtusizeButtonState extends State<VirtusizeButton> {
           productDataCheck.externalProductId) {
         return;
       }
+      _productDataCheckTimeout?.cancel();
       setState(() {
         _isValidProduct = productDataCheck.isValidProduct;
+        _productDataCheckTimedOut = false;
       });
     });
+
+    // Start timeout timer for product data check
+    _startProductDataCheckTimeout();
+  }
+
+  void _startProductDataCheckTimeout() {
+    _productDataCheckTimeout?.cancel();
+    _productDataCheckTimedOut = false;
+
+    _productDataCheckTimeout = Timer(Duration(seconds: 10), () {
+      if (!mounted) return;
+      if (!_isValidProduct) {
+        setState(() {
+          _productDataCheckTimedOut = true;
+        });
+      }
+    });
+  }
+
+  @override
+  void didUpdateWidget(VirtusizeButton oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.product.externalProductId != widget.product.externalProductId) {
+      setState(() {
+        _isValidProduct = false;
+      });
+      _startProductDataCheckTimeout();
+    }
   }
 
   @override
   void dispose() {
     _vsTextSubscription.cancel();
     _pdcSubscription.cancel();
+    _productDataCheckTimeout?.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_isValidProduct == true) {
+    // Show the button only when the product is confirmed valid
+    if (_isValidProduct) {
       switch (widget.style) {
         case VirtusizeStyle.none:
           return widget.child!;
