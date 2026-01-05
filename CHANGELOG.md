@@ -4,6 +4,7 @@
 * Fix: Android: InPage Standard sometimes does not appear
 * Fix: Android: VS widget sometimes does not show when navigating between different colors
 * Update native SDK support to Android 2.12.15 & iOS 2.12.22
+* Replace horizontalMargin with padding in VirtusizeInPageMini and VirtusizeInPageStandard widgets for improved layout control
 
 ## 2.2.7
 * Fix: the human icon thumbnail is missing in inpage

@@ -36,7 +36,6 @@ class _VirtusizeButtonState extends State<VirtusizeButton> {
   VSText _vsText = IVirtusizeSDK.instance.vsText;
   bool _isValidProduct = false;
   Timer? _productDataCheckTimeout;
-  bool _productDataCheckTimedOut = false;
 
   @override
   void initState() {
@@ -58,7 +57,6 @@ class _VirtusizeButtonState extends State<VirtusizeButton> {
       _productDataCheckTimeout?.cancel();
       setState(() {
         _isValidProduct = productDataCheck.isValidProduct;
-        _productDataCheckTimedOut = false;
       });
     });
 
@@ -68,14 +66,11 @@ class _VirtusizeButtonState extends State<VirtusizeButton> {
 
   void _startProductDataCheckTimeout() {
     _productDataCheckTimeout?.cancel();
-    _productDataCheckTimedOut = false;
 
     _productDataCheckTimeout = Timer(Duration(seconds: 10), () {
       if (!mounted) return;
       if (!_isValidProduct) {
-        setState(() {
-          _productDataCheckTimedOut = true;
-        });
+        setState(() {});
       }
     });
   }

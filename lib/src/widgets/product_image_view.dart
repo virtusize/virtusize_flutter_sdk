@@ -50,7 +50,7 @@ class ProductImageView extends StatelessWidget {
     );
 
     if (type == ProductImageViewType.user) {
-      return Container(
+      return SizedBox(
         width: 36,
         height: 36,
         child: Center(
@@ -66,14 +66,16 @@ class ProductImageView extends StatelessWidget {
       );
     }
 
-    return Container(
+    return SizedBox(
       width: 36,
       height: 36,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.all(Radius.circular(18.0)),
-        border: Border.all(color: VSColors.vsGray800, width: 0.5),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(18.0)),
+          border: Border.all(color: VSColors.vsGray800, width: 0.5),
+        ),
+        child: imageContainer,
       ),
-      child: imageContainer,
     );
   }
 }
