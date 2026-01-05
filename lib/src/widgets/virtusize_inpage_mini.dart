@@ -2,35 +2,35 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:virtusize_flutter_sdk/src/main.dart';
-import 'package:virtusize_flutter_sdk/src/models/product_data_check.dart';
 import 'package:virtusize_flutter_sdk/src/models/recommendation.dart';
+import 'package:virtusize_flutter_sdk/src/models/product_data_check.dart';
 import 'package:virtusize_flutter_sdk/src/res/vs_colors.dart';
 import 'package:virtusize_flutter_sdk/src/res/vs_font.dart';
 import 'package:virtusize_flutter_sdk/src/res/vs_images.dart';
 import 'package:virtusize_flutter_sdk/src/res/vs_text.dart';
-import 'package:virtusize_flutter_sdk/src/widgets/animated_dots.dart';
-import 'package:virtusize_flutter_sdk/src/widgets/cta_button.dart';
 import 'package:virtusize_flutter_sdk/virtusize_flutter_sdk.dart';
+import 'package:virtusize_flutter_sdk/src/widgets/cta_button.dart';
+import 'package:virtusize_flutter_sdk/src/widgets/animated_dots.dart';
 
 class VirtusizeInPageMini extends StatefulWidget {
   final VirtusizeClientProduct product;
   final VirtusizeStyle style;
   final Color backgroundColor;
-  final double horizontalMargin;
+  final EdgeInsets margin;
 
-  VirtusizeInPageMini({
+  const VirtusizeInPageMini({
+    super.key,
     required this.product,
     this.backgroundColor = VSColors.vsGray900,
-    this.horizontalMargin = 16,
-  }) : style = VirtusizeStyle.none,
-       super(key: ValueKey('mini_${product.externalProductId}'));
+    this.margin = const EdgeInsets.symmetric(horizontal: 16),
+  }) : style = VirtusizeStyle.none;
 
-  VirtusizeInPageMini.vsStyle({
+  const VirtusizeInPageMini.vsStyle({
+    super.key,
     required this.product,
     this.style = VirtusizeStyle.black,
-    this.horizontalMargin = 16,
-  }) : backgroundColor = VSColors.vsGray900,
-       super(key: ValueKey('vs_mini_${product.externalProductId}'));
+    this.margin = const EdgeInsets.symmetric(horizontal: 16),
+  }) : backgroundColor = VSColors.vsGray900;
 
   @override
   // ignore: library_private_types_in_public_api
@@ -48,8 +48,6 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
   bool _isLoading = true;
   bool _hasError = false;
   late String _recText;
-  Timer? _productDataCheckTimeout;
-  bool _productDataCheckTimedOut = false;
 
   @override
   void initState() {
@@ -66,12 +64,10 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
       if (widget.product.externalProductId != pdc.externalProductId) {
         return;
       }
-      _productDataCheckTimeout?.cancel();
       setState(() {
         _isLoading = true;
         _hasError = false;
         _productDataCheck = pdc;
-        _productDataCheckTimedOut = false;
       });
     });
 
@@ -103,36 +99,6 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
         _hasError = true;
       });
     });
-
-    // Start timeout timer for product data check
-    _startProductDataCheckTimeout();
-  }
-
-  void _startProductDataCheckTimeout() {
-    _productDataCheckTimeout?.cancel();
-    _productDataCheckTimedOut = false;
-
-    _productDataCheckTimeout = Timer(Duration(seconds: 10), () {
-      if (!mounted) return;
-      if (_productDataCheck == null) {
-        setState(() {
-          _productDataCheckTimedOut = true;
-        });
-      }
-    });
-  }
-
-  @override
-  void didUpdateWidget(VirtusizeInPageMini oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.product.externalProductId != widget.product.externalProductId) {
-      setState(() {
-        _productDataCheck = null;
-        _isLoading = true;
-        _hasError = false;
-      });
-      _startProductDataCheckTimeout();
-    }
   }
 
   @override
@@ -141,20 +107,12 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
     _pdcSubscription.cancel();
     _recSubscription.cancel();
     _errorSubscription.cancel();
-    _productDataCheckTimeout?.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    // Hide if product data check timed out
-    if (_productDataCheckTimedOut && _productDataCheck == null) {
-      return Container();
-    }
-
-    // Show the widget while loading or if the product is valid
-    // Hide only if PDC confirms the product is invalid
-    if (_productDataCheck == null || _productDataCheck!.isValidProduct) {
+    if (_productDataCheck?.isValidProduct == true) {
       return GestureDetector(
         onTap: !_hasError ? _openVirtusizeWebview : () => {},
         child: _buildVSInPageMini(),
@@ -174,7 +132,7 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
             : widget.backgroundColor;
 
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: widget.horizontalMargin),
+      margin: widget.margin,
       color: _isLoading || _hasError ? Colors.white : color,
       width: double.infinity,
       child:
