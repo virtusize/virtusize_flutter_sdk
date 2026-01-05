@@ -73,13 +73,14 @@ class RunnerTests: XCTestCase {
                 VirtusizeFlutterKey.imageURL: "https://example.com/image.jpg"
             ]
         )
-        
+
         var resultData: Any?
         plugin.handle(call) { result in
             resultData = result
         }
-        
-        XCTAssertNil(resultData)
+
+        XCTAssertNotNil(resultData)
+        XCTAssertEqual(resultData as? Bool, true)
     }
     
     func testLoadVirtusizeWithoutProductId() {
@@ -106,13 +107,14 @@ class RunnerTests: XCTestCase {
             methodName: VirtusizeFlutterMethod.setUserId,
             arguments: "test_user_id"
         )
-        
+
         var resultData: Any?
         plugin.handle(call) { result in
             resultData = result
         }
-        
-        XCTAssertNil(resultData)
+
+        XCTAssertNotNil(resultData)
+        XCTAssertEqual(resultData as? Bool, true)
     }
     
     func testSetUserIdWithEmptyId() {
@@ -139,13 +141,14 @@ class RunnerTests: XCTestCase {
             methodName: VirtusizeFlutterMethod.openVirtusizeWebView,
             arguments: "product123"
         )
-        
+
         var resultData: Any?
         plugin.handle(call) { result in
             resultData = result
         }
-        
-        XCTAssertNil(resultData)
+
+        XCTAssertNotNil(resultData)
+        XCTAssertEqual(resultData as? Bool, true)
     }
     
     func testOpenVirtusizeWebViewWithoutProductId() {
