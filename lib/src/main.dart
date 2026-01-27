@@ -145,7 +145,7 @@ class VirtusizeSDK {
                   return infoCategory.value;
                 }).toList(),
             FlutterVirtusizeKey.showSNSButtons: showSNSButtons,
-            FlutterVirtusizeKey.branch: (branch ?? "snkrdnk-line-quick-fix"),
+            FlutterVirtusizeKey.branch: branch,
             FlutterVirtusizeKey.showPrivacyPolicy: showShowPrivacyPolicy,
             FlutterVirtusizeKey.serviceEnvironment: serviceEnvironment,
           });
