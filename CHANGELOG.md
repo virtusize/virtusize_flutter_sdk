@@ -1,5 +1,7 @@
-## Changes:
+## 2.2.9
 * Fix: imageURL download time improvement
+* Fix: product image load takes longer than native SDK
+* Update native SDK support to Android 2.12.18 & iOS 2.12.24
 
 ## 2.2.8
 * Fix: recommended size is shown in InPage even when there is no available size in the comparison screen
