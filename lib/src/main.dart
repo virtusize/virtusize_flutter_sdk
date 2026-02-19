@@ -4,6 +4,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:virtusize_flutter_sdk/src/models/virtusize_client_product.dart';
 
 import 'models/product_data_check.dart';
@@ -155,6 +156,13 @@ class VirtusizeSDK {
       await _loadVSText(
         paramsData[FlutterVirtusizeKey.displayLanguage],
         language,
+      );
+
+      await SentryFlutter.init(
+            (options) {
+          options.dsn = 'https://4340d4578b6c28fea8f1e108096f030b@o903.ingest.us.sentry.io/4510877746462720';
+          options.autoInitializeNativeSdk = false; // Prevents the plugin from starting a second native SDK instance
+        },
       );
     } on PlatformException catch (error) {
       log(

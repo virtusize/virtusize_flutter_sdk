@@ -14,6 +14,7 @@ dependencies:
   url_launcher: ^6.3.1
   plugin_platform_interface: ^2.1.8
   dotted_border: ^2.1.0
+  sentry_flutter: ^9.13.0
 
 dev_dependencies:
   flutter_test:
