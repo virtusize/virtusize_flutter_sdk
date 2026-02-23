@@ -63,8 +63,10 @@ class VirtusizeSDK {
             call.arguments[FlutterVirtusizeKey.externalProductId];
         final isValidProduct =
             call.arguments[FlutterVirtusizeKey.isValidProduct];
+        final storeName =
+        call.arguments[FlutterVirtusizeKey.storeName];
         IVirtusizeSDK.instance._pdcController.add(
-          ProductDataCheck(externalId, isValidProduct),
+          ProductDataCheck(externalId, isValidProduct, storeName),
         );
       },
       FlutterVirtusizeMethod.onProductError: (call) {

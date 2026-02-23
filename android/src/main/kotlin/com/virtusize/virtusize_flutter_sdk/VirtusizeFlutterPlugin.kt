@@ -39,6 +39,7 @@ class VirtusizeFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
             mutableMapOf(
               VirtusizeFlutterKey.EXTERNAL_PRODUCT_ID to productWithPCDData.externalId,
               VirtusizeFlutterKey.IS_VALID_PRODUCT to (productWithPCDData.productCheckData?.data?.validProduct ?: false),
+              VirtusizeFlutterKey.STORE_NAME to (productWithPCDData.productCheckData?.data?.storeName ?: ""),
             )
           )
         }

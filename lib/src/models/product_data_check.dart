@@ -5,10 +5,19 @@ class ProductDataCheck {
   /// A boolean to tell whether it's a valid product in the Virtusize server
   final bool isValidProduct;
 
-  ProductDataCheck(this.externalProductId, this.isValidProduct);
+  /// A string to represent the store name
+  final String storeName;
+
+  ProductDataCheck(this.externalProductId, this.isValidProduct, this.storeName);
 
   @override
   String toString() {
-    return '{externalProductId: $externalProductId, isValidProduct: $isValidProduct}';
+    return '{externalProductId: $externalProductId, isValidProduct: $isValidProduct, storeName: $storeName}';
   }
+
+  bool canBuildVirtusizeWidget() => _Stores.values.any((store) => store.name == storeName);
+}
+
+enum _Stores{
+  snkrdunk
 }
