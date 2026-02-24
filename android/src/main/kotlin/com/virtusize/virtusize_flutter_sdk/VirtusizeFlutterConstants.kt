@@ -42,6 +42,7 @@ internal object VirtusizeFlutterKey {
     const val SHOW_USER_PRODUCT_IMAGE = "showUserProductImage"
     const val IS_VALID_PRODUCT = "isValidProduct"
     const val SHOW_PRIVACY_POLICY = "showPrivacyPolicy"
+    const val STORE_NAME = "storeName"
 }
 
 internal object VirtusizeEventKey {

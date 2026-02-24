@@ -165,13 +165,14 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
 }
 
 extension SwiftVirtusizeFlutterPlugin: VirtusizeFlutterProductEventHandler {
-    public func onProductCheckData(externalId: String, isValid: Bool) {
+    public func onProductCheckData(externalId: String, isValid: Bool, storeName: String) {
         DispatchQueue.main.async {
             self.flutterChannel?.invokeMethod(
                 VirtusizeFlutterMethod.onProductDataCheck,
                 arguments:  [
                     VirtusizeFlutterKey.externalProductId: externalId,
-                    VirtusizeFlutterKey.isValidProduct: isValid
+                    VirtusizeFlutterKey.isValidProduct: isValid,
+                    VirtusizeFlutterKey.storeName: storeName,
                 ]
             )
         }

@@ -69,6 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
         child: ListView(
           shrinkWrap: true,
           children: [
+
             Center(
               child:
               /// A [VirtusizeButton] widget with the default VirtusizeStyle

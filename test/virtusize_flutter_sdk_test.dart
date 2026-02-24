@@ -179,6 +179,7 @@ void main() {
         final matcher = 'product123';
         expect(pdc.externalProductId, matcher);
         expect(pdc.isValidProduct, true);
+        expect(pdc.storeName, "");
         completer.complete(true);
       });
 
@@ -190,6 +191,7 @@ void main() {
               MethodCall(FlutterVirtusizeMethod.onProductDataCheck, {
                 FlutterVirtusizeKey.externalProductId: 'product123',
                 FlutterVirtusizeKey.isValidProduct: true,
+                FlutterVirtusizeKey.storeName: "",
               }),
             ),
             (_) {},
