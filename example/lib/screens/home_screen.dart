@@ -15,9 +15,6 @@ class _HomeScreenState extends State<HomeScreen> {
   /// Declare a global [VirtusizeClientProduct] variable, which will be passed to the `Virtusize` widgets in order to bind the product info
   late VirtusizeClientProduct _product;
 
-  String _virtusizeWidget = "Virtusize Widget Test";
-
-
   @override
   void initState() {
     super.initState();
@@ -165,26 +162,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Text("Go to next product page"),
               ),
             ),
-            Container(height: 16),
-            Center(
-              child: VirtusizeWidget(
-                product: _product,
-                onVirtusizeEventChanged: handleVirtusizeWidgetEvent,
-                child: Container(
-                  padding: EdgeInsets.all(8.0),
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [
-                        Color(0xFF6A5AE0),
-                        Color(0xFFB967FF),
-                      ],
-                    ),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                    child: Text(_virtusizeWidget),
-                ),
-              ),
-            ),
           ],
         ),
       ),
@@ -231,25 +208,5 @@ class _HomeScreenState extends State<HomeScreen> {
         print(error);
       },
     );
-  }
-
-  void handleVirtusizeWidgetEvent(VirtusizeWidgetEvent event) {
-    switch (event) {
-      case RecommendedSizeChanged(:final text, :final size):
-        print("Recommended size: $size");
-        setState(() {
-          if(size.isNotEmpty){
-            _virtusizeWidget = "your size is $size";
-          } else {
-            _virtusizeWidget = text;
-          }
-        });
-
-      case LoadingChanged(:final isLoading):
-        print("Loading: $isLoading");
-
-      case ErrorOccurred():
-        print("Error");
-    }
   }
 }
