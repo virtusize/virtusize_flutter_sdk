@@ -28,7 +28,7 @@ class _VirtusizeWidgetState extends State<VirtusizeWidget> {
   late final StreamSubscription<Recommendation> _recSubscription;
 
   bool _isValidProduct = false;
-  bool _canBuildWidget = false;
+  bool _isAllowedForStore = false;
   Timer? _productDataCheckTimeout;
 
   @override
@@ -45,7 +45,7 @@ class _VirtusizeWidgetState extends State<VirtusizeWidget> {
 
       setState(() {
         _isValidProduct = productDataCheck.isValidProduct;
-        _canBuildWidget = productDataCheck.canBuildVirtusizeWidget();
+        _isAllowedForStore = productDataCheck.isAllowedForStore();
       });
 
       widget.onVirtusizeEventChanged(LoadingChanged(true));
@@ -111,7 +111,7 @@ class _VirtusizeWidgetState extends State<VirtusizeWidget> {
   @override
   Widget build(BuildContext context) {
     // Show the view only when the product is confirmed valid
-    if (_isValidProduct && _canBuildWidget) {
+    if (_isValidProduct && _isAllowedForStore) {
       return GestureDetector(
         onTap: _openVirtusizeWebview,
         child: widget.child,

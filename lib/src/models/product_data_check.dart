@@ -15,7 +15,7 @@ class ProductDataCheck {
     return '{externalProductId: $externalProductId, isValidProduct: $isValidProduct, storeName: $storeName}';
   }
 
-  bool canBuildVirtusizeWidget() => _Stores.values.any((store) => store.name == storeName);
+  bool isAllowedForStore() => _Stores.values.any((store) => store.name == storeName);
 }
 
 enum _Stores{
