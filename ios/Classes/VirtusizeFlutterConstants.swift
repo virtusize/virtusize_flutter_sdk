@@ -41,6 +41,7 @@ struct VirtusizeFlutterKey {
 	static let showUserProductImage = "showUserProductImage"
 	static let isValidProduct = "isValidProduct"
 	static let showPrivacyPolicy = "showPrivacyPolicy"
+    static let storeName = "storeName"
 }
 
 struct VirtusizeEventKey {

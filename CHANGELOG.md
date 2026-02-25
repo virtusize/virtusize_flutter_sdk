@@ -1,3 +1,7 @@
+## 2.2.10
+* Feature: Virtusize Widget component added
+* Update native SDK support to Android 2.12.20 & iOS 2.12.25
+
 ## 2.2.9
 * Fix: imageURL download time improvement
 * Fix: product image load takes longer than native SDK
