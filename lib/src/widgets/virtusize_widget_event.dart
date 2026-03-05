@@ -10,4 +10,7 @@ class VirtusizeDone extends VirtusizeStatus {
   VirtusizeDone({required this.recommendedText, required this.recommendedSize});
 }
 
-class VirtusizeError extends VirtusizeStatus {}
+class VirtusizeError extends VirtusizeStatus {
+  final Object error;
+  VirtusizeError({required this.error});
+}

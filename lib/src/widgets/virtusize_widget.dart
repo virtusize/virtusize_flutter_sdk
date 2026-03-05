@@ -46,10 +46,15 @@ class _VirtusizeBuilderState extends State<VirtusizeBuilder> {
       }
       _productDataCheckTimeout?.cancel();
 
-      if (!productDataCheck.isValidProduct ||
-          !productDataCheck.isAllowedForStore()) {
+      if (!productDataCheck.isValidProduct) {
         setState(() {
-          _status = VirtusizeError();
+          _status = VirtusizeError(error: 'Invalid product: ${productDataCheck.externalProductId}');
+        });
+        return;
+      }
+      if (!productDataCheck.isAllowedForStore()) {
+        setState(() {
+          _status = VirtusizeError(error: 'Store not allowed: ${productDataCheck.storeName}');
         });
         return;
       }
@@ -76,7 +81,7 @@ class _VirtusizeBuilderState extends State<VirtusizeBuilder> {
         return;
       }
       setState(() {
-        _status = VirtusizeError();
+        _status = VirtusizeError(error: 'Product error: $externalProductId');
       });
     });
 
@@ -90,7 +95,7 @@ class _VirtusizeBuilderState extends State<VirtusizeBuilder> {
       if (!mounted) return;
       if (_status is VirtusizeWaiting) {
         setState(() {
-          _status = VirtusizeError();
+          _status = VirtusizeError(error: 'Product data check timed out');
         });
       }
     });
