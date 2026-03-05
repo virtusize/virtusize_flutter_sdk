@@ -128,19 +128,12 @@ class _VirtusizeBuilderState extends State<VirtusizeBuilder> {
   }
 
   void _setDone(String recText) {
-    List<String> recTextArray = recText.split("<br>");
+    final parts = recText.split("<br>");
     setState(() {
-      if (recTextArray.length == 2) {
-        _status = VirtusizeDone(
-          recommendedText: recTextArray.first,
-          recommendedSize: recTextArray.last,
-        );
-      } else {
-        _status = VirtusizeDone(
-          recommendedText: recText,
-          recommendedSize: "",
-        );
-      }
+      _status = VirtusizeDone(
+        recommendedText: parts.length == 2 ? parts.first : recText,
+        recommendedSize: parts.length == 2 ? parts.last : "",
+      );
     });
   }
 }
