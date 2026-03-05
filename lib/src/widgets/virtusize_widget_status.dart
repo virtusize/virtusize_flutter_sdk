@@ -1,7 +1,5 @@
 sealed class VirtusizeWidgetStatus {}
 
-class VirtusizeWidgetWaiting extends VirtusizeWidgetStatus {}
-
 class VirtusizeWidgetLoading extends VirtusizeWidgetStatus {}
 
 class VirtusizeWidgetDone extends VirtusizeWidgetStatus {

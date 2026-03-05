@@ -30,7 +30,7 @@ class _VirtusizeBuilderState extends State<VirtusizeBuilder> {
   late final StreamSubscription<String> _errorSubscription;
   late final StreamSubscription<Recommendation> _recSubscription;
 
-  VirtusizeWidgetStatus _status = VirtusizeWidgetWaiting();
+  VirtusizeWidgetStatus _status = VirtusizeWidgetLoading();
   Timer? _productDataCheckTimeout;
 
   @override
@@ -59,9 +59,6 @@ class _VirtusizeBuilderState extends State<VirtusizeBuilder> {
         return;
       }
 
-      setState(() {
-        _status = VirtusizeWidgetLoading();
-      });
     });
 
     _recSubscription = IVirtusizeSDK.instance.recStream.listen((
@@ -93,7 +90,7 @@ class _VirtusizeBuilderState extends State<VirtusizeBuilder> {
 
     _productDataCheckTimeout = Timer(Duration(seconds: 10), () {
       if (!mounted) return;
-      if (_status is VirtusizeWidgetWaiting) {
+      if (_status is VirtusizeWidgetLoading) {
         setState(() {
           _status = VirtusizeWidgetError(error: 'Product data check timed out');
         });
@@ -107,7 +104,7 @@ class _VirtusizeBuilderState extends State<VirtusizeBuilder> {
     if (oldWidget.product.externalProductId !=
         widget.product.externalProductId) {
       setState(() {
-        _status = VirtusizeWidgetWaiting();
+        _status = VirtusizeWidgetLoading();
       });
       _startProductDataCheckTimeout();
     }
