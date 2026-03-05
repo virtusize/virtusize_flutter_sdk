@@ -9,7 +9,7 @@ import '../models/recommendation.dart';
 
 typedef VirtusizeWidgetBuilder = Widget Function(
   BuildContext context,
-  VirtusizeStatus status,
+  VirtusizeWidgetStatus status,
 );
 
 class VirtusizeBuilder extends StatefulWidget {
@@ -30,7 +30,7 @@ class _VirtusizeBuilderState extends State<VirtusizeBuilder> {
   late final StreamSubscription<String> _errorSubscription;
   late final StreamSubscription<Recommendation> _recSubscription;
 
-  VirtusizeStatus _status = VirtusizeWaiting();
+  VirtusizeWidgetStatus _status = VirtusizeWidgetWaiting();
   Timer? _productDataCheckTimeout;
 
   @override
@@ -48,19 +48,19 @@ class _VirtusizeBuilderState extends State<VirtusizeBuilder> {
 
       if (!productDataCheck.isValidProduct) {
         setState(() {
-          _status = VirtusizeError(error: 'Invalid product: ${productDataCheck.externalProductId}');
+          _status = VirtusizeWidgetError(error: 'Invalid product: ${productDataCheck.externalProductId}');
         });
         return;
       }
       if (!productDataCheck.isAllowedForStore()) {
         setState(() {
-          _status = VirtusizeError(error: 'Store not allowed: ${productDataCheck.storeName}');
+          _status = VirtusizeWidgetError(error: 'Store not allowed: ${productDataCheck.storeName}');
         });
         return;
       }
 
       setState(() {
-        _status = VirtusizeLoading();
+        _status = VirtusizeWidgetLoading();
       });
     });
 
@@ -81,7 +81,7 @@ class _VirtusizeBuilderState extends State<VirtusizeBuilder> {
         return;
       }
       setState(() {
-        _status = VirtusizeError(error: 'Product error: $externalProductId');
+        _status = VirtusizeWidgetError(error: 'Product error: $externalProductId');
       });
     });
 
@@ -93,9 +93,9 @@ class _VirtusizeBuilderState extends State<VirtusizeBuilder> {
 
     _productDataCheckTimeout = Timer(Duration(seconds: 10), () {
       if (!mounted) return;
-      if (_status is VirtusizeWaiting) {
+      if (_status is VirtusizeWidgetWaiting) {
         setState(() {
-          _status = VirtusizeError(error: 'Product data check timed out');
+          _status = VirtusizeWidgetError(error: 'Product data check timed out');
         });
       }
     });
@@ -107,7 +107,7 @@ class _VirtusizeBuilderState extends State<VirtusizeBuilder> {
     if (oldWidget.product.externalProductId !=
         widget.product.externalProductId) {
       setState(() {
-        _status = VirtusizeWaiting();
+        _status = VirtusizeWidgetWaiting();
       });
       _startProductDataCheckTimeout();
     }
@@ -130,7 +130,7 @@ class _VirtusizeBuilderState extends State<VirtusizeBuilder> {
   void _setDone(String recText) {
     final parts = recText.split("<br>");
     setState(() {
-      _status = VirtusizeDone(
+      _status = VirtusizeWidgetDone(
         recommendedText: parts.length == 2 ? parts.first : recText,
         recommendedSize: parts.length == 2 ? parts.last : "",
       );
