@@ -1,34 +1,36 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:virtusize_flutter_sdk/src/widgets/virtusize_widget_event.dart';
 
 import '../../virtusize_flutter_sdk.dart';
 import '../main.dart';
 import '../models/product_data_check.dart';
 import '../models/recommendation.dart';
 
-class VirtusizeWidget extends StatefulWidget {
+typedef VirtusizeWidgetBuilder = Widget Function(
+  BuildContext context,
+  VirtusizeStatus status,
+);
+
+class VirtusizeBuilder extends StatefulWidget {
   final VirtusizeClientProduct product;
-  final Container child;
-  final ValueChanged<VirtusizeWidgetEvent> onVirtusizeEventChanged;
-  VirtusizeWidget({
+  final VirtusizeWidgetBuilder builder;
+
+  VirtusizeBuilder({
     required this.product,
-    required this.child,
-    required this.onVirtusizeEventChanged,
-  }) : super(key: ValueKey('button_${product.externalProductId}'));
+    required this.builder,
+  }) : super(key: ValueKey('builder_${product.externalProductId}'));
 
   @override
-  State<StatefulWidget> createState() => _VirtusizeWidgetState();
+  State<StatefulWidget> createState() => _VirtusizeBuilderState();
 }
 
-class _VirtusizeWidgetState extends State<VirtusizeWidget> {
+class _VirtusizeBuilderState extends State<VirtusizeBuilder> {
   late final StreamSubscription<ProductDataCheck> _pdcSubscription;
   late final StreamSubscription<String> _errorSubscription;
   late final StreamSubscription<Recommendation> _recSubscription;
 
-  bool _isValidProduct = false;
-  bool _isAllowedForStore = false;
+  VirtusizeStatus _status = VirtusizeWaiting();
   Timer? _productDataCheckTimeout;
 
   @override
@@ -36,44 +38,48 @@ class _VirtusizeWidgetState extends State<VirtusizeWidget> {
     super.initState();
 
     _pdcSubscription = IVirtusizeSDK.instance.pdcStream.listen((
-        productDataCheck,
-        ) {
-      if (widget.product.externalProductId != productDataCheck.externalProductId) {
+      productDataCheck,
+    ) {
+      if (widget.product.externalProductId !=
+          productDataCheck.externalProductId) {
         return;
       }
       _productDataCheckTimeout?.cancel();
 
-      setState(() {
-        _isValidProduct = productDataCheck.isValidProduct;
-        _isAllowedForStore = productDataCheck.isAllowedForStore();
-      });
+      if (!productDataCheck.isValidProduct ||
+          !productDataCheck.isAllowedForStore()) {
+        setState(() {
+          _status = VirtusizeError();
+        });
+        return;
+      }
 
-      widget.onVirtusizeEventChanged(LoadingChanged(true));
+      setState(() {
+        _status = VirtusizeLoading();
+      });
     });
 
     _recSubscription = IVirtusizeSDK.instance.recStream.listen((
-        recommendation,
-        ) {
+      recommendation,
+    ) {
       if (widget.product.externalProductId !=
           recommendation.externalProductID) {
         return;
       }
-      widget.onVirtusizeEventChanged(LoadingChanged(false));
-      getRecommendedSize(recommendation.text);
+      _setDone(recommendation.text);
     });
 
     _errorSubscription = IVirtusizeSDK.instance.productErrorStream.listen((
-        externalProductId,
-        ) {
+      externalProductId,
+    ) {
       if (widget.product.externalProductId != externalProductId) {
         return;
       }
-      widget.onVirtusizeEventChanged(LoadingChanged(false));
-      widget.onVirtusizeEventChanged(ErrorOccurred());
-
+      setState(() {
+        _status = VirtusizeError();
+      });
     });
 
-    // Start timeout timer for product data check
     _startProductDataCheckTimeout();
   }
 
@@ -82,18 +88,21 @@ class _VirtusizeWidgetState extends State<VirtusizeWidget> {
 
     _productDataCheckTimeout = Timer(Duration(seconds: 10), () {
       if (!mounted) return;
-      if (!_isValidProduct) {
-        setState(() {});
+      if (_status is VirtusizeWaiting) {
+        setState(() {
+          _status = VirtusizeError();
+        });
       }
     });
   }
 
   @override
-  void didUpdateWidget(VirtusizeWidget oldWidget) {
+  void didUpdateWidget(VirtusizeBuilder oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.product.externalProductId != widget.product.externalProductId) {
+    if (oldWidget.product.externalProductId !=
+        widget.product.externalProductId) {
       setState(() {
-        _isValidProduct = false;
+        _status = VirtusizeWaiting();
       });
       _startProductDataCheckTimeout();
     }
@@ -110,26 +119,23 @@ class _VirtusizeWidgetState extends State<VirtusizeWidget> {
 
   @override
   Widget build(BuildContext context) {
-    // Show the view only when the product is confirmed valid
-    if (_isValidProduct && _isAllowedForStore) {
-      return GestureDetector(
-        onTap: _openVirtusizeWebview,
-        child: widget.child,
-      );
-    }
-    return Container();
+    return widget.builder(context, _status);
   }
 
-  void getRecommendedSize(String recText) {
+  void _setDone(String recText) {
     List<String> recTextArray = recText.split("<br>");
-    if (recTextArray.length == 2) {
-      widget.onVirtusizeEventChanged(RecommendedSizeChanged(recTextArray.first, recTextArray.last));
-    } else {
-      widget.onVirtusizeEventChanged(RecommendedSizeChanged(recText, ""));
-    }
-  }
-
-  Future<void> _openVirtusizeWebview() async {
-    await VirtusizeSDK.instance.openVirtusizeWebView(widget.product);
+    setState(() {
+      if (recTextArray.length == 2) {
+        _status = VirtusizeDone(
+          recommendedText: recTextArray.first,
+          recommendedSize: recTextArray.last,
+        );
+      } else {
+        _status = VirtusizeDone(
+          recommendedText: recText,
+          recommendedSize: "",
+        );
+      }
+    });
   }
 }
