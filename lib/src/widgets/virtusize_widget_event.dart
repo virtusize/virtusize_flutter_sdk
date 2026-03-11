@@ -1,18 +1,17 @@
-sealed class VirtusizeWidgetEvent {}
+sealed class VirtusizeWidgetState {}
 
-class RecommendedSizeChanged extends VirtusizeWidgetEvent {
-  final String size;
-  final String text;
+class VirtusizeWidgetCompleted extends VirtusizeWidgetState {
+  final String recommendedText;
+  final String recommendedSize;
 
-  RecommendedSizeChanged(this.text, this.size);
+  VirtusizeWidgetCompleted({required this.recommendedText,required this.recommendedSize});
 }
 
-class LoadingChanged extends VirtusizeWidgetEvent {
-  final bool isLoading;
-
-  LoadingChanged(this.isLoading);
+class VirtusizeWidgetLoading extends VirtusizeWidgetState {
+  VirtusizeWidgetLoading();
 }
 
-class ErrorOccurred extends VirtusizeWidgetEvent {
-  ErrorOccurred();
+class VirtusizeWidgetError extends VirtusizeWidgetState {
+  final Object error;
+  VirtusizeWidgetError({required this.error});
 }
