@@ -184,7 +184,8 @@ extension SwiftVirtusizeFlutterPlugin: VirtusizeFlutterProductEventHandler {
         storeProduct: VirtusizeServerProduct,
         bestUserProduct: VirtusizeServerProduct?,
         recommendationText: String,
-        willFit: Bool?) {
+        willFit: Bool
+    ) {
             DispatchQueue.main.async { [self] in
                 self.flutterChannel?.invokeMethod(
                     VirtusizeFlutterMethod.onProduct,
