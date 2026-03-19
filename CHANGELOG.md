@@ -1,3 +1,7 @@
+## 2.2.11
+* Feature: Enhancement changes on VritusizeWidget implementation
+* Update native SDK support to iOS 2.12.26
+
 ## 2.2.10
 * Feature: Virtusize Widget component added
 * Update native SDK support to Android 2.12.20 & iOS 2.12.25
