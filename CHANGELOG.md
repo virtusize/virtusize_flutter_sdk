@@ -1,3 +1,6 @@
+## 2.2.12
+* Update native SDK support to Android 2.12.22 & iOS 2.12.29
+
 ## 2.2.11
 * Feature: Enhancement changes on VritusizeWidget implementation
 * Update native SDK support to iOS 2.12.26
