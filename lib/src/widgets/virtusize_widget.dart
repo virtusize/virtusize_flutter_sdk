@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:virtusize_flutter_sdk/src/widgets/virtusize_widget_event.dart';
 
 import '../../virtusize_flutter_sdk.dart';
 import '../main.dart';
@@ -13,10 +12,8 @@ class VirtusizeWidgetBuilder extends StatefulWidget {
 
   final Widget Function(BuildContext context, VirtusizeWidgetState) builder;
 
-  VirtusizeWidgetBuilder({
-    required this.product,
-    required this.builder,
-  }) : super(key: ValueKey('button_${product.externalProductId}'));
+  VirtusizeWidgetBuilder({required this.product, required this.builder})
+    : super(key: ValueKey('button_${product.externalProductId}'));
 
   @override
   State<StatefulWidget> createState() => _VirtusizeWidgetBuilderState();
@@ -38,9 +35,10 @@ class _VirtusizeWidgetBuilderState extends State<VirtusizeWidgetBuilder> {
     super.initState();
 
     _pdcSubscription = IVirtusizeSDK.instance.pdcStream.listen((
-        productDataCheck,
-        ) {
-      if (widget.product.externalProductId != productDataCheck.externalProductId) {
+      productDataCheck,
+    ) {
+      if (widget.product.externalProductId !=
+          productDataCheck.externalProductId) {
         return;
       }
       _productDataCheckTimeout?.cancel();
@@ -48,18 +46,20 @@ class _VirtusizeWidgetBuilderState extends State<VirtusizeWidgetBuilder> {
       setState(() {
         _eventState = VirtusizeWidgetLoading();
 
-         _isValidProduct = productDataCheck.isValidProduct;
+        _isValidProduct = productDataCheck.isValidProduct;
         _isAllowedForStore = productDataCheck.isAllowedForStore();
 
-        if(!_isValidProduct) {
-          _eventState = VirtusizeWidgetError(error: 'Invalid product: ${productDataCheck.externalProductId}');
+        if (!_isValidProduct) {
+          _eventState = VirtusizeWidgetError(
+            error: 'Invalid product: ${productDataCheck.externalProductId}',
+          );
         }
       });
     });
 
     _recSubscription = IVirtusizeSDK.instance.recStream.listen((
-        recommendation,
-        ) {
+      recommendation,
+    ) {
       if (widget.product.externalProductId !=
           recommendation.externalProductID) {
         return;
@@ -68,14 +68,16 @@ class _VirtusizeWidgetBuilderState extends State<VirtusizeWidgetBuilder> {
     });
 
     _errorSubscription = IVirtusizeSDK.instance.productErrorStream.listen((
-        externalProductId,
-        ) {
+      externalProductId,
+    ) {
       if (widget.product.externalProductId != externalProductId) {
         return;
       }
 
       setState(() {
-        _eventState = VirtusizeWidgetError(error: 'Product error: $externalProductId');
+        _eventState = VirtusizeWidgetError(
+          error: 'Product error: $externalProductId',
+        );
       });
     });
 
@@ -90,7 +92,9 @@ class _VirtusizeWidgetBuilderState extends State<VirtusizeWidgetBuilder> {
       if (!mounted) return;
       if (_eventState is VirtusizeWidgetLoading) {
         setState(() {
-          _eventState = VirtusizeWidgetError(error: 'Product data check timed out');
+          _eventState = VirtusizeWidgetError(
+            error: 'Product data check timed out',
+          );
         });
       }
     });
@@ -99,7 +103,8 @@ class _VirtusizeWidgetBuilderState extends State<VirtusizeWidgetBuilder> {
   @override
   void didUpdateWidget(VirtusizeWidgetBuilder oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.product.externalProductId != widget.product.externalProductId) {
+    if (oldWidget.product.externalProductId !=
+        widget.product.externalProductId) {
       setState(() {
         _isValidProduct = false;
       });
@@ -118,19 +123,19 @@ class _VirtusizeWidgetBuilderState extends State<VirtusizeWidgetBuilder> {
 
   @override
   Widget build(BuildContext context) {
+    switch (_eventState) {
+      case VirtusizeWidgetCompleted():
+        {
+          //Return empty container if store is not allowed to use this widget class
+          if (!_isAllowedForStore) {
+            return Container();
+          }
 
-    switch(_eventState){
-      case VirtusizeWidgetCompleted():{
-        //Return empty container if store is not allowed to use this widget class
-        if(!_isAllowedForStore){
-          return Container();
+          return GestureDetector(
+            onTap: _openVirtusizeWebview,
+            child: widget.builder(context, _eventState),
+          );
         }
-
-        return GestureDetector(
-          onTap: _openVirtusizeWebview,
-          child: widget.builder(context, _eventState),
-        );
-      }
       default:
         return widget.builder(context, _eventState);
     }
@@ -141,10 +146,14 @@ class _VirtusizeWidgetBuilderState extends State<VirtusizeWidgetBuilder> {
     setState(() {
       if (recTextArray.length == 2) {
         _eventState = VirtusizeWidgetCompleted(
-            recommendedText: recTextArray.first, recommendedSize: recTextArray.last);
+          recommendedText: recTextArray.first,
+          recommendedSize: recTextArray.last,
+        );
       } else {
         _eventState = VirtusizeWidgetCompleted(
-            recommendedText: recText, recommendedSize: '');
+          recommendedText: recText,
+          recommendedSize: '',
+        );
       }
     });
   }

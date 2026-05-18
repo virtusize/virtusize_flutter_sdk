@@ -34,8 +34,6 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         switch call.method {
             case VirtusizeFlutterMethod.setVirtusizeParams:
-                VirtusizeFlutter.initNotificationObserver(flutterHandler: self)
-            
                 guard let arguments = call.arguments as? [String: Any] else {
                     result(FlutterError.noArguments)
                     return
@@ -50,11 +48,13 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
                 if let userId = arguments[VirtusizeFlutterKey.externalUserId] as? String {
                     VirtusizeFlutter.userID = userId
                 }
-                
+
                 if let envStr = arguments[VirtusizeFlutterKey.environment] as? String,
                    let env = VirtusizeEnvironment.allCases.first(where: {environment in "\(environment.self)".lowercased() == envStr.lowercased() }) {
                     VirtusizeFlutter.environment = env
                 }
+
+                VirtusizeFlutter.initNotificationObserver(flutterHandler: self)
                 
                 var virtusizeBuilder = VirtusizeParamsBuilder()
                 

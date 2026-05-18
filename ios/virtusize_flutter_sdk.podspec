@@ -17,7 +17,7 @@ This SDK helps clients to integrate Virtusize’s size and fit service into thei
   s.resources = 'Resources/**/*.json'
   s.resource_bundle = { 'virtusize_flutter_sdk' => ['Resources/**/*.json'] }
   s.dependency 'Flutter'
-  s.dependency 'Virtusize', '~> 2.12.29'
+  s.dependency 'Virtusize', '~> 2.12.30'
   s.static_framework = true
   
   s.platform = :ios, '14.0'
