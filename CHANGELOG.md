@@ -1,4 +1,4 @@
-## Changes:
+## 2.2.13
 * Added `hideLoadingState` parameter to `VirtusizeInPageStandard` widget to allow hiding the loading state when the product data is being fetched
 
 ## 2.2.12
