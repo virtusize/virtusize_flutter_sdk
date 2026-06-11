@@ -79,6 +79,11 @@ class VirtusizeFlutterSdkTest {
     every { mockEditor.apply() } just Runs
     every { mockContext.getSharedPreferences(any(), any()) } returns mockSharedPreferences
 
+    // The plugin constructs a real VirtusizeFlutterBuilder() and calls init() on it.
+    // Intercept the constructor so init() returns our fully-stubbed builder mock,
+    // otherwise build() would run the native SDK (Sentry init) and crash on the JVM.
+    mockkConstructor(VirtusizeFlutterBuilder::class)
+    every { anyConstructed<VirtusizeFlutterBuilder>().init(any()) } returns mockVirtusizeFlutterBuilder
     every { mockVirtusizeFlutterBuilder.init(any()) } returns mockVirtusizeFlutterBuilder
     every { mockVirtusizeFlutterBuilder.setApiKey(any()) } returns mockVirtusizeFlutterBuilder
     every { mockVirtusizeFlutterBuilder.setUserId(any()) } returns mockVirtusizeFlutterBuilder
@@ -88,6 +93,7 @@ class VirtusizeFlutterSdkTest {
     every { mockVirtusizeFlutterBuilder.setAllowedLanguages(any()) } returns mockVirtusizeFlutterBuilder
     every { mockVirtusizeFlutterBuilder.setDetailsPanelCards(any()) } returns mockVirtusizeFlutterBuilder
     every { mockVirtusizeFlutterBuilder.setShowSNSButtons(any()) } returns mockVirtusizeFlutterBuilder
+    every { mockVirtusizeFlutterBuilder.setPresenter(any()) } returns mockVirtusizeFlutterBuilder
     every { mockVirtusizeFlutterBuilder.build() } returns mockVirtusizeFlutter
 
     every { mockVirtusizeFlutter.load(any()) } just Runs
@@ -95,6 +101,7 @@ class VirtusizeFlutterSdkTest {
     every { mockVirtusizeFlutter.setUserId(any()) } just Runs
     every { mockVirtusizeFlutter.getPrivacyPolicyLink(any()) } returns "https://privacy.virtusize.com"
     every { mockVirtusizeFlutter.registerMessageHandler(any()) } just Runs
+    every { mockVirtusizeFlutter.displayLanguage } returns VirtusizeLanguage.EN
 
     mockResult = TestMethodResult()
     methodChannel = TestMethodChannel()
@@ -105,6 +112,7 @@ class VirtusizeFlutterSdkTest {
   @After
   fun tearDown() {
     Dispatchers.resetMain()
+    unmockkConstructor(VirtusizeFlutterBuilder::class)
     clearAllMocks()
   }
 
