@@ -25,11 +25,16 @@ class VirtusizeInPageStandard extends StatefulWidget {
   final EdgeInsets margin;
   final bool alwaysShowUserProductImage;
 
+  /// When `true`, the widget renders nothing while loading and only appears
+  /// once the product recommendation has successfully loaded.
+  final bool hideLoadingState;
+
   VirtusizeInPageStandard({
     required this.product,
     this.buttonBackgroundColor = VSColors.vsGray900,
     this.margin = const EdgeInsets.symmetric(horizontal: 16),
     this.alwaysShowUserProductImage = true,
+    this.hideLoadingState = false,
   }) : style = VirtusizeStyle.none,
        super(key: ValueKey('standard_${product.externalProductId}'));
 
@@ -38,6 +43,7 @@ class VirtusizeInPageStandard extends StatefulWidget {
     this.style = VirtusizeStyle.black,
     this.margin = const EdgeInsets.symmetric(horizontal: 16),
     this.alwaysShowUserProductImage = true,
+    this.hideLoadingState = false,
   }) : buttonBackgroundColor = VSColors.vsGray900,
        super(key: ValueKey('vs_standard_${product.externalProductId}'));
 
@@ -217,6 +223,10 @@ class _VirtusizeInPageStandardState extends State<VirtusizeInPageStandard> {
 
   @override
   Widget build(BuildContext context) {
+    // Hide the loading state entirely until the recommendation has loaded.
+    if (widget.hideLoadingState && _isLoading && !_hasError) {
+      return SizedBox.shrink();
+    }
     // Hide if product data check timed out
     if (_productDataCheckTimedOut && _productDataCheck == null) {
       return SizedBox.shrink();
