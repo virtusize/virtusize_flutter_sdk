@@ -2,15 +2,15 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:virtusize_flutter_sdk/src/main.dart';
-import 'package:virtusize_flutter_sdk/src/models/recommendation.dart';
 import 'package:virtusize_flutter_sdk/src/models/product_data_check.dart';
+import 'package:virtusize_flutter_sdk/src/models/recommendation.dart';
 import 'package:virtusize_flutter_sdk/src/res/vs_colors.dart';
 import 'package:virtusize_flutter_sdk/src/res/vs_font.dart';
 import 'package:virtusize_flutter_sdk/src/res/vs_images.dart';
 import 'package:virtusize_flutter_sdk/src/res/vs_text.dart';
-import 'package:virtusize_flutter_sdk/virtusize_flutter_sdk.dart';
-import 'package:virtusize_flutter_sdk/src/widgets/cta_button.dart';
 import 'package:virtusize_flutter_sdk/src/widgets/animated_dots.dart';
+import 'package:virtusize_flutter_sdk/src/widgets/cta_button.dart';
+import 'package:virtusize_flutter_sdk/virtusize_flutter_sdk.dart';
 
 class VirtusizeInPageMini extends StatefulWidget {
   final VirtusizeClientProduct product;
@@ -18,11 +18,16 @@ class VirtusizeInPageMini extends StatefulWidget {
   final Color backgroundColor;
   final EdgeInsets margin;
 
+  /// When `true`, the widget renders nothing while loading and only appears
+  /// once the product recommendation has successfully loaded.
+  final bool hideLoadingState;
+
   const VirtusizeInPageMini({
     super.key,
     required this.product,
     this.backgroundColor = VSColors.vsGray900,
     this.margin = const EdgeInsets.symmetric(horizontal: 16),
+    this.hideLoadingState = false,
   }) : style = VirtusizeStyle.none;
 
   const VirtusizeInPageMini.vsStyle({
@@ -30,6 +35,7 @@ class VirtusizeInPageMini extends StatefulWidget {
     required this.product,
     this.style = VirtusizeStyle.black,
     this.margin = const EdgeInsets.symmetric(horizontal: 16),
+    this.hideLoadingState = false,
   }) : backgroundColor = VSColors.vsGray900;
 
   @override
@@ -112,13 +118,18 @@ class _VirtusizeInPageMiniState extends State<VirtusizeInPageMini> {
 
   @override
   Widget build(BuildContext context) {
+    // Hide the loading state entirely until the recommendation has loaded.
+    if (widget.hideLoadingState && _isLoading && !_hasError) {
+      return const SizedBox.shrink();
+    }
     if (_productDataCheck?.isValidProduct == true) {
       return GestureDetector(
         onTap: !_hasError ? _openVirtusizeWebview : () => {},
         child: _buildVSInPageMini(),
       );
     }
-    return Container();
+
+    return const SizedBox.shrink();
   }
 
   Future<void> _openVirtusizeWebview() async {
