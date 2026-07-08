@@ -1,3 +1,6 @@
+## Changes:
+* Update native SDK support to Android 2.12.25 & iOS 2.12.32
+
 ## 2.2.13
 * Added `hideLoadingState` parameter to `VirtusizeInPageStandard` widget to allow hiding the loading state when the product data is being fetched
 
