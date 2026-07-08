@@ -1,4 +1,4 @@
-## Changes:
+## 2.2.14
 * Update native SDK support to Android 2.12.25 & iOS 2.12.32
 
 ## 2.2.13
