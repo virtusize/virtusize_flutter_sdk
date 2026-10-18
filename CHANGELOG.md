@@ -1,3 +1,6 @@
+## 2.2.16
+* Update native SDK support to Android 2.12.29 & iOS 2.12.39
+
 ## 2.2.15
 * Update native SDK support to Android 2.12.28 & iOS 2.12.38
 * Migrate app to latest Flutter SDK requirements
