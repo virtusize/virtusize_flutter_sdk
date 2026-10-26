@@ -1,3 +1,7 @@
+## 2.2.17
+* Fix: Flutter recommended size not found issue resolved
+* Fix: Update Flutter SDK to Swift Package Manager structure
+
 ## 2.2.16
 * Update native SDK support to Android 2.12.29 & iOS 2.12.39
 
