@@ -13,9 +13,9 @@ This SDK helps clients to integrate Virtusize’s size and fit service into thei
   s.license          = { :file => '../LICENSE' }
   s.author           = { 'Virtusize' => 'client.support@virtusize.com' }
   s.source           = { :path => '.' }
-  s.source_files = 'Classes/**/*'
-  s.resources = 'Resources/**/*.json'
-  s.resource_bundle = { 'virtusize_flutter_sdk' => ['Resources/**/*.json'] }
+  s.source_files = 'virtusize_flutter_sdk/Sources/virtusize_flutter_sdk/**/*.swift'
+  s.resources = 'virtusize_flutter_sdk/Sources/virtusize_flutter_sdk/Resources/**/*.json'
+  s.resource_bundle = { 'virtusize_flutter_sdk' => ['virtusize_flutter_sdk/Sources/virtusize_flutter_sdk/Resources/**/*.json'] }
   s.dependency 'Flutter'
   s.dependency 'Virtusize', '~> 2.12.40'
   s.static_framework = true
