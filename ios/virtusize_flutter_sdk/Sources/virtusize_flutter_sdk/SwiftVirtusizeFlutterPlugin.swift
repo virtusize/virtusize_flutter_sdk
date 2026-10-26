@@ -38,6 +38,10 @@ public class SwiftVirtusizeFlutterPlugin: NSObject, FlutterPlugin {
                     result(FlutterError.noArguments)
                     return
                 }
+                if arguments[VirtusizeFlutterKey.debugLogging] as? Bool == true {
+                    enableVirtusizeDebugLogging()
+                }
+
                 if let apiKey = arguments[VirtusizeFlutterKey.apiKey] as? String {
                     VirtusizeFlutter.APIKey = apiKey
                 } else {
@@ -240,6 +244,26 @@ extension SwiftVirtusizeFlutterPlugin: VirtusizeFlutterProductEventHandler {
             self.flutterChannel?.invokeMethod(
                 VirtusizeFlutterMethod.onProductError,
                 arguments: externalId
+            )
+        }
+    }
+
+    /// Turns on Virtusize logs for debug runs and forwards them to Flutter.
+    /// Swift `print` stays in Xcode and does not show up in the Flutter debug console.
+    private func enableVirtusizeDebugLogging() {
+        VirtusizeLogger.logLevel = .debug
+        VirtusizeLogger.logHandler = { [weak self] level, message in
+            self?.forwardVirtusizeLog("[\(level.description)] \(message)")
+        }
+        forwardVirtusizeLog("[Debug] iOS logging enabled")
+    }
+
+    private func forwardVirtusizeLog(_ message: String) {
+        NSLog("[Virtusize] %@", message)
+        DispatchQueue.main.async { [weak self] in
+            self?.flutterChannel?.invokeMethod(
+                VirtusizeFlutterMethod.onVirtusizeLog,
+                arguments: message
             )
         }
     }

@@ -15,6 +15,7 @@ struct VirtusizeFlutterMethod {
 	static let onRecChange = "onRecChange"
     static let onLanguageClick = "onLanguageClick"
 	static let onProductError = "onProductError"
+	static let onVirtusizeLog = "onVirtusizeLog"
 }
 
 struct VirtusizeFlutterKey {
@@ -42,6 +43,7 @@ struct VirtusizeFlutterKey {
 	static let isValidProduct = "isValidProduct"
 	static let showPrivacyPolicy = "showPrivacyPolicy"
     static let storeName = "storeName"
+	static let debugLogging = "debugLogging"
 }
 
 struct VirtusizeEventKey {

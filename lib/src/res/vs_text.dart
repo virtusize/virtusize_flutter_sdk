@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:virtusize_flutter_sdk/src/utils/virtusize_constants.dart';
 
@@ -26,9 +24,8 @@ class VSText {
         (lang) => lang.langCode == localeName,
       );
     } catch (e) {
-      log(
+      virtusizeLog(
         'Could not get the language by the locale name $localeName, $e',
-        name: virtusizeLogLabel,
       );
     }
     return VSText._(localization, VSFont(language));

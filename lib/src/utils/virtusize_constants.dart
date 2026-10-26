@@ -1,4 +1,11 @@
+import 'package:flutter/foundation.dart';
+
 const virtusizeLogLabel = 'VirtusizeFlutter';
+
+/// Writes a Virtusize message to the debug console.
+void virtusizeLog(String message) {
+  debugPrint('[$virtusizeLogLabel] $message');
+}
 
 class FlutterVirtusizeMethod {
   // Flutter to Native
@@ -17,6 +24,7 @@ class FlutterVirtusizeMethod {
   static const String onRecChange = "onRecChange";
   static const String onProductError = "onProductError";
   static const String onLanguageClick = "onLanguageClick";
+  static const String onVirtusizeLog = "onVirtusizeLog";
 }
 
 class FlutterVirtusizeKey {
@@ -44,4 +52,5 @@ class FlutterVirtusizeKey {
   static const String isValidProduct = "isValidProduct";
   static const String showPrivacyPolicy = "showPrivacyPolicy";
   static const String storeName = "storeName";
+  static const String debugLogging = "debugLogging";
 }

@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:developer';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:virtusize_flutter_sdk/src/models/virtusize_client_product.dart';
@@ -44,6 +44,10 @@ class VirtusizeSDK {
 
   /// Returns the method call handler that receives data from Native
   Future<dynamic> _methodCallHandler(MethodCall call) {
+    if (kDebugMode && call.method != FlutterVirtusizeMethod.onVirtusizeLog) {
+      virtusizeLog('${call.method}: ${call.arguments}');
+    }
+
     // A map to match each method call from Native with its corresponding exectuion
     Map<String, Function> methodCallExecutionMap = {
       FlutterVirtusizeMethod.onRecChange:
@@ -64,13 +68,25 @@ class VirtusizeSDK {
         final isValidProduct =
             call.arguments[FlutterVirtusizeKey.isValidProduct];
         final storeName = call.arguments[FlutterVirtusizeKey.storeName];
-        IVirtusizeSDK.instance._pdcController.add(
-          ProductDataCheck(externalId, isValidProduct, storeName),
+        final productDataCheck = ProductDataCheck(
+          externalId,
+          isValidProduct,
+          storeName,
+        );
+        IVirtusizeSDK.instance._pdcController.add(productDataCheck);
+        _virtusizeMessageListener.productDataCheckSuccess?.call(
+          productDataCheck,
         );
       },
       FlutterVirtusizeMethod.onProductError: (call) {
         final externalProductId = call.arguments;
         IVirtusizeSDK.instance._productErrorController.add(externalProductId);
+        _virtusizeMessageListener.productDataCheckError?.call(
+          Exception('Product data check failed for $externalProductId'),
+        );
+      },
+      FlutterVirtusizeMethod.onVirtusizeLog: (call) {
+        virtusizeLog('${call.arguments}');
       },
       FlutterVirtusizeMethod.onVSEvent:
           (call) => {_virtusizeMessageListener.vsEvent?.call(call.arguments)},
@@ -149,6 +165,7 @@ class VirtusizeSDK {
             FlutterVirtusizeKey.branch: branch,
             FlutterVirtusizeKey.showPrivacyPolicy: showShowPrivacyPolicy,
             FlutterVirtusizeKey.serviceEnvironment: serviceEnvironment,
+            FlutterVirtusizeKey.debugLogging: kDebugMode,
           });
 
       IVirtusizeSDK.instance._showPrivacyPolicy = showShowPrivacyPolicy;
@@ -158,10 +175,7 @@ class VirtusizeSDK {
         language,
       );
     } on PlatformException catch (error) {
-      log(
-        'Failed to set the Virtusize parameters: $error',
-        name: virtusizeLogLabel,
-      );
+      virtusizeLog('Failed to set the Virtusize parameters: $error');
     }
   }
 
@@ -171,9 +185,8 @@ class VirtusizeSDK {
       IVirtusizeSDK.instance._vsTextController.add(vsText);
       IVirtusizeSDK.instance.vsText = vsText;
     } catch (e) {
-      log(
+      virtusizeLog(
         'Failed to load the i18n localization data and the custom font information',
-        name: virtusizeLogLabel,
       );
     }
   }
@@ -192,10 +205,7 @@ class VirtusizeSDK {
   /// A function for clients to set the user ID
   Future<void> setUserId(String userId) async {
     if (userId.isEmpty) {
-      log(
-        'Failed to set the external user ID: userId is empty',
-        name: virtusizeLogLabel,
-      );
+      virtusizeLog('Failed to set the external user ID: userId is empty');
       return;
     }
     try {
@@ -204,10 +214,7 @@ class VirtusizeSDK {
         userId,
       );
     } on PlatformException catch (error) {
-      log(
-        'Failed to set the external user ID: $error',
-        name: virtusizeLogLabel,
-      );
+      virtusizeLog('Failed to set the external user ID: $error');
     }
   }
 
@@ -219,10 +226,7 @@ class VirtusizeSDK {
         product.externalProductId,
       );
     } on PlatformException catch (error) {
-      log(
-        'Failed to open the VirtusizeWebView: $error',
-        name: virtusizeLogLabel,
-      );
+      virtusizeLog('Failed to open the VirtusizeWebView: $error');
     }
   }
 
@@ -248,7 +252,7 @@ class VirtusizeSDK {
           .invokeMethod(FlutterVirtusizeMethod.sendOrder, order.toJson());
       onSuccess?.call(sentOrder);
     } on PlatformException catch (error) {
-      log('Failed to send an order: $error', name: virtusizeLogLabel);
+      virtusizeLog('Failed to send an order: $error');
       onError?.call(error);
     }
   }
@@ -299,10 +303,7 @@ class IVirtusizeSDK {
         FlutterVirtusizeMethod.getPrivacyPolicyLink,
       );
     } on PlatformException catch (error) {
-      log(
-        'Failed to get the privacy policy link: $error',
-        name: virtusizeLogLabel,
-      );
+      virtusizeLog('Failed to get the privacy policy link: $error');
       return null;
     }
   }
